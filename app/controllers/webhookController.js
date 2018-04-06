@@ -374,7 +374,7 @@ const fbEvaluate = (id, replyobject, siteid) => {
         messagecontentobject: {
             elements: [
                 {
-                    title: questionTitle,
+                    title: "Phiếu đánh giá dịch vụ",
                     buttons: [
                         {
                             type: "postback",
@@ -624,7 +624,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 return;
             }
             else if (button_payload_state === "NORMAL" || button_payload_state === "BAD" || button_payload_state === "GOOD") {
-                SentToClient(sender, "Cảm ơn bạn đã đánh giá. Rất vui được giúp đỡ bạn.", questionTitle, button_payload_state, "", replyobject, siteid)
+                SentToClient(sender, "Cảm ơn bạn đã đánh giá. Rất vui được phục vụ bạn.", questionTitle, button_payload_state, "", replyobject, siteid)
                     .catch(console.error);
                 return;
             }
@@ -700,8 +700,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent === "goodbye") {
                 sessions[sessionId].prev_intent = "goodbye";
                 questionTitle = "Cảm ơn!";
-                resultanswer = "Cảm ơn bạn. Chúc bạn một ngày vui vẻ nha! \n";
-                resultanswer += "Bạn có thể đánh giá giúp mình được không? Cảm ơn bạn nhiều nha \n";
+                resultanswer = "Cảm ơn bạn. Vui lòng dành ít thời gian để đánh giá dịch vụ của chúng tôi. Chúc bạn một ngày vui vẻ.\n";
 
                 fbEvaluate(sender, replyobject, siteid);
 
@@ -1455,7 +1454,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     for (var i = 0; i < result.length; i++) {//lấy tối đa 6
                                                                         if (i > 5) break;
                                                                         var resultEach = result[i]._source;
-                                                                        if (i == result.length - 1) {
+                                                                        if (i == result.length - 1 || i==5) {
 
 
                                                                             jsonmessageDistrict += '{' +
@@ -1624,12 +1623,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].prev_intent = "ask_promotion";
             }
             else if (intent === "offense") {
-                if (json.text.toLowerCase().includes("chào")) {
-                    resultanswer += "Hi bạn. Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p";
-                }
-                else {
-                    resultanswer += "Wow! À thật ra là mình không hiểu ý của bạn lắm. Bạn có thể nói lại rõ hơn được không. :p ";
-                }
+               
+               
+                    resultanswer += "Wow! À thật ra là mình không hiểu ý của bạn lắm. Bạn có thể nói lại rõ hơn được không. ";
+                
                 //var resultanswer2 = "Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
 
                 intent = "offense";
@@ -1639,16 +1636,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 questionTitle = "Thông tin trả góp!";
                 if (entities.length == 0) {
 
-                    resultanswer = "Về thủ tục trả góp, cách thức trả góp, bạn vui lòng liên hệ SĐT 1800.1060 (miễn phí cuộc gọi) để được trả lời cụ thể nha. ";
+                    resultanswer = "Về thủ tục trả góp, cách thức trả góp, bạn vui lòng liên hệ SĐT 1800.1060 (miễn phí cuộc gọi) để được trả lời cụ thể.\n\
+                    Hoặc xem tại https://www.thegioididong.com/tra-gop ";
                 }
                 else {
                     resultanswer = "Thông tin trả góp" + "\n";
-                    resultanswer += "Đang tra cứu. Vui lòng chờ....";
-
+                    
                     resultanswer += "\nChức năng thông tin trả góp đang phát triển. Xin lỗi vì sự bất tiện này!"
+                    resultanswer+="\nBạn có thể xem thông tin trả góp tại đây: https://www.thegioididong.com/tra-gop"
 
                 }
-                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                resultanswer += "\nBạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
                 intent = "ask_instalment";
                 sessions[sessionId].prev_intent = "ask_instalment";
             }
@@ -1668,7 +1666,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             else if (intent === "ask_name") {
                 questionTitle = "Hỏi tên";
-                resultanswer = "Tên mình là Fiona Bot. Mình được tạo ra bởi tập đoàn Thế giới di động (MWG). Bạn có gì cần trợ giúp ạ?" + "\n";
+                resultanswer = "Mình là Bot Agent. Mình được tạo ra bởi tập đoàn Thế giới di động (MWG). Bạn có gì cần trợ giúp ạ?" + "\n";
 
                 intent = "ask_name";
                 sessions[sessionId].prev_intent = "ask_name";
@@ -1713,7 +1711,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 resultanswer = "Cảm ơn bạn.Chúng tôi sẽ liên hệ bạn sớm nhất có thể. Bạn có thể hỏi thông tin sản phẩm khác ạ.";
             }
             else {
-                resultanswer = "Mình là Fiona Bot. Mình chưa rõ câu hỏi của bạn lắm. Bạn vui lòng cung cấp rõ thông tin cần hỏi như: tên sản phẩm, giá cả, địa chỉ...Cảm ơn bạn";
+                resultanswer = "Mình chưa rõ câu hỏi của bạn lắm. Bạn vui lòng cung cấp rõ thông tin cần hỏi như: tên sản phẩm, giá cả, địa chỉ...Cảm ơn bạn";
 
             }
 
