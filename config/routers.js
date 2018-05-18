@@ -12,19 +12,11 @@ module.exports=function(app)
 {
 	
 
-	var homeRouter=Router()
-		.get('/',controllers.home.index);
-
-
 	var webhookRouter=Router()
 		.get('/',controllers.webhook.index)
 		.post('/',controllers.webhook.postmessage);
 
 
-	
-
-	app.use('/',homeRouter);
-	
 	app.use('/webhook',webhookRouter);
 	
 }

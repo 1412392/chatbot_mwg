@@ -1,8 +1,6 @@
 var express=require('express');
 var bodyParser=require('body-parser');
 var fileUpload = require('express-fileupload');
-var passport=require('passport');
-var flash=require("connect-flash");
 
 var cookieParser=require('cookie-parser');
 var session=require('express-session');
@@ -26,8 +24,5 @@ module.exports=function(app)
 	  resave: true,
 	  saveUninitialized: true
 	}));
-	app.use(passport.initialize());
-	app.use(passport.session());
-	app.use(flash());
-
+	
 }
