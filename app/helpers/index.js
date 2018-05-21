@@ -1,48 +1,88 @@
 
-module.exports={
-	setSelected:function(valueSelected)//message là tham số helpers gọi, ở đây là detailMessage
-			{
-				
 
-				if(valueSelected==undefined)
-				{
-					return "";
-				}
-				if(valueSelected.message2.toLowerCase()=="còn hàng")
-				{
-					return '<option value="CH" selected>Còn Hàng</option> <option value="SCH">Sắp Có Hàng</option> <option value="NKD">Ngừng Kinh Doanh</option>';
-				}
-				if(valueSelected.message2.toLowerCase()=="sắp có hàng")
-				{
-					return '<option value="CH">Còn Hàng</option> <option value="SCH" selected>Sắp Có Hàng</option> <option value="NKD">Ngừng Kinh Doanh</option>';
-				}
-				if(valueSelected.message2.toLowerCase()=="ngừng kinh doanh")
-				{
-					return '<option value="CH">Còn Hàng</option> <option value="SCH" >Sắp Có Hàng</option> <option  value="NKD" selected>Ngừng Kinh Doanh</option>';
-				}
+const PATH = "/home/tgdd/chat_history/";
+var fs = require('fs');
 
-				return "";
-			},
+var encoding = require("encoding");
 
-	setSelectedcategory:function(valueSelected)
-	{
-				if(valueSelected==undefined)
-				{
-					return "";
-				}
-				if(valueSelected.message.toLowerCase()=="laptop")
-				{
-					return '<option value="Mo">Mobile</option> <option value="Ka">Karaoke</option> <option value="La" selected>Laptop</option>';
-				}
-				if(valueSelected.message.toLowerCase()=="mobile")
-				{
-					return '<option value="Mo" selected>Mobile</option> <option value="Ka">Karaoke</option> <option value="La" >Laptop</option>';
-				}
-				if(valueSelected.message.toLowerCase()=="karaoke")
-				{
-					return '<option value="Mo" >Mobile</option> <option value="Ka" selected>Karaoke</option> <option value="La" >Laptop</option>';
-				}
 
-				return "";
-	}
+function writeFile(path, content) {
+    var status = false;
+    return new Promise(function (resolve, reject) {
+        fs.appendFile(path, content, function (err) {
+
+            if (err) {
+
+                reject(err);
+            }
+            else {
+                status = true;
+                resolve(status);
+            }
+        });
+    });
+
+};
+
+const checkFileExist = (newfile, dirname) => {
+    var status = false;
+    return new Promise(function (resolve, reject) {
+        fs.readdir(dirname, function (err, filenames) {
+            if (err) {
+
+                console.log(err);
+                reject(err);
+            }
+            for (var i = 0; i < filenames.length; i++) {
+                if (filenames[i] === newfile) {
+                    status = true;
+                    resolve(status)
+                }
+
+            }
+
+            resolve(status)
+
+        });
+    });
+}
+module.exports = {
+    logChatHistory: function (sessionID, message, who) {
+        console.log("session  " + sessionID);
+        var filename = PATH + sessionID + ".txt";
+
+
+
+        //check file exist
+        checkFileExist(sessionID + ".txt", PATH).then(function (result) {
+            if (!result) {//file chưa tồn tại
+                writeFile(filename, message.fullname + "\n");
+
+            }
+
+            setTimeout(function () {
+                if (who === 1) {
+                    if (!message.postbackobject.title) {
+                        writeFile(filename, "CUSTOMER-" + message.messageobject.content + "\n");
+                    }
+                    else {//postback
+                        writeFile(filename, "CUSTOMER-" + message.postbackobject.title + "\n");
+                    }
+                }
+                else {
+                    if (message.length < 2) return; //rác
+                    writeFile(filename, "BOT-" + message + "\n");
+                }
+
+            }, 1000);
+
+        });
+
+
+        var status = true;
+
+
+
+        return status;
+    }
 };

@@ -1,5 +1,6 @@
 ﻿//import { read } from 'fs';
 
+var tracechat = require('../helpers/index');
 var fetch = require('node-fetch');
 var request = require("request")
 
@@ -41,6 +42,7 @@ const findOrCreateSession = (fbid) => {
     let sessionId;
     // Let's see if we already have a session for the user fbid
     Object.keys(sessions).forEach(k => {
+
         if (sessions[k].fbid === fbid) {
             // Yep, got it!
             sessionId = k;
@@ -59,8 +61,27 @@ const findOrCreateSession = (fbid) => {
 
 
 const SentToClientButton = (id, text) => {
+    //console.log("============SentToClientButton===============");
+    var jsonparse = JSON.parse(text);
+    var btnlist = jsonparse.messagecontentobject.elements[0].buttons;
+    var titlelogs = jsonparse.messagecontentobject.elements[0].title;
+    //phân rã button thành html, lưu file logs
+    var contentlogs = "";
+    contentlogs += "<p>" + titlelogs + "</p>";
+    for (var i = 0; i < btnlist.length; i++) {
+        if (btnlist[i].type === "web_url") {
+            contentlogs += "<a " + "href=" + "'" + btnlist[i].url + "'" + ">" + btnlist[i].title + "</a>" + "<br />"
+        }
+        else if (btnlist[i].type === "postback") {
+            contentlogs += "<button " + "type=button " + "value=" + "'" + btnlist[i].title + "'" + ">" + btnlist[i].title + "</button>" + "<br />"
+        }
+    }
+    // console.log(contentlogs);
+    // console.log("============SentToClientButton===============");
 
-    console.log(text);
+    tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
+
+    //console.log(text);
     return fetch(severResponse, {
         method: 'POST',
         headers: {
@@ -85,9 +106,11 @@ const SentToClientButton = (id, text) => {
 const SentToClient = (id, text, questionTitle, state, intent, replyobject, siteid) => {
     //console.log('send=' + text);
 
-    console.log("=============SEND TO CUSTOMER===================");
-    console.log(text);
-    console.log("===============================================");
+    // console.log("=============SEND TO CUSTOMER===================");
+    // console.log(text);
+
+
+    // console.log("===============================================");
 
     var body = "";
 
@@ -125,8 +148,11 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
 
                 }
             });
+            var contentlogs = "<p>" + text + "</p>";
+            contentlogs += "<button " + "type=button>" + "Xem tồn kho sản phẩm" + "</button>" + "<br />";
+            contentlogs += "<button " + "type=button>" + "Xem giá sản phẩm" + "</button>" + "<br />";
 
-
+            tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
 
         }
         else if (intent == "option_whenoutcolorstock") {
@@ -161,6 +187,13 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
 
                 }
             });
+            var contentlogs = "<p>" + text + "</p>";
+            contentlogs += "<button " + "type=button>" + "Hỏi sản phẩm khác" + "</button>" + "<br />";
+            contentlogs += "<button " + "type=button>" + "Chọn lại màu" + "</button>" + "<br />";
+            contentlogs += "<button " + "type=button>" + "Chọn lại quận/huyện" + "</button>" + "<br />";
+
+            tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
+
         }
         else {
             body = JSON.stringify({
@@ -170,6 +203,9 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
                 messagetype: "text",
                 messagecontentobject: text
             });
+
+            tracechat.logChatHistory(id, text, 2);//1 là câu hỏi, 2 là câu trả lời
+
         }
 
     }
@@ -181,6 +217,8 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
             messagetype: "text",
             messagecontentobject: text
         });
+        tracechat.logChatHistory(id, text, 2);//1 là câu hỏi, 2 là câu trả lời
+
     }
 
     //console.log("================================");
@@ -282,7 +320,7 @@ function SendToUserListColor(productID, productName, sender, siteid, replyobject
             var bodystring = JSON.parse(jsoncolortemplate);
             var bodyjson = JSON.stringify(bodystring);
 
-           // console.log(bodyjson);
+            // console.log(bodyjson);
             //xóa màu cũ đi
             sessions[sessionId].color = null;
             sessions[sessionId].colorname = null;
@@ -399,6 +437,16 @@ const fbEvaluate = (id, replyobject, siteid) => {
         }
     });
 
+    //===============trace log
+    var contentlogs = "<p>" + "Phiếu đánh giá dịch vụ" + "</p>";
+    contentlogs += "<button " + "type=button>" + "Tốt" + "</button>" + "<br />";
+    contentlogs += "<button " + "type=button>" + "Trung bình" + "</button>" + "<br />";
+    contentlogs += "<button " + "type=button>" + "Tệ" + "</button>" + "<br />";
+
+    tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
+
+
+    //
     return fetch(severResponse, {
         method: 'POST',
         headers: {
@@ -996,10 +1044,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         };
 
 
-                                       // console.log(result);
+                                        // console.log(result);
                                         resultanswer = "Sản phẩm: " + result.GetProductResult.productNameField + "<br />"
                                             + (result.GetProductResult.productErpPriceBOField.priceField == "0" || result.GetProductResult.productErpPriceBOField.priceField == "-1" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
-                                      //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
+                                        //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
 
                                         APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
 
@@ -1129,7 +1177,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     jsonmessageStore +=
                                                                         ']' +
                                                                         '}' + ']' + '}' + '}';
-                                                                   // console.log(jsonmessageStore);
+                                                                    // console.log(jsonmessageStore);
 
                                                                     var bodystring = JSON.parse(jsonmessageStore);
                                                                     var bodyjson = JSON.stringify(bodystring);
@@ -1682,7 +1730,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                 }
 
-                                               // console.log("Sản phẩm hỏi: " + productName);
+                                                // console.log("Sản phẩm hỏi: " + productName);
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                     .catch(console.error);
                                             }
@@ -2003,7 +2051,7 @@ var webhookController = {
         const sessionId = findOrCreateSession(sender);
 
         //trace chat history
-
+        tracechat.logChatHistory(sender, data, 1);//1 là câu hỏi, 2 là câu trả lời
 
         //
 
