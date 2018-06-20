@@ -56,22 +56,22 @@ module.exports = {
         //check file exist
         checkFileExist(sessionID + ".txt", PATH).then(function (result) {
             if (!result) {//file chưa tồn tại
-                writeFile(filename, message.fullname + "\n");
+                writeFile(filename, message.fullname + "<br />" + "\n");
 
             }
 
             setTimeout(function () {
                 if (who === 1) {
                     if (!message.postbackobject.title) {
-                        writeFile(filename, "CUSTOMER-" + message.messageobject.content + "\n");
+                        writeFile(filename, "CUSTOMER-" + message.messageobject.content.replace(/\n/g, '') + "<br />" + "\n");
                     }
                     else {//postback
-                        writeFile(filename, "CUSTOMER-" + message.postbackobject.title + "\n");
+                        writeFile(filename, "CUSTOMER-" + message.postbackobject.title + "<br />" + "\n");
                     }
                 }
                 else {
                     if (message.length < 2) return; //rác
-                    writeFile(filename, "BOT-" + message + "\n");
+                    writeFile(filename, "BOT-" + message + "<br />" + "\n");
                 }
 
             }, 1000);

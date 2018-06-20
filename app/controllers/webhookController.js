@@ -141,6 +141,16 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
                                     type: "postback",
                                     title: "Xem giá sản phẩm",
                                     payload: "2"
+                                },
+                                {
+                                    type: "postback",
+                                    title: "Xem khuyễn mãi sản phẩm",
+                                    payload: "3"
+                                },
+                                {
+                                    type: "postback",
+                                    title: "Thông tin trả góp",
+                                    payload: "4"
                                 }
                             ]
                         }
@@ -151,6 +161,8 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
             var contentlogs = "<p>" + text + "</p>";
             contentlogs += "<button " + "type=button>" + "Xem tồn kho sản phẩm" + "</button>" + "<br />";
             contentlogs += "<button " + "type=button>" + "Xem giá sản phẩm" + "</button>" + "<br />";
+            contentlogs += "<button " + "type=button>" + "Xem khuyễn mãi sản phẩm" + "</button>" + "<br />";
+            contentlogs += "<button " + "type=button>" + "Thông tin trả góp" + "</button>" + "<br />";
 
             tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
 
@@ -174,12 +186,12 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
                                 {
                                     type: "postback",
                                     title: "Chọn lại màu",
-                                    payload: "3"
+                                    payload: "6"
                                 },
                                 {
                                     type: "postback",
                                     title: "Chọn lại quận/huyện",
-                                    payload: "4"
+                                    payload: "7"
                                 }
                             ]
                         }
@@ -649,16 +661,18 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             // sessions[sessionId].province=null;
             // sessions[sessionId].district=null;
 
-            if (button_payload_state != 1 && button_payload_state != 2 && button_payload_state != 3 && button_payload_state != 4 &&
+            if (button_payload_state.toString().trim().length >= 2 &&
                 button_payload_state.toString().length < 10 && hasNumber(button_payload_state))//là districtID
             {
                 sessions[sessionId].district = button_payload_state;
             }
             else if (button_payload_state.length >= 10)//la productCode color
             {
+                sessions[sessionId].isPreAskColor = true;
                 sessions[sessionId].color = button_payload_state;
             }
-            else if (button_payload_state == 3)//gợi ý lại danh sách màu (trường hợp này đã có product)
+          
+            else if (button_payload_state === 6)//gợi ý lại danh sách màu (trường hợp này đã có product)
             {
                 questionTitle = "Vui lòng chọn màu sắc bạn quan tâm";
 
@@ -667,7 +681,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 return;
             }
-            else if (button_payload_state == 4)//gợi ý lại danh sách quận huyện (đã có product, province)
+            else if (button_payload_state === 7)//gợi ý lại danh sách quận huyện (đã có product, province)
             {
                 questionTitle = "Chọn quận/huyện nơi bạn ở";
                 SendToUserListDistrict(sessions[sessionId].provinveID, sender, siteid, replyobject, questionTitle);
@@ -694,6 +708,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 sessions[sessionId].currentvalue = entities[i].value;
                 if (entities[i].entity === "product") {
+                    if (entities[i].value.includes("cường lực")) {
+                        entities[i].value = entities[i].value.replace("cường lực", "màn hình");
+                    }
                     sessions[sessionId].product = entities[i].value;
                 }
                 if (entities[i].entity === "color") {
@@ -752,7 +769,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].prev_intent = "greet";
                     questionTitle = "Xin chào!";
 
-                    resultanswer = " Mình có thể giúp gì cho bạn?Vui lòng sử dụng tiếng việt có dấu nha bạn.";
+                    resultanswer = " Mình là trợ lý ảo của TGDD. Hiện tại mình chỉ hỗ trợ TỰ ĐỘNG các vấn đề bên dưới. Nếu bạn có các thắc mắc khác, vui lòng liên hệ với nhân viên chúng tôi.Tất cả thông tin chỉ mang tính chất THAM KHẢO";
                 }
 
             }
@@ -773,8 +790,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 fbEvaluate(sender, replyobject, siteid);
             }
-            else if (intent === "ask_promotion" /*|| sessions[sessionId].prev_intent == "ask_promotion"*/) {
-                sessions[sessionId].prev_intent = "ask_promotion";
+            else if (intent === "ask_promotion" || sessions[sessionId].prev_intent == "ask_promotion") {
+                //sessions[sessionId].prev_intent = "ask_promotion";
                 if (sessions[sessionId].product) {
                     var productName = sessions[sessionId].product;
                     console.log(productName);
@@ -797,6 +814,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("đồng hồ") ||
                         keyword.toLowerCase().includes("dong ho") ||
                         keyword.toLowerCase().includes("gậy") ||
+                        keyword.toLowerCase().includes("dán màn hình") ||
+                        keyword.toLowerCase().includes("cường lực") ||
+                        keyword.toLowerCase().includes("tai phone") ||
                         keyword.toLowerCase().includes("gay tu suong"))//search phụ kiện
                     {
                         argsSearchProduct = {
@@ -922,7 +942,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
 
                 intent = "ask_promotion";
-                sessions[sessionId].prev_intent = "ask_promotion";
+                //sessions[sessionId].prev_intent = "ask_promotion";
             }
             else if (intent === "ask_stock" || intent === "ask_price" || intent === "ask_old_stock") {
                 if (intent === "ask_stock")
@@ -987,7 +1007,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("đồng hồ") ||
                         keyword.toLowerCase().includes("dong ho") ||
                         keyword.toLowerCase().includes("gậy") ||
-                        keyword.toLowerCase().includes("gay tu suong"))//search phụ kiện
+                        keyword.toLowerCase().includes("gay tu suong") ||
+                        keyword.toLowerCase().includes("dán màn hình") ||
+                        keyword.toLowerCase().includes("tai phone") ||
+                        keyword.toLowerCase().includes("cường lực"))//search phụ kiện
                     {
                         argsSearchProduct = {
                             q: keyword,
@@ -1429,7 +1452,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         //if (color) {
                                                                         setTimeout(function () { resultanswer += "Vui lòng chọn màu sắc bạn quan tâm để xem danh sách cửa hàng còn hàng!" }, 1000);
 
-                                                                        SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle);
+
+                                                                        if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
+                                                                            resultanswer = "";
+                                                                            SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
+                                                                                .catch(console.error);
+                                                                        }
+                                                                        else {
+                                                                            SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle);
+
+                                                                        }
+
 
 
                                                                         //}//end if color
@@ -1824,7 +1857,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }//end if (sessions[sessionId].product)
 
                 else {
-                    resultanswer = "Vui lòng cung cấp tên sản phẩm!";
+                    resultanswer = "Mình chưa rõ câu hỏi lắm. Vui lòng cung cấp rõ tên sản phẩm!";
                 }
 
             }
@@ -1912,9 +1945,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 intent = "ask_compare";
                 sessions[sessionId].prev_intent = "ask_compare";
             }
+            else if (intent == "ask_helper") {
+
+                resultanswer = "Danh sách tổng đài hỗ trợ của TGDD: <br />";
+                resultanswer += "<ul><li> Gọi mua hàng 1800.1060 (7: 30 - 22: 00)</li> <li> Gọi khiếu nại 1800.1062 (8: 00 - 21: 30)</li> <li> Gọi bảo hành 1800.1064 (8: 00 - 21: 00)</li> <li>Hỗ trợ kỹ thuật 1800.1763 (7: 30 - 22: 00) </li> </ul>";
+
+
+            }
             else if (intent == "ans_tel") {
                 resultanswer = "Cảm ơn bạn.Chúng tôi sẽ liên hệ bạn sớm nhất có thể. Bạn cần tư vấn hỗ trợ gì nữa không ạ?";
             }
+
             else {
                 if (intent === "greet") {
                 }
@@ -1947,10 +1988,17 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
         questionTitle = "Hỏi giá sản phẩm"
         resultanswer = "Bạn muốn hỏi giá sản phẩm nào ạ?"
     }
-    //else if (button_payload_state == "3") {
-    //    questionTitle = "Hỏi trả góp sản phẩm"
-    //    resultanswer = "Bạn muốn hỏi trả góp cho sản phẩm nào ạ?"
-    //}
+    else if (button_payload_state == "3") {
+        questionTitle = "Hỏi khuyễn mãi sản phẩm"
+        resultanswer = "Bạn muốn xem khuyễn mãi của sản phẩm nào ạ?"
+
+        sessions[sessionId].prev_intent = "ask_promotion";
+    }
+    else if (button_payload_state == "4") {
+        questionTitle = "Thông tin trả góp"
+        resultanswer = "Xin lỗi. Chức năng THÔNG TIN TRẢ GÓP đang được phát triển. Vui lòng chọn dịch vụ khác. Xin lỗi vì sự bất tiện này. "
+    }
+
 
     SentToClient(sender, resultanswer, questionTitle, parseInt(button_payload_state), "", replyobject, siteid)
         .catch(console.error);
@@ -1959,15 +2007,15 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
 };
 
 
-const responsepostbackdistric = (sender, sessionId, districID, replyobject, siteid) => {
+const responsepostbackothers = (sender, sessionId, othersID, replyobject, siteid) => {
 
     var sever = severRasaQuery;
     var url = encodeURI(sever);
 
-    var button_payload_state = districID;
+    var button_payload_state = othersID;
 
 
-    getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
+    getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
 
 
 };
@@ -2049,6 +2097,7 @@ var webhookController = {
         const fullname = data.fullname;
         const gender = data.gender;
         const sessionId = findOrCreateSession(sender);
+        sessions[sessionId].isPreAskColor = false;
 
         //trace chat history
         tracechat.logChatHistory(sender, data, 1);//1 là câu hỏi, 2 là câu trả lời
@@ -2079,7 +2128,7 @@ var webhookController = {
                 var sever = severRasaQuery + messagecontent;
                 var url = encodeURI(sever);
 
-                var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi trả góp
+                var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
 
                 getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
@@ -2105,7 +2154,7 @@ var webhookController = {
 
             }
 
-            if (button_payload_state === "1" || button_payload_state === "2")//greet
+            if (button_payload_state === "1" || button_payload_state === "2" || button_payload_state === "3" || button_payload_state === "4")//greet
             {
 
                 responsepostbackgreet(sender, sessionId, button_payload_state, replyobject, siteid);
@@ -2129,9 +2178,9 @@ var webhookController = {
                 else {
 
 
-                    var districID = parseInt(button_payload_state);
+                    var others = parseInt(button_payload_state);
 
-                    responsepostbackdistric(sender, sessionId, districID, replyobject, siteid);
+                    responsepostbackothers(sender, sessionId, others, replyobject, siteid);
 
                 }
             }
