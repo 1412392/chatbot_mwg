@@ -769,7 +769,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].prev_intent = "greet";
                     questionTitle = "Xin chào!";
 
-                    resultanswer = " Mình là trợ lý ảo của TGDD. Hiện tại mình chỉ hỗ trợ TỰ ĐỘNG các vấn đề bên dưới. Nếu bạn có các thắc mắc khác, vui lòng liên hệ với nhân viên chúng tôi.Tất cả thông tin chỉ mang tính chất THAM KHẢO. Vui lòng sử dụng tiếng việt có dấu";
+                    resultanswer = " Chào mừng bạn đến trang mua sắm của Thế Giới Di Động. Mình xin giải đáp tất cả các thắc mắc của bạn. Vui lòng chọn các vấn đề bên dưới và sử dụng tiếng việt có dấu để giao tiếp ạ. Hiện tại đang trong quá trình nâng cấp, nếu có vấn đề gì sai sót xin vui lòng bỏ qua. ";
                 }
 
             }
