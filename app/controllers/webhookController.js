@@ -147,11 +147,11 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
                                     title: "Xem khuyễn mãi sản phẩm",
                                     payload: "3"
                                 },
-                                {
-                                    type: "postback",
-                                    title: "Thông tin trả góp",
-                                    payload: "4"
-                                }
+                                // {
+                                //     type: "postback",
+                                //     title: "Thông tin trả góp",
+                                //     payload: "4"
+                                // }
                             ]
                         }
                     ]
@@ -671,7 +671,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isPreAskColor = true;
                 sessions[sessionId].color = button_payload_state;
             }
-          
+
             else if (button_payload_state === 6)//gợi ý lại danh sách màu (trường hợp này đã có product)
             {
                 questionTitle = "Vui lòng chọn màu sắc bạn quan tâm";
@@ -769,7 +769,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].prev_intent = "greet";
                     questionTitle = "Xin chào!";
 
-                    resultanswer = " Mình là trợ lý ảo của TGDD. Hiện tại mình chỉ hỗ trợ TỰ ĐỘNG các vấn đề bên dưới. Nếu bạn có các thắc mắc khác, vui lòng liên hệ với nhân viên chúng tôi.Tất cả thông tin chỉ mang tính chất THAM KHẢO";
+                    resultanswer = " Mình là trợ lý ảo của TGDD. Hiện tại mình chỉ hỗ trợ TỰ ĐỘNG các vấn đề bên dưới. Nếu bạn có các thắc mắc khác, vui lòng liên hệ với nhân viên chúng tôi.Tất cả thông tin chỉ mang tính chất THAM KHẢO. Vui lòng sử dụng tiếng việt có dấu";
                 }
 
             }
@@ -790,8 +790,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 fbEvaluate(sender, replyobject, siteid);
             }
-            else if (intent === "ask_promotion" || sessions[sessionId].prev_intent == "ask_promotion") {
-                //sessions[sessionId].prev_intent = "ask_promotion";
+            else if (intent === "ask_promotion" || sessions[sessionId].prev_intent === "ask_promotion") {
+                if (sessions[sessionId].prev_intent === "ask_promotion" && intent != "ask_promotion") {//nếu đã hỏi khuyễn mãi trước mà hiện tại câu này không còn hỏi km nữa thì reset
+                    sessions[sessionId].prev_intent = null;
+                }
+                if (intent === "ask_promotion") {//nếu câu hiện tại đang hỏi km 
+                    sessions[sessionId].prev_intent = "ask_promotion";
+                }
+
                 if (sessions[sessionId].product) {
                     var productName = sessions[sessionId].product;
                     console.log(productName);
@@ -938,7 +944,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
 
                 else {
-                    resultanswer = "Vui lòng cung cấp tên sản phẩm!";
+                    resultanswer = "Mình chưa rõ lắm. Vui lòng cung cấp rõ tên sản phẩm!";
                 }
 
                 intent = "ask_promotion";
@@ -1857,7 +1863,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }//end if (sessions[sessionId].product)
 
                 else {
-                    resultanswer = "Mình chưa rõ câu hỏi lắm. Vui lòng cung cấp rõ tên sản phẩm!";
+                    resultanswer = "Mình chưa rõ lắm. Vui lòng cung cấp rõ tên sản phẩm!";
                 }
 
             }
@@ -1983,10 +1989,12 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
     if (button_payload_state == "1") {
         questionTitle = "Hỏi thông tin sản phẩm"
         resultanswer = "Bạn muốn hỏi thông tin sản phẩm nào ạ?"
+        sessions[sessionId].prev_intent = "ask_stock";
     }
     else if (button_payload_state == "2") {
         questionTitle = "Hỏi giá sản phẩm"
         resultanswer = "Bạn muốn hỏi giá sản phẩm nào ạ?"
+        sessions[sessionId].prev_intent = "ask_price";
     }
     else if (button_payload_state == "3") {
         questionTitle = "Hỏi khuyễn mãi sản phẩm"
@@ -1997,6 +2005,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
     else if (button_payload_state == "4") {
         questionTitle = "Thông tin trả góp"
         resultanswer = "Xin lỗi. Chức năng THÔNG TIN TRẢ GÓP đang được phát triển. Vui lòng chọn dịch vụ khác. Xin lỗi vì sự bất tiện này. "
+        sessions[sessionId].prev_intent = "ask_instalment";
     }
 
 
