@@ -894,7 +894,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                     //console.log(result);
                                     resultanswer = "Sản phẩm: " + result.GetProductResult.productNameField + "<br />"
                                         + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
+                                    resultanswer += "<img src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
+                                  //  console.log(resultanswer);
 
                                     APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
 
@@ -1101,6 +1103,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         resultanswer = "Sản phẩm: " + result.GetProductResult.productNameField + "<br />"
                                             + (result.GetProductResult.productErpPriceBOField.priceField == "0" || result.GetProductResult.productErpPriceBOField.priceField == "-1" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
                                         //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
+                                        resultanswer += "<br /><img src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+                                        //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
+                                        // console.log(resultanswer);
 
                                         APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
 
@@ -1762,7 +1767,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                 else {
 
-                                                                    SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố bạn đang ở. Vui lòng cung cấp tỉnh/Thành trước. (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                    SentToClient(sender, "Bạn đang ở Tỉnh/Thành phố nào ạ? (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                         .catch(console.error);
                                                                 }
 
