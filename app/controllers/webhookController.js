@@ -894,7 +894,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                     //console.log(result);
                                     resultanswer = "Sản phẩm: " + result.GetProductResult.productNameField + "<br />"
                                         + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
-                                    resultanswer += "<img src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                   //  console.log(resultanswer);
 
@@ -1103,7 +1103,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         resultanswer = "Sản phẩm: " + result.GetProductResult.productNameField + "<br />"
                                             + (result.GetProductResult.productErpPriceBOField.priceField == "0" || result.GetProductResult.productErpPriceBOField.priceField == "-1" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
                                         //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
-                                        resultanswer += "<br /><img src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+                                        resultanswer += "<br /><img width='120' height='120' src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
                                         //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                         // console.log(resultanswer);
 
