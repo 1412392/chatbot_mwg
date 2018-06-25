@@ -3,9 +3,10 @@
 var tracechat = require('../helpers/index');
 var fetch = require('node-fetch');
 var request = require("request")
-
+var path = require('path');
 var elasticsearch = require('elasticsearch');
 var soap = require('soap');
+var fs = require('fs');
 
 var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNwciAmicecV7IfX0rOfsFNUwZCMnZATJxWpkK0aFmj2XUuhacR8XA1sWsFiGasBtBcAOgon0BQqeP8RDCm6VQR9V9Ygxow0EvBwbhrHjwViGHDQ77dIkfkY3XDhzv';
 
@@ -23,6 +24,18 @@ var provinceDefault = 3;
 var pagesizedefault = 10;
 var pageIndexDefault = 0;
 
+var pathToExample = path.join(__dirname, '..', 'helpers', 'example');
+
+
+var greet = [];
+var offense = [];
+var ask_name = [];
+var unknowproduct = [];
+var thankyou = [];
+var goodbye = [];
+
+var isGetExampleAnswer = false;
+
 var el = new elasticsearch.Client({
     host: '192.168.2.54:9200',
     log: 'trace'
@@ -34,6 +47,10 @@ function wait(ms) {
     while (end < start + ms) {
         end = new Date().getTime();
     }
+}
+
+function randomNumber(lengthNumber) {
+    return Math.floor((Math.random() * (lengthNumber - 1)) + 0);//random tu 0 den lengthnumber-1
 }
 
 const sessions = {};
@@ -113,7 +130,7 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
     // console.log("===============================================");
 
     var body = "";
-
+   
     if (state === 0)//câu hỏi do user send, không phải từ postback
     {
         if (intent == "greet") {
@@ -162,7 +179,7 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
             contentlogs += "<button " + "type=button>" + "Xem tồn kho sản phẩm" + "</button>" + "<br />";
             contentlogs += "<button " + "type=button>" + "Xem giá sản phẩm" + "</button>" + "<br />";
             contentlogs += "<button " + "type=button>" + "Xem khuyễn mãi sản phẩm" + "</button>" + "<br />";
-            contentlogs += "<button " + "type=button>" + "Thông tin trả góp" + "</button>" + "<br />";
+            //contentlogs += "<button " + "type=button>" + "Thông tin trả góp" + "</button>" + "<br />";
 
             tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
 
@@ -759,7 +776,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
             if (intent === "greet") {
-                if (customer_question === "chào bạn" && (sessions[sessionId].prev_intent === "ask_price" || sessions[sessionId].prev_intent === "ask_stock"
+                if (customer_question.toLowerCase() === "chào bạn" && (sessions[sessionId].prev_intent === "ask_price" || sessions[sessionId].prev_intent === "ask_stock"
                     || sessions[sessionId].prev_intent === "ask_promotion" || sessions[sessionId].prev_intent === "ask_delivery"
                     || sessions[sessionId].prev_intent === "thankyou" || sessions[sessionId].prev_intent === "felling_love")) {
                     intent = "goodbye";
@@ -769,7 +786,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].prev_intent = "greet";
                     questionTitle = "Xin chào!";
 
-                    resultanswer = " Chào mừng bạn đến trang mua sắm của Thế Giới Di Động. Mình xin giải đáp tất cả các thắc mắc của bạn. Vui lòng chọn các vấn đề bên dưới và sử dụng tiếng việt có dấu để giao tiếp ạ. Hiện tại đang trong quá trình nâng cấp, nếu có vấn đề gì sai sót xin vui lòng bỏ qua. ";
+                    var rn = randomNumber(greet.length);
+                    resultanswer = greet[rn];
+
                 }
 
             }
@@ -777,7 +796,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 sessions[sessionId].prev_intent = "goodbye";
                 questionTitle = "Cảm ơn!";
-                resultanswer = "Cảm ơn bạn. Vui lòng dành ít thời gian để đánh giá dịch vụ của chúng tôi. Chúc bạn một ngày vui vẻ.<br />";
+                
+                var rn = randomNumber(greet.length);
+                resultanswer = goodbye[rn];
 
                 fbEvaluate(sender, replyobject, siteid);
 
@@ -786,7 +807,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent === "thankyou") {
                 sessions[sessionId].prev_intent = "thankyou";
                 questionTitle = "Cảm ơn!";
-                resultanswer = "Cảm ơn bạn. Rất hân hạnh được phục vụ bạn. Chúc bạn một ngày tốt đẹp";
+                var rn = randomNumber(greet.length);
+                resultanswer = thankyou[rn];
 
                 fbEvaluate(sender, replyobject, siteid);
             }
@@ -944,7 +966,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
 
                 else {
-                    resultanswer = "Mình chưa rõ lắm. Vui lòng cung cấp rõ tên sản phẩm!";
+                    var rn = randomNumber(greet.length);
+                    resultanswer = unknowproduct[rn];
                 }
 
                 intent = "ask_promotion";
@@ -1863,16 +1886,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }//end if (sessions[sessionId].product)
 
                 else {
-                    resultanswer = "Mình chưa rõ lắm. Vui lòng cung cấp rõ tên sản phẩm!";
+                    var rn = randomNumber(greet.length);
+                    resultanswer = unknowproduct[rn];
                 }
 
             }
 
             else if (intent === "offense") {
 
-
-                resultanswer += "Wow! À thật ra là mình không hiểu ý của bạn lắm. Bạn có thể nói lại rõ hơn được không. ";
-
+                var rn = randomNumber(greet.length);
+                resultanswer += offense[rn];
+               
                 //var resultanswer2 = "Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
 
                 intent = "offense";
@@ -1910,8 +1934,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             else if (intent === "ask_name") {
                 questionTitle = "Hỏi tên";
-                resultanswer = "Mình là Bot Agent. Mình được tạo ra bởi tập đoàn Thế giới di động (MWG). Bạn có gì cần trợ giúp ạ?" + "<br />";
-
+                var rn = randomNumber(greet.length);
+                resultanswer = ask_name[rn];
+                
                 intent = "ask_name";
                 sessions[sessionId].prev_intent = "ask_name";
             }
@@ -2049,6 +2074,22 @@ const responsepostbackFeedback = (sender, sessionId, feedback, replyobject, site
     getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
 
 };
+function readFiles(dirname, onFileContent) {
+    fs.readdir(dirname, function (err, filenames) {
+        if (err) {
+
+            console.log(err);
+            return;
+        }
+        filenames.forEach(function (filename) {
+            fs.readFile(path.join(dirname, filename), { encoding: 'utf8' }, function (err, content) {
+
+                onFileContent(filename, content);
+            });
+        });
+
+    });
+};
 
 var webhookController = {
     index: function (req, res) {
@@ -2064,35 +2105,44 @@ var webhookController = {
     },
     postmessage: function (req, res) {
 
+        //load data
+        if (!isGetExampleAnswer) {
+            readFiles(pathToExample, function (filename, content) {
+                isGetExampleAnswer = true;
+                //console.log(filename);
+                var splitcontent = content.split('\n');
+                var fileName = filename.split('.')[0];
 
+                for (var i = 0; i < splitcontent.length; i++) {
+                    if (fileName === "greet") {
+                        greet.push(splitcontent[i]);
+                    }
+                    else if (fileName === "offense") {
+                        offense.push(splitcontent[i]);
+                    }
+                    else if (fileName === "ask_name") {
+                        ask_name.push(splitcontent[i]);
+
+                    }
+                    else if (fileName === "thankyou") {
+                        thankyou.push(splitcontent[i]);
+
+                    }
+                    else if (fileName === "goodbye") {
+                        goodbye.push(splitcontent[i]);
+
+                    }
+                    else if (fileName === "unknowproduct") {
+                        unknowproduct.push(splitcontent[i]);
+
+                    }
+
+                }
+
+            });
+        }
 
         var data = (req.body);
-
-        //var object = "{" +
-        //    '"username":' + '"' + msg.fullname + '"' + "," +
-        //    '"siteid":' + '"' + msg.siteid + '"' + "," +
-        //    '"fullname":' + '"' + msg.fullname + '"' + "," +
-        //    '"messageobject":' + '{' +
-        //    '"type":' + '"1"' + ',' +
-        //    '"content":' + '"' + content + '"' +
-
-
-        //    '}' +','+
-        //    '"replyobject":' + '{' +
-
-        //    '"currenturl":' + '"' + msg.currenturl + '"' + ',' +
-        //    '"sendat":' + '"' + msg.sendat + '"' + ',' +
-        //    '"usertype":' + '"' + msg.usertype + '"' + ',' +
-        //    '"roomid":' + '"' + msg.roomid + '"' + ',' +
-        //    '"msgid":' + '"' + msg.msgid + '"' + ',' +
-        //    '"isbot":' + '"' + msg.isbot + '"' +
-
-        //    '}' +','+
-        //    +'"postbackobject":' + '{}' +
-
-        //    "}";
-
-
 
         // var data = JSON.parse(JSON.stringify((req.body)));
         console.log("=============DATA POST XUONG======================");
