@@ -124,13 +124,13 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
     //console.log('send=' + text);
 
     // console.log("=============SEND TO CUSTOMER===================");
-    // console.log(text);
+    console.log(text);
 
 
     // console.log("===============================================");
 
     var body = "";
-   
+
     if (state === 0)//câu hỏi do user send, không phải từ postback
     {
         if (intent == "greet") {
@@ -560,6 +560,7 @@ function APIGetProductDetail(url, args, fn) {
 }
 
 function APICheckInStock(url, args, fn) {
+    console.log(args);
     soap.createClient(url, function (err, client) {
 
         client.GetStoreInStock2016(args, function (err, result) {
@@ -796,7 +797,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 sessions[sessionId].prev_intent = "goodbye";
                 questionTitle = "Cảm ơn!";
-                
+
                 var rn = randomNumber(greet.length);
                 resultanswer = goodbye[rn];
 
@@ -1163,6 +1164,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                 // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
                                                                 // console.log(total);
+                                                                console.log(result);
                                                                 if (result.total) {//có hàng
                                                                     resultanswer = "";
 
@@ -1390,7 +1392,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
 
                                                                     // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                                    if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 1 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
+                                                                    console.log(result);
+                                                                    if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
 
                                                                         // console.log(total);
                                                                         resultanswer = "";
@@ -1896,7 +1899,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 var rn = randomNumber(greet.length);
                 resultanswer += offense[rn];
-               
+
                 //var resultanswer2 = "Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
 
                 intent = "offense";
@@ -1936,7 +1939,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 questionTitle = "Hỏi tên";
                 var rn = randomNumber(greet.length);
                 resultanswer = ask_name[rn];
-                
+
                 intent = "ask_name";
                 sessions[sessionId].prev_intent = "ask_name";
             }
