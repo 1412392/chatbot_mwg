@@ -767,6 +767,19 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         }
         else {
 
+            //câu chào HI
+            if (customer_question.trim().toLowerCase() === "hi") {
+                var rn = randomNumber(greet.length);
+                resultanswer = greet[rn];
+
+                SentToClient(sender, resultanswer, "Xin chào!", button_payload_state, "greet", replyobject, siteid)
+                    .catch(console.error);
+                return;
+            }
+
+            ///
+
+
             //truong hợp này intent có thể null
             if (intent === null || intent === "") {
                 if (sessions[sessionId].prev_intent)//nếu trước đó đã hỏi
@@ -896,7 +909,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
                                     resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
-                                  //  console.log(resultanswer);
+                                    //  console.log(resultanswer);
 
                                     APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
 
@@ -1999,8 +2012,6 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 if (intent === "greet") {
                 }
                 else {
-
-
                     resultanswer = "Mình chưa rõ câu hỏi của bạn lắm. Bạn vui lòng cung cấp rõ thông tin cần hỏi như: tên sản phẩm, giá cả, địa chỉ...Cảm ơn bạn";
                 }
             }
@@ -2191,11 +2202,12 @@ var webhookController = {
                 if (messagecontent.includes("@"))
                     messagecontent = messagecontent.replace("@", " ");
                 messagecontent = messagecontent.replace(/\n/g, '');
+                var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
+
 
                 var sever = severRasaQuery + messagecontent;
                 var url = encodeURI(sever);
 
-                var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
 
                 getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
