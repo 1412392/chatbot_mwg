@@ -935,18 +935,23 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                             //console.log(result.GetProductResult.promotionField.Promotion[0]);
                                             if (result.GetProductResult.promotionField) {
                                                 if (result.GetProductResult.promotionField.Promotion.length > 0) {
-                                                    resultanswer += "<br />Thông tin khuyến mãi:<br /> ";
+                                                    resultanswer += "<br /><ul><li>Thông tin khuyến mãi:</li> ";
                                                     for (var i = 0; i < result.GetProductResult.promotionField.Promotion.length; i++) {
                                                         var currentPromotion = result.GetProductResult.promotionField.Promotion[i];
                                                         if (!currentPromotion.homePageDescriptionField || currentPromotion.homePageDescriptionField === "undefined") {
 
                                                         }
                                                         else {
-                                                            resultanswer += "#" + currentPromotion.homePageDescriptionField + "<br />";
+                                                            resultanswer += "<li style='color:red'>" + currentPromotion.homePageDescriptionField +"</li>";
                                                         }
 
 
                                                     }
+                                                    resultanswer+="</ul>";
+
+                                                }
+                                                else{
+                                                    resultanswer += "<p style='color:red'>Hiện tại không có chương trình khuyến mãi nào dành cho sản phẩm này!</p>";
                                                 }
                                             }
                                             else {
