@@ -913,7 +913,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                     APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
 
-                                        resultanswer += "<br />Thông tin chi tiết sản phẩm: " + seoURL + "<br />";
+                                        resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "'>" + seoURL + "</a>" + "<br />";
 
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
                                             resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại ngừng kinh doanh. Vui lòng chọn sản phẩm khác ạ!";
@@ -1127,7 +1127,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                         APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
 
-                                            resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "'>" + seoURL + "</a" + "<br />";
+                                            resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "'>" + seoURL + "</a>" + "<br />";
 
                                             if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
                                                 (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
