@@ -2189,7 +2189,7 @@ var webhookController = {
 
             // We retrieve the message content
             var messagetype = data.messageobject.type;
-            var messagecontent = data.messageobject.content;
+            var messagecontent = data.messageobject.content.toLowerCase();
 
             //console.log(event.message);
             if (messagetype == 2) {
@@ -2209,11 +2209,7 @@ var webhookController = {
                 var url = encodeURI(sever);
 
 
-
                 getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
-
-
-
 
             }
         }
