@@ -935,27 +935,27 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                             //console.log(result.GetProductResult.promotionField.Promotion[0]);
                                             if (result.GetProductResult.promotionField) {
                                                 if (result.GetProductResult.promotionField.Promotion.length > 0) {
-                                                    resultanswer += "<br /><ul><li>Thông tin khuyến mãi:</li> ";
+                                                    resultanswer += "<br /><p>Thông tin khuyến mãi:</p> ";
                                                     for (var i = 0; i < result.GetProductResult.promotionField.Promotion.length; i++) {
                                                         var currentPromotion = result.GetProductResult.promotionField.Promotion[i];
                                                         if (!currentPromotion.homePageDescriptionField || currentPromotion.homePageDescriptionField === "undefined") {
 
                                                         }
                                                         else {
-                                                            resultanswer += "<li style='color:red'>" + currentPromotion.homePageDescriptionField +"</li>";
+                                                            resultanswer += "<p style='color:red'>" + currentPromotion.homePageDescriptionField + "</p>";
                                                         }
 
 
                                                     }
-                                                    resultanswer+="</ul>";
+
 
                                                 }
-                                                else{
+                                                else {
                                                     resultanswer += "<p style='color:red'>Hiện tại không có chương trình khuyến mãi nào dành cho sản phẩm này!</p>";
                                                 }
                                             }
                                             else {
-                                                resultanswer += "Hiện tại không có chương trình khuyến mãi nào dành cho sản phẩm này!";
+                                                resultanswer += "<p style='color:red'>Hiện tại không có chương trình khuyến mãi nào dành cho sản phẩm này!</p>";
                                             }
 
                                             //console.log("Sản phẩm hỏi: " + productName);
@@ -1127,7 +1127,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                         APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
 
-                                            resultanswer += "<br />Thông tin chi tiết sản phẩm: " + seoURL + "<br />";
+                                            resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "'>" + seoURL + "</a" + "<br />";
 
                                             if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
                                                 (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
