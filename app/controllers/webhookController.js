@@ -354,8 +354,11 @@ function SendToUserListColor(productID, productName, sender, siteid, replyobject
             sessions[sessionId].color = null;
             sessions[sessionId].colorname = null;
 
-            SentToClientButton(sender, bodyjson)
-                .catch(console.error);
+            setTimeout(() => {
+                SentToClientButton(sender, bodyjson)
+                    .catch(console.error);
+            }, 1500);
+
         });//end APIGetProductColor
     }
 }
@@ -1492,10 +1495,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     //console.log("===============BUTTON URL STORE===================");
                                                                     //console.log(bodyjson);
 
-                                                                    setTimeout(() => {
-                                                                        SentToClientButton(sender, bodyjson)
-                                                                            .catch(console.error);
-                                                                    }, 1000);
+
+                                                                    SentToClientButton(sender, bodyjson)
+                                                                        .catch(console.error);
 
 
                                                                     //===========================================================================================
@@ -1727,10 +1729,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         //console.log(bodyjson);
 
 
-                                                                        setTimeout(() => {
-                                                                            SentToClientButton(sender, bodyjson)
-                                                                                .catch(console.error);
-                                                                        }, 1000);
+
+                                                                        SentToClientButton(sender, bodyjson)
+                                                                            .catch(console.error);
 
                                                                         //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                         //    .catch(console.error);
@@ -1738,7 +1739,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         //nếu có hỏi màu, gợi ý thêm danh sách màu
                                                                         //không hỏi thì kệ nó :v
                                                                         //if (color) {
-                                                                        setTimeout(function () { resultanswer += "Vui lòng chọn màu sắc bạn quan tâm để xem danh sách cửa hàng còn hàng!" }, 1000);
+                                                                        resultanswer += "Vui lòng chọn màu sắc bạn quan tâm để xem danh sách cửa hàng còn hàng!";
 
 
                                                                         if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
