@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://8775367e.ngrok.io/chatbot";
+var severResponse = "https://d016a8d2.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1008,11 +1008,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     resultanswer += "<br /><p>Thông tin khuyến mãi:</p> ";
                                                     for (var i = 0; i < result.GetProductResult.promotionField.Promotion.length; i++) {
                                                         var currentPromotion = result.GetProductResult.promotionField.Promotion[i];
-                                                        if (!currentPromotion.homePageDescriptionField || currentPromotion.homePageDescriptionField === "undefined") {
+                                                        console.log(currentPromotion);
+                                                        // if (!currentPromotion.homePageDescriptionField || currentPromotion.homePageDescriptionField === "undefined") {
+
+                                                        // }
+                                                        if (!currentPromotion.promotionListGroupNameField) {
 
                                                         }
                                                         else {
-                                                            resultanswer += "<p style='color:red'>" + currentPromotion.homePageDescriptionField + "</p>";
+                                                            // resultanswer += "<p style='color:red'>" + currentPromotion.homePageDescriptionField + "</p>";
+                                                            resultanswer += "<p style='color:red'>" + currentPromotion.promotionListGroupNameField + "</p>";
+
                                                         }
 
 
@@ -1180,6 +1186,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                         var jsonbuttonFinancialCompany = getButtonFinancialCompany(productID, productName, sender, siteid, replyobject, questionTitle);
                                                         console.log(jsonbuttonFinancialCompany);
+
+
+                                                        SentToClientButton(sender, jsonbuttonFinancialCompany)
+                                                            .catch(console.error);
+
 
 
                                                     }
@@ -1770,7 +1781,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         if (color && hasNumber(color)) {
 
 
-                                                                            resultanswer = "Rất tiếc. Sản phẩm có màu " + sessions[sessionId].colorname.toUpperCase() + " đã hết hàng tại khu vực của bạn! Vui lòng chọn lại."
+                                                                            resultanswer = "Rất tiếc. Sản phẩm có màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của bạn! Vui lòng chọn lại."
 
                                                                             //đưa ra ôption
 
@@ -1792,7 +1803,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                         }
                                                                         else {
-                                                                            resultanswer = "Rất tiếc. Sản phẩm đã hết hàng tại khu vực " + districtName + " của bạn! Vui lòng chọn lại khu vực lân cận.";
+                                                                            resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của bạn! Vui lòng chọn lại khu vực lân cận.";
 
                                                                             //suggest khu vực
                                                                             var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
