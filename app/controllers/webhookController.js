@@ -13,9 +13,9 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-//var severResponse = "https://a92370be.ngrok.io/chatbot";
+var severResponse = "https://8775367e.ngrok.io/chatbot";
 
-var severResponse = "http://rtm.thegioididong.com/chatbot";
+// var severResponse = "http://rtm.thegioididong.com/chatbot";
 
 var urlApiProduct = "http://api.thegioididong.com/ProductSvc.svc?singleWsdl";
 var urlApiCategory = "http://api.thegioididong.com/CategorySvc.svc?singleWsdl";
@@ -496,6 +496,38 @@ const fbEvaluate = (id, replyobject, siteid) => {
 
 };
 
+const getButtonFinancialCompany = (productID, productName, sender, siteid, replyobject, questionTitle) => {
+    var jsonmessageFiC =
+        {
+            username: sender,
+            siteid: siteid,
+            messagetype: "template",
+            replyobject: replyobject,
+            messagecontentobject: {
+                elements: [
+                    {
+                        title: questionTitle,
+                        buttons: [
+                            {
+                                type: "postback",
+                                title: "HomeCredit",
+                                payload: 8
+                            },
+                            {
+                                type: "postback",
+                                title: "FeCredit",
+                                payload: 9
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
+    var bodyjson = JSON.stringify(jsonmessageFiC);
+    return bodyjson;
+
+}
 function APIGetProductColor(url, args, fn) {
     soap.createClient(url, function (err, client) {
 
@@ -525,7 +557,7 @@ function APIGetSeoURLProduct(url, args, fn) {
 
             var seourl = JSON.parse(JSON.stringify(result));
 
-            var final = "https://thegioididong.com" + seourl.getSeoURLProductResult;
+            var final = "https://www.thegioididong.com" + seourl.getSeoURLProductResult;
             fn(final);
 
 
@@ -588,6 +620,7 @@ function APIGetDistrictByProvince(url, args, fn) {
 }
 
 
+
 function APIGetProductSearch(url, args, fn) {
     soap.createClient(url, function (err, client) {
 
@@ -595,6 +628,40 @@ function APIGetProductSearch(url, args, fn) {
 
             var productSearch = JSON.parse(JSON.stringify(result));
             fn(productSearch);
+
+        });
+
+    });
+}
+
+function APICheckZeroInstalment(url, args, fn) {
+    soap.createClient(url, function (err, client) {
+
+        client.GetZeroInstallmentByProduct(args, function (err, result) {
+
+            var productSearch = JSON.parse(JSON.stringify(result));
+            console.log(productSearch);
+            if (productSearch) {
+                if (productSearch.GetZeroInstallmentByProductResult.ID) {
+                    var fromDate = Date.parse(productSearch.GetZeroInstallmentByProductResult.FromDate);
+                    var toDate = Date.parse(productSearch.GetZeroInstallmentByProductResult.ToDate);
+                    var nowDate = Date.parse(new Date());
+                    console.log(fromDate)
+                    console.log(toDate)
+                    console.log(nowDate)
+                    if (nowDate >= fromDate && nowDate <= toDate) {
+                        fn(true);
+                    }
+                    else {
+                        fn(false);
+                    }
+
+                }
+                else {
+                    fn(false);
+                }
+            }
+            else fn(false);
 
         });
 
@@ -811,7 +878,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].prev_intent = "goodbye";
                 questionTitle = "Cảm ơn!";
 
-                var rn = randomNumber(greet.length);
+                var rn = randomNumber(goodbye.length);
                 resultanswer = goodbye[rn];
 
                 fbEvaluate(sender, replyobject, siteid);
@@ -821,7 +888,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent === "thankyou") {
                 sessions[sessionId].prev_intent = "thankyou";
                 questionTitle = "Cảm ơn!";
-                var rn = randomNumber(greet.length);
+                var rn = randomNumber(thankyou.length);
                 resultanswer = thankyou[rn];
 
                 fbEvaluate(sender, replyobject, siteid);
@@ -905,8 +972,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                                     //console.log(result);
-                                    resultanswer = "Sản phẩm: " + result.GetProductResult.productNameField + "<br />"
-                                        + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
+                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
+                                        + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
                                     resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                     //  console.log(resultanswer);
@@ -916,7 +983,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "'>" + seoURL + "</a>" + "<br />";
 
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại ngừng kinh doanh. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -967,7 +1034,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                 }
 
                                 else {
-                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại không kinh doanh tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>NGỪNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                         .catch(console.error);
                                 }
@@ -987,12 +1054,174 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
 
                 else {
-                    var rn = randomNumber(greet.length);
+                    var rn = randomNumber(unknowproduct.length);
                     resultanswer = unknowproduct[rn];
                 }
 
                 intent = "ask_promotion";
                 //sessions[sessionId].prev_intent = "ask_promotion";
+            }
+            else if (intent === "ask_instalment" || sessions[sessionId].prev_intent === "ask_instalment") {
+                questionTitle = "Thông tin trả góp!";
+                resultanswer += "<p style='color:red;font-style: italic;'>Để mua hàng trả góp, tuổi của bạn phải lớn hớn 20 và nhỏ hơn 60, và bắt buộc phải có CMND chính chủ.Lưu ý tất cả các giấy tờ phải còn hạn sử dụng. Chấp nhận bản photo phải có CÔNG CHỨNG không quá 6 tháng.</p>";
+                if (!sessions[sessionId].product) {
+
+                    resultanswer += "Bạn muốn hỏi thông tin trả góp cho sản phẩm nào ạ?";
+
+                }
+                else {
+                    //check sản phẩm có hỗ trợ trả góp hay không
+                    var productID = sessions[sessionId].product;
+                    var productName = sessions[sessionId].product;
+                    console.log(productName);
+                    var keyword = productName;
+                    var argsSearchProduct = "";
+
+                    if (keyword.toLowerCase().includes("ốp lưng") ||
+                        keyword.toLowerCase().includes("op lung") ||
+                        keyword.toLowerCase().includes("tai nghe") ||
+                        keyword.toLowerCase().includes("pin") ||
+                        keyword.toLowerCase().includes("sạc") ||
+                        keyword.toLowerCase().includes("sac") ||
+                        keyword.toLowerCase().includes("bàn phím") ||
+                        keyword.toLowerCase().includes("ban phim") ||
+                        keyword.toLowerCase().includes("loa") ||
+                        keyword.toLowerCase().includes("thẻ nhớ") ||
+                        keyword.toLowerCase().includes("the nho") ||
+                        keyword.toLowerCase().includes("usb") ||
+                        keyword.toLowerCase().includes("đồng hồ") ||
+                        keyword.toLowerCase().includes("dong ho") ||
+                        keyword.toLowerCase().includes("gậy") ||
+                        keyword.toLowerCase().includes("dán màn hình") ||
+                        keyword.toLowerCase().includes("cường lực") ||
+                        keyword.toLowerCase().includes("tai phone") ||
+                        keyword.toLowerCase().includes("gay tu suong"))//search phụ kiện
+                    {
+                        argsSearchProduct = {
+                            q: keyword,
+                            CateID: -3
+                        };
+                    }
+                    else {
+
+                        argsSearchProduct = {
+                            q: keyword,
+                            CateID: -4
+                        };
+                    }
+                    APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+
+                        if (result.SearchProductPhiResult != null) {
+
+                            var productID = result.SearchProductPhiResult.string[0];
+                            sessions[sessionId].productID = productID;
+
+                            var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
+                            var lstproduct = result;
+
+                            APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+                                if (result && result.GetProductResult.productErpPriceBOField) {
+                                    //lấy link sp
+                                    var argsProductDetailGetSeoURL = {
+                                        productCategoryLangBOField_uRLField: result.GetProductResult.productCategoryLangBOField.uRLField,
+                                        productCategoryLangBOField_categoryNameField: result.GetProductResult.productCategoryLangBOField.categoryNameField,
+                                        productCategoryBOField_uRLField: result.GetProductResult.productCategoryBOField.uRLField,
+                                        productCategoryBOField_categoryNameField: result.GetProductResult.productCategoryBOField.categoryNameField,
+                                        categoryNameField: result.GetProductResult.categoryNameField,
+                                        productLanguageBOField_productNameField: result.GetProductResult.productLanguageBOField.productNameField,
+                                        productLanguageBOField_uRLField: result.GetProductResult.productLanguageBOField.uRLField,
+                                        productNameField: result.GetProductResult.productNameField,
+                                        uRLField: result.GetProductResult.uRLField
+                                    };
+
+
+                                    //console.log(result);
+                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
+                                        + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>Không xác định</span>") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
+                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+                                    //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
+                                    //  console.log(resultanswer);
+
+                                    APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
+                                        resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "'>" + seoURL + "</a>" + "<br />";
+
+                                        if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
+                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+
+
+                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                .catch(console.error);
+                                        }
+                                        else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
+                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+
+                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                .catch(console.error);
+                                        }
+                                        else {
+                                            var productPrice = result.GetProductResult.productErpPriceBOField.priceField === "0" ? 0 : parseFloat(result.GetProductResult.productErpPriceBOField.priceField);
+                                            if (productPrice >= 1200000) {
+                                                console.log("===support tra gop===========");
+                                                console.log("======find 0% package============");
+                                                //nếu có trả góp 0% cho sp đó
+                                                var argCheckZeroInstalment = {
+                                                    ProductId: productID,
+                                                    SiteId: 1
+                                                };
+                                                APICheckZeroInstalment(urlwcfProduct, argCheckZeroInstalment, function callback(result) {
+
+                                                    //console.log("=====CHECK=======", result);
+                                                    if (result) {
+                                                        resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói trả góp 0%. (trả góp 0% là gói trả góp đặc biệt rất hấp dẫn, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br> ";
+                                                        //send ds ctytc
+
+                                                        var jsonbuttonFinancialCompany = getButtonFinancialCompany(productID, productName, sender, siteid, replyobject, questionTitle);
+                                                        console.log(jsonbuttonFinancialCompany);
+
+
+                                                    }
+                                                    else {
+                                                        resultanswer += "<br />Sản phẩm này không hỗ trợ trả góp 0%. Mời bạn thêm một số thông tin sau để xem góp trả góp thường phù hợp nhất. </br> ";
+                                                        resultanswer += "1. Bạn muốn trả trước bao nhiêu %? (vui lòng chỉ nhập số, ví dụ: 10,20,30...</br>";
+
+                                                    }
+                                                });
+                                                //nếu không có...
+                                            }
+
+                                            else {
+                                                resultanswer += "<br />Sản phẩm này hiện tại không hỗ trợ bất kỳ hình thức trả góp nào. Bạn có thể hỏi sản phẩm khác hoặc bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                    .catch(console.error);
+                                                // resultanswer += "<br />Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+
+                                            }
+                                        }
+
+                                    });
+                                }
+
+                                else {
+                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>NGỪNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                        .catch(console.error);
+                                }
+                            });
+                        }
+
+                        else {
+                            resultanswer = "Mình không nhận diện được sản phẩm/hoặc sản phẩm không tồn tại. Vui lòng nói rõ hơn về tên sản phẩm! Hoặc có thể nói ít từ khóa hơn. Ví dụ: sạc iphone, iphonex, iphone 5s...";
+                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                .catch(console.error);
+
+                        }
+
+                    });
+
+                }
+
+                intent = "ask_instalment";
+                sessions[sessionId].prev_intent = "ask_instalment";
             }
             else if (intent === "ask_stock" || intent === "ask_price" || intent === "ask_old_stock") {
                 if (intent === "ask_stock")
@@ -1118,8 +1347,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                                         // console.log(result);
-                                        resultanswer = "Sản phẩm: " + result.GetProductResult.productNameField + "<br />"
-                                            + (result.GetProductResult.productErpPriceBOField.priceField == "0" || result.GetProductResult.productErpPriceBOField.priceField == "-1" ? ("") : ("Giá: " + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ"));
+                                        resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
+                                            + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
                                         //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                         resultanswer += "<br /><img width='120' height='120' src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
                                         //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
@@ -1131,7 +1360,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                             if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
                                                 (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
-                                                resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại ngừng kinh doanh. Vui lòng chọn sản phẩm khác ạ!";
+                                                resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -1193,7 +1422,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                     var type = "template";
 
-                                                                    questionTitle = "Danh sách siêu thị có hàng tại " + provinceName;
+                                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + provinceName;
                                                                     var jsonmessageStore = '{' +
                                                                         '"username":' + '"' + sender + '"' + ',' +
                                                                         '"siteid":' + '"' + siteid + '"' + ',' +
@@ -1263,9 +1492,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     //console.log("===============BUTTON URL STORE===================");
                                                                     //console.log(bodyjson);
 
+                                                                    setTimeout(() => {
+                                                                        SentToClientButton(sender, bodyjson)
+                                                                            .catch(console.error);
+                                                                    }, 1000);
 
-                                                                    SentToClientButton(sender, bodyjson)
-                                                                        .catch(console.error);
 
                                                                     //===========================================================================================
 
@@ -1349,7 +1580,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     });
                                                                 }
                                                                 else {//hết hàng
-                                                                    SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã hết hàng HOẶC ĐANG NHẬP VỀ tại khu vực " + provinceName + " của bạn! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                    SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của bạn! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                         .catch(console.error);
                                                                 }
 
@@ -1423,11 +1654,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                         if (color && hasNumber(color)) {
                                                                             //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
-                                                                            questionTitle = "Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
+                                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
                                                                         }
                                                                         else {
                                                                             //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
-                                                                            questionTitle = "Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName;
+                                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName + "," + provinceName;
                                                                         }
 
                                                                         var type = "template";
@@ -1496,8 +1727,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         //console.log(bodyjson);
 
 
-                                                                        SentToClientButton(sender, bodyjson)
-                                                                            .catch(console.error);
+                                                                        setTimeout(() => {
+                                                                            SentToClientButton(sender, bodyjson)
+                                                                                .catch(console.error);
+                                                                        }, 1000);
 
                                                                         //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                         //    .catch(console.error);
@@ -1510,8 +1743,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                         if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
                                                                             resultanswer = "";
-                                                                            SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                                .catch(console.error);
+                                                                            setTimeout(() => {
+                                                                                SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
+                                                                                    .catch(console.error);
+                                                                            }, 1500);
+
                                                                         }
                                                                         else {
                                                                             SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle);
@@ -1827,7 +2063,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                     }
 
                                     else {
-                                        resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại không kinh doanh tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                        resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
                                         SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                             .catch(console.error);
                                     }
@@ -1912,7 +2148,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }//end if (sessions[sessionId].product)
 
                 else {
-                    var rn = randomNumber(greet.length);
+                    var rn = randomNumber(unknowproduct.length);
                     resultanswer = unknowproduct[rn];
                 }
 
@@ -1920,7 +2156,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             else if (intent === "offense") {
 
-                var rn = randomNumber(greet.length);
+                var rn = randomNumber(offense.length);
                 resultanswer += offense[rn];
 
                 //var resultanswer2 = "Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
@@ -1928,24 +2164,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 intent = "offense";
                 sessions[sessionId].prev_intent = "offense";
             }
-            else if (intent === "ask_instalment") {
-                questionTitle = "Thông tin trả góp!";
-                if (entities.length == 0) {
 
-                    resultanswer = "Về thủ tục trả góp, cách thức trả góp, bạn vui lòng liên hệ SĐT 1800.1060 (miễn phí cuộc gọi) để được trả lời cụ thể.<br />\
-                    Hoặc xem tại https://www.thegioididong.com/tra-gop ";
-                }
-                else {
-                    resultanswer = "Thông tin trả góp" + "<br />";
-
-                    resultanswer += "<br />Chức năng thông tin trả góp đang phát triển. Xin lỗi vì sự bất tiện này!"
-                    resultanswer += "<br />Bạn có thể xem thông tin trả góp tại đây: https://www.thegioididong.com/tra-gop"
-
-                }
-                resultanswer += "<br />Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
-                intent = "ask_instalment";
-                sessions[sessionId].prev_intent = "ask_instalment";
-            }
             else if (intent === "ask_consultant") {
                 questionTitle = "Tư vấn sản phẩm.";
 
@@ -1960,7 +2179,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             else if (intent === "ask_name") {
                 questionTitle = "Hỏi tên";
-                var rn = randomNumber(greet.length);
+                var rn = randomNumber(ask_name.length);
                 resultanswer = ask_name[rn];
 
                 intent = "ask_name";
@@ -2098,6 +2317,9 @@ const responsepostbackFeedback = (sender, sessionId, feedback, replyobject, site
     getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
 
 };
+const responsepostbackfinacilcompany = (sender, sessionId, button_payload_state, replyobject, siteid) => {
+
+}
 function readFiles(dirname, onFileContent) {
     fs.readdir(dirname, function (err, filenames) {
         if (err) {
@@ -2238,6 +2460,9 @@ var webhookController = {
             {
 
                 responsepostbackgreet(sender, sessionId, button_payload_state, replyobject, siteid);
+            }
+            else if (button_payload_state === "8" || button_payload_state === "9") {//2 cty tai chinh   
+                responsepostbackfinacilcompany(sender, sessionId, button_payload_state, replyobject, siteid);
             }
             else {//quận/huyện select hoặc select color
 
