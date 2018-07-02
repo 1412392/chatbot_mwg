@@ -1017,7 +1017,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         }
                                                         else {
                                                             // resultanswer += "<p style='color:red'>" + currentPromotion.homePageDescriptionField + "</p>";
-                                                            resultanswer += "<p style='color:red'>" + currentPromotion.promotionListGroupNameField + "</p>";
+                                                            var fromDate = currentPromotion.beginDateField.split('T')[0];
+                                                            var endDate = currentPromotion.endDateField.split('T')[0];
+                                                            var fromDateSplit = fromDate.split("-");
+                                                            var toDateSplit = endDate.split("-");
+
+                                                            resultanswer += "<p style='color:red'>" + currentPromotion.promotionListGroupNameField + " ( <span style='color:green'> Từ " + fromDateSplit[2] + "/" + fromDateSplit[1] + " - " + toDateSplit[2] + "/" + toDateSplit[1] + "</span> )" + "</p>";
+
 
                                                         }
 
