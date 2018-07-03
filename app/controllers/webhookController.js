@@ -404,7 +404,7 @@ function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobje
                 };
 
                 APICheckInStock(urlApiCategory, argsProductStock, function (item) {
-                    if (item.GetStoreInStock2016Result.total > 0 || item.GetStoreInStock2016Result.StoreBO.length > 0) {
+                    if (item.GetStoreInStock2016Result.StoreBO.length > 0) {
                         jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
                             type: "postback",
                             title: districbo.districtNameField,
