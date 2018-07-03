@@ -33,6 +33,7 @@ var ask_name = [];
 var unknowproduct = [];
 var thankyou = [];
 var goodbye = [];
+var productnotfound = [];
 
 var isGetExampleAnswer = false;
 
@@ -394,7 +395,6 @@ function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobje
                     ]
                 }
             };
-
             arrDistrictBO.forEach(function (item, i) {
                 var total = 0;
                 var districbo = arrDistrictBO[i];
@@ -404,16 +404,18 @@ function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobje
                 };
 
                 APICheckInStock(urlApiCategory, argsProductStock, function (item) {
-                    if (item.GetStoreInStock2016Result.StoreBO.length > 0) {
-                        jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                            type: "postback",
-                            title: districbo.districtNameField,
-                            payload: districbo.districtIDField
-                        });
+                    console.log(item.GetStoreInStock2016Result);
+                    if (item.GetStoreInStock2016Result) {
+                        if (item.GetStoreInStock2016Result.StoreBO.length > 0)
+                            jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+                                type: "postback",
+                                title: districbo.districtNameField,
+                                payload: districbo.districtIDField
+                            });
                     }
                 });
             });
-           
+
 
             setTimeout(() => {
                 // var bodystring = JSON.parse(jsonmessageDistrict);
@@ -1052,7 +1054,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         }
 
                         else {
-                            resultanswer = "Mình không nhận diện được sản phẩm/hoặc sản phẩm không tồn tại. Vui lòng nói rõ hơn về tên sản phẩm! Hoặc có thể nói ít từ khóa hơn. Ví dụ: sạc iphone, iphonex, iphone 5s...";
+                            
+                            var rn = randomNumber(productnotfound.length);
+                            resultanswer = productnotfound[rn];
+
                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                 .catch(console.error);
 
@@ -1225,7 +1230,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         }
 
                         else {
-                            resultanswer = "Mình không nhận diện được sản phẩm/hoặc sản phẩm không tồn tại. Vui lòng nói rõ hơn về tên sản phẩm! Hoặc có thể nói ít từ khóa hơn. Ví dụ: sạc iphone, iphonex, iphone 5s...";
+                            var rn = randomNumber(productnotfound.length);
+                            resultanswer = productnotfound[rn];
+
                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                 .catch(console.error);
 
@@ -2011,7 +2018,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             }
 
                             else {
-                                resultanswer = "Mình không nhận diện được sản phẩm/hoặc sản phẩm không tồn tại. Vui lòng nói rõ hơn về tên sản phẩm! Hoặc có thể nói ít từ khóa hơn. Ví dụ: sạc iphone, iphonex, iphone 5s...";
+                                var rn = randomNumber(productnotfound.length);
+                                resultanswer = productnotfound[rn];
+                                
                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                     .catch(console.error);
 
@@ -2071,7 +2080,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             else if (intent === "felling_price") {
                 questionTitle = "Cảm xúc giá";
-                resultanswer = "Giá như vậy là rất hợp lý rồi bạn. Hàng ở công ty mình ngon về Chất Lượng, rẻ về Giá Cả, tốt về Dịch Vụ nên bạn yên tâm mua nha. " + "<br />";
+                resultanswer = "Chất lượng sản phẩm ở Thế Giới Di Động được cam kết là chất lượng và chính hãng nha bạn. Giá cả rất hợp lý cho người mua ạ. " + "<br />";
 
                 //suggest kh
                 intent = "felling_price";
@@ -2257,7 +2266,10 @@ var webhookController = {
                         unknowproduct.push(splitcontent[i]);
 
                     }
+                    else if (fileName === "productnotfound") {
+                        productnotfound.push(splitcontent[i]);
 
+                    }
                 }
 
             });
