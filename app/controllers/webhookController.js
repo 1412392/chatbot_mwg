@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://d016a8d2.ngrok.io/chatbot";
+var severResponse = "https://6ca4e410.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -363,74 +363,69 @@ function SendToUserListColor(productID, productName, sender, siteid, replyobject
     }
 }
 
-function SendToUserListDistrict(provinceID, sender, siteid, replyobject, questionTitle) {
+function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobject, questionTitle) {
+
 
 
     if (provinceID) {
 
         var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-
-
         APIGetDistrictByProvince(urlApiCategory, argsDistrictByProvince, function getResult(result) {
             //console.log(result.GetDistricByProvinceResult.DistrictBO[0]);
             var length = result.GetDistricByProvinceResult.DistrictBO.length;
+            var arrDistrictBO = result.GetDistricByProvinceResult.DistrictBO;
             resultanswer = "";
             //resultanswer += "<br />CHỌN QUẬN/HUYỆN CỦA BẠN ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
 
             var type = "template";
             questionTitle = "Danh sách quận/huyện";
 
-            var jsonmessageDistrict = '{' +
-                '"username":' + '"' + sender + '"' + ',' +
-                '"siteid":' + '"' + siteid + '"' + ',' +
-                '"messagetype":"template"' + ',' +
-                '"replyobject":' + '{' +
-                '"username":' + '"' + replyobject.username + '"' + ',' +
-                '"message":' + '"' + replyobject.message + '"' + ',' +
-                '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                '"sentAt":' + replyobject.sentAt + ',' +
-                '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                '"gender":' + replyobject.gender + ',' +
-                '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                '"isbot":' + replyobject.isbot +
-                '}' + ',' +
-                '"messagecontentobject":' + '{' +
-                '"elements":' + '[' +
-                '{' +
-                '"title":' + '"' + questionTitle + '"' + ',' +
-                '"buttons":' + '[';
-
-
-            for (var i = 0; i < length; i++) {
-                if (i > 26) break;
-                var districbo = result.GetDistricByProvinceResult.DistrictBO[i];
-
-                if (i == (length - 1)) {
-                    jsonmessageDistrict += '{' +
-                        '"type":"postback"' + ',' +
-                        '"title":' + '"' + districbo.districtNameField + '"' + ',' +
-                        '"payload":' + '"' + districbo.districtIDField + '"' + '}';
+            var jsonmessageDistrict = {
+                username: sender,
+                siteid: siteid,
+                messagetype: "template",
+                replyobject: replyobject,
+                messagecontentobject: {
+                    elements: [
+                        {
+                            title: questionTitle,
+                            buttons: []
+                        }
+                    ]
                 }
-                else {
-                    jsonmessageDistrict += '{' +
-                        '"type":"postback"' + ',' +
-                        '"title":' + '"' + districbo.districtNameField + '"' + ',' +
-                        '"payload":' + '"' + districbo.districtIDField + '"' + '}' + ',';
+            };
 
-                }
-            }
-            jsonmessageDistrict +=
-                ']' +
-                '}' + ']' + '}' + '}';
+            arrDistrictBO.forEach(function (item, i) {
+                var total = 0;
+                var districbo = arrDistrictBO[i];
+                var argsProductStock = {
+                    productID: parseInt(productID), productCode: null, provinceID: parseInt(provinceID),
+                    districtID: parseInt(districbo.districtIDField), pageSize: 20, pageIndex: pageIndexDefault, total
+                };
 
-            var bodystring = JSON.parse(jsonmessageDistrict);
-            var bodyjson = JSON.stringify(bodystring);
+                APICheckInStock(urlApiCategory, argsProductStock, function (item) {
+                    if (item.GetStoreInStock2016Result.total > 0 || item.GetStoreInStock2016Result.StoreBO.length > 0) {
+                        jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+                            type: "postback",
+                            title: districbo.districtNameField,
+                            payload: districbo.districtIDField
+                        });
+                    }
+                });
+            });
+           
+
+            setTimeout(() => {
+                // var bodystring = JSON.parse(jsonmessageDistrict);
+                var bodyjson = JSON.stringify(jsonmessageDistrict);
+                console.log(bodyjson);
 
 
-            SentToClientButton(sender, bodyjson)
-                .catch(console.error);
+                SentToClientButton(sender, bodyjson)
+                    .catch(console.error);
+
+            }, 2000);
+
         });
     }
 
@@ -772,7 +767,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (button_payload_state === 7)//gợi ý lại danh sách quận huyện (đã có product, province)
             {
                 questionTitle = "Chọn quận/huyện nơi bạn ở";
-                SendToUserListDistrict(sessions[sessionId].provinveID, sender, siteid, replyobject, questionTitle);
+                SendToUserListDistrict(sessions[sessionId].productID, sessions[sessionId].provinveID, sender, siteid, replyobject, questionTitle);
                 return;
             }
             else if (button_payload_state === "NORMAL" || button_payload_state === "BAD" || button_payload_state === "GOOD") {
@@ -1524,79 +1519,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                     var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
 
-
-                                                                    APIGetDistrictByProvince(urlApiCategory, argsDistrictByProvince, function getResult(result) {
-
-
-                                                                        //console.log(result.GetDistricByProvinceResult.DistrictBO[0]);
-                                                                        var length = result.GetDistricByProvinceResult.DistrictBO.length;
-                                                                        resultanswer = "";
-                                                                        resultanswer += "<br />CHỌN QUẬN/HUYỆN CỦA BẠN ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
-
-                                                                        var type = "template";
-
-                                                                        questionTitle = "Danh sách quận/huyện";
-                                                                        var jsonmessageDistrict = '{' +
-                                                                            '"username":' + '"' + sender + '"' + ',' +
-                                                                            '"siteid":' + '"' + siteid + '"' + ',' +
-                                                                            '"messagetype":"template"' + ',' +
-                                                                            '"replyobject":' + '{' +
-                                                                            '"username":' + '"' + replyobject.username + '"' + ',' +
-                                                                            '"message":' + '"' + replyobject.message + '"' + ',' +
-                                                                            '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                                                                            '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                                                                            '"sentAt":' + replyobject.sentAt + ',' +
-                                                                            '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                                                                            '"gender":' + replyobject.gender + ',' +
-                                                                            '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                                                                            '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                                                                            '"isbot":' + replyobject.isbot +
-                                                                            '}' + ',' +
-                                                                            '"messagecontentobject":' + '{' +
-                                                                            '"elements":' + '[' +
-                                                                            '{' +
-                                                                            '"title":' + '"' + questionTitle + '"' + ',' +
-                                                                            '"buttons":' + '[';
-
-                                                                        for (var i = 0; i < length; i++) {
-                                                                            if (i > 26) break;
-                                                                            var districbo = result.GetDistricByProvinceResult.DistrictBO[i];
-
-                                                                            if (i == (length - 1)) {
-
-                                                                                jsonmessageDistrict += '{' +
-                                                                                    '"type":"postback"' + ',' +
-                                                                                    '"title":' + '"' + districbo.districtNameField + '"' + ',' +
-                                                                                    '"payload":' + '"' + districbo.districtIDField + '"' + '}';
+                                                                    SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle);
 
 
-                                                                            }
-                                                                            else {
-                                                                                jsonmessageDistrict += '{' +
-
-
-                                                                                    '"type":"postback"' + ',' +
-                                                                                    '"title":' + '"' + districbo.districtNameField + '"' + ',' +
-                                                                                    '"payload":' + '"' + districbo.districtIDField + '"' + '}' + ',';
-
-                                                                            }
-
-                                                                        }
-                                                                        jsonmessageDistrict +=
-                                                                            ']' +
-                                                                            '}' + ']' + '}' + '}';
-
-                                                                        var bodystring = JSON.parse(jsonmessageDistrict);
-                                                                        var bodyjson = JSON.stringify(bodystring);
-
-
-                                                                        //console.log("===============BUTTON POSTBACK===================");
-                                                                        //console.log(bodyjson);
-
-
-                                                                        SentToClientButton(sender, bodyjson)
-                                                                            .catch(console.error);
-                                                                    });
                                                                 }
                                                                 else {//hết hàng
                                                                     SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của bạn! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -1756,7 +1681,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         //nếu có hỏi màu, gợi ý thêm danh sách màu
                                                                         //không hỏi thì kệ nó :v
                                                                         //if (color) {
-                                                                        resultanswer += "Vui lòng chọn màu sắc bạn quan tâm để xem danh sách cửa hàng còn hàng!";
+
 
 
                                                                         if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
@@ -1768,8 +1693,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                         }
                                                                         else {
+                                                                            resultanswer += "Vui lòng chọn màu sắc bạn quan tâm để xem danh sách cửa hàng còn hàng!";
                                                                             SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle);
-
+                                                                            return;
                                                                         }
 
 
@@ -1814,77 +1740,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             //suggest khu vực
                                                                             var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
                                                                             //=======================================================================
-                                                                            APIGetDistrictByProvince(urlApiCategory, argsDistrictByProvince, function getResult(result) {
 
-
-                                                                                //console.log(result.GetDistricByProvinceResult.DistrictBO[0]);
-                                                                                var length = result.GetDistricByProvinceResult.DistrictBO.length;
-                                                                                resultanswer = "";
-                                                                                //resultanswer += "<br />CHỌN QUẬN/HUYỆN CỦA BẠN ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
-
-                                                                                var type = "template";
-                                                                                questionTitle = "Danh sách quận/huyện";
-
-                                                                                var jsonmessageDistrict = '{' +
-                                                                                    '"username":' + '"' + sender + '"' + ',' +
-                                                                                    '"siteid":' + '"' + siteid + '"' + ',' +
-                                                                                    '"messagetype":"template"' + ',' +
-                                                                                    '"replyobject":' + '{' +
-                                                                                    '"username":' + '"' + replyobject.username + '"' + ',' +
-                                                                                    '"message":' + '"' + replyobject.message + '"' + ',' +
-                                                                                    '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                                                                                    '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                                                                                    '"sentAt":' + replyobject.sentAt + ',' +
-                                                                                    '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                                                                                    '"gender":' + replyobject.gender + ',' +
-                                                                                    '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                                                                                    '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                                                                                    '"isbot":' + replyobject.isbot +
-                                                                                    '}' + ',' +
-                                                                                    '"messagecontentobject":' + '{' +
-                                                                                    '"elements":' + '[' +
-                                                                                    '{' +
-                                                                                    '"title":' + '"' + questionTitle + '"' + ',' +
-                                                                                    '"buttons":' + '[';
-
-                                                                                for (var i = 0; i < length; i++) {
-                                                                                    if (i > 26) break;
-                                                                                    var districbo = result.GetDistricByProvinceResult.DistrictBO[i];
-
-                                                                                    if (i == (length - 1)) {
-                                                                                        jsonmessageDistrict += '{' +
-                                                                                            '"type":"postback"' + ',' +
-                                                                                            '"title":' + '"' + districbo.districtNameField + '"' + ',' +
-                                                                                            '"payload":' + '"' + districbo.districtIDField + '"' + '}';
-
-                                                                                    }
-                                                                                    else {
-
-                                                                                        jsonmessageDistrict += '{' +
-
-
-                                                                                            '"type":"postback"' + ',' +
-                                                                                            '"title":' + '"' + districbo.districtNameField + '"' + ',' +
-                                                                                            '"payload":' + '"' + districbo.districtIDField + '"' + '}' + ',';
-
-                                                                                    }
-
-                                                                                }
-                                                                                jsonmessageDistrict +=
-                                                                                    ']' +
-                                                                                    '}' + ']' + '}' + '}';
-
-                                                                                var bodystring = JSON.parse(jsonmessageDistrict);
-                                                                                var bodyjson = JSON.stringify(bodystring);
-
-
-                                                                                //console.log("===============BUTTON POSTBACK===================");
-                                                                                //console.log(bodyjson);
-
-
-                                                                                SentToClientButton(sender, bodyjson)
-                                                                                    .catch(console.error);
-                                                                            });
+                                                                            SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle);
 
                                                                             //=======================================================================
 
