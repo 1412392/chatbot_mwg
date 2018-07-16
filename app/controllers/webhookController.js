@@ -1003,7 +1003,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             {
                 intent = "ask_instalment";
                 sessions[sessionId].prev_intent = "ask_instalment";
-              
+
 
             }
             else if (button_payload_state === 11)//hỏi trả góp thường
@@ -1165,6 +1165,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
             if (intent === "greet") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 if (customer_question.toLowerCase() === "chào bạn" && (sessions[sessionId].prev_intent === "ask_price" || sessions[sessionId].prev_intent === "ask_stock"
                     || sessions[sessionId].prev_intent === "ask_promotion" || sessions[sessionId].prev_intent === "ask_delivery"
                     || sessions[sessionId].prev_intent === "thankyou" || sessions[sessionId].prev_intent === "felling_love")) {
@@ -1182,6 +1184,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
             if (intent === "goodbye") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 sessions[sessionId].prev_intent = "goodbye";
                 questionTitle = "Cảm ơn!";
@@ -1194,6 +1197,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
             else if (intent === "thankyou") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 sessions[sessionId].prev_intent = "thankyou";
                 questionTitle = "Cảm ơn!";
                 var rn = randomNumber(thankyou.length);
@@ -1202,6 +1207,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 fbEvaluate(sender, replyobject, siteid);
             }
             else if (intent === "ask_promotion" || sessions[sessionId].prev_intent === "ask_promotion") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 if (sessions[sessionId].prev_intent === "ask_promotion" && intent != "ask_promotion") {//nếu đã hỏi khuyễn mãi trước mà hiện tại câu này không còn hỏi km nữa thì reset
                     sessions[sessionId].prev_intent = null;
                 }
@@ -1385,6 +1392,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 //sessions[sessionId].prev_intent = "ask_promotion";
             }
             else if (intent === "ask_instalment" || sessions[sessionId].prev_intent === "ask_instalment") {
+
                 questionTitle = "Thông tin trả góp!";
                 if (/*!sessions[sessionId].financialCompany ||*/ sessions[sessionId].prev_intent != "ask_instalment") {
                     resultanswer += "<p style='color:red;font-style: italic;'>Để mua hàng trả góp, tuổi của bạn phải lớn hớn 20 và nhỏ hơn 60, và bắt buộc phải có CMND chính chủ.Lưu ý tất cả các giấy tờ phải còn hạn sử dụng. Chấp nhận bản photo phải có CÔNG CHỨNG không quá 6 tháng.</p>";
@@ -1586,6 +1594,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         }
                                                     }
                                                     else {
+
                                                         if (sessions[sessionId].isLatestAskPercentInstalment) {//nếu câu liền trước là hỏi số % trả trước
                                                             //==> mục đích là lấy đúng input người dùng nhập vào cho câu đó
                                                             if (sessions[sessionId].percent_instalment != null) {
@@ -1629,7 +1638,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         //hỏi CMND
                                                         if (!sessions[sessionId].isAskedGID || sessions[sessionId].isLatestAskGID /*chưa bị reset (phá ngang câu hỏi)*/) {
                                                             if (sessions[sessionId].isLatestAskNormalInstallment) {
-                                                                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                                                                 resultanswer += "<br />Mời bạn thêm một số thông tin sau để xem góp trả góp thường phù hợp nhất. </br> ";
 
                                                             }
@@ -2032,6 +2041,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].prev_intent = "ask_instalment";
             }
             else if (intent === "ask_stock" || intent === "ask_price" || intent === "ask_old_stock") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 if (intent === "ask_stock")
                     sessions[sessionId].prev_intent = "ask_stock";
                 if (intent === "ask_price")
@@ -2826,7 +2837,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
 
             else if (intent === "offense") {
-
+                sessions[sessionId].isLatestAskNormalInstallment = false;
                 var rn = randomNumber(offense.length);
                 resultanswer += offense[rn];
 
@@ -2837,6 +2848,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
 
             else if (intent === "ask_consultant") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 questionTitle = "Tư vấn sản phẩm.";
 
                 resultanswer += "<br />Chức năng tư vấn sản phẩm đang phát triển. Xin lỗi vì sự bất tiện này!"
@@ -2849,6 +2862,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
             else if (intent === "ask_name") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 questionTitle = "Hỏi tên";
                 var rn = randomNumber(ask_name.length);
                 resultanswer = ask_name[rn];
@@ -2858,6 +2873,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
 
             else if (intent === "felling_love") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 questionTitle = "Cảm xúc";
                 resultanswer = "Cảm ơn bạn. Rất hân hạnh được phục vụ bạn. !" + "<br />";
 
@@ -2866,6 +2883,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
 
             else if (intent === "felling_price") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 questionTitle = "Cảm xúc giá";
                 resultanswer = "Chất lượng sản phẩm ở Thế Giới Di Động được cam kết là chất lượng và chính hãng nha bạn. Giá cả rất hợp lý cho người mua ạ. " + "<br />";
 
@@ -2874,6 +2893,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].prev_intent = "felling_price";
             }
             else if (intent === "ask_delivery") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 questionTitle = "Giao hàng";
                 resultanswer = "Chức năng giao hàng đang được phát triển... Xin lỗi bạn vì sự bất tiện này!";
                 resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
@@ -2883,6 +2904,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].prev_intent = "ask_delivery";
             }
             else if (intent === "ask_compare") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 questionTitle = "So sánh";
                 resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập https://www.thegioididong.com/hoi-dap để được trả lời cụ thể hơn nha bạn!";
 
@@ -2893,6 +2916,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].prev_intent = "ask_compare";
             }
             else if (intent == "ask_helper") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 resultanswer = "Danh sách tổng đài hỗ trợ của TGDD: <br />";
                 resultanswer += "<ul><li> Gọi mua hàng 1800.1060 (7: 30 - 22: 00)</li> <li> Gọi khiếu nại 1800.1062 (8: 00 - 21: 30)</li> <li> Gọi bảo hành 1800.1064 (8: 00 - 21: 00)</li> <li>Hỗ trợ kỹ thuật 1800.1763 (7: 30 - 22: 00) </li> </ul>";
@@ -2900,6 +2924,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
             else if (intent == "ask_guarantee") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 resultanswer = "Về các dịch vụ liên quan đến bảo hành như thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin... <br />";
                 resultanswer += "Kính mong quý khách đem máy đến cửa hàng Thế Giới Di Động gần nhất để được phục vụ, báo giá chi tiết và chính xác nhất ạ.";
@@ -2908,16 +2933,23 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
             else if (intent == "ans_tel") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 resultanswer = "Cảm ơn bạn.Chúng tôi sẽ liên hệ bạn sớm nhất có thể. Bạn cần tư vấn hỗ trợ gì nữa không ạ?";
             }
             else if (intent == "ask_return") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 resultanswer = "Chức năng ĐỔI TRẢ VÀ MUA LẠI hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001064 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. Xin cảm ơn";
             }
             else if (intent == "ask_order") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
                 resultanswer = "Chức năng KIỂM TRA ĐƠN HÀNG hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001062 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. Xin cảm ơn";
             }
 
             else {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
                 if (intent === "greet") {
                 }
                 else {
