@@ -1078,6 +1078,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 else if (button_payload_state === 8 || button_payload_state === 9)//cong ty tai chinh
                 {
                     sessions[sessionId].financialCompany = button_payload_state;
+                    intent = "ask_instalment";
                 }
 
                 else if (button_payload_state === "NORMAL" || button_payload_state === "BAD" || button_payload_state === "GOOD") {
