@@ -1104,7 +1104,67 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     if (entities[i].value.includes("cường lực")) {
                         entities[i].value = entities[i].value.replace("cường lực", "màn hình");
                     }
-                    sessions[sessionId].product = entities[i].value;
+                    //phụ kiện 
+                    if (sessions[sessionId].product != null && (
+                        sessions[sessionId].product.toLowerCase().includes("ốp lưng") ||
+                        sessions[sessionId].product.toLowerCase().includes("op lung") ||
+                        sessions[sessionId].product.toLowerCase().includes("tai nghe") ||
+                        sessions[sessionId].product.toLowerCase().includes("tai phone") ||
+                        sessions[sessionId].product.toLowerCase().includes("pin") ||
+                        sessions[sessionId].product.toLowerCase().includes("sạc") ||
+                        sessions[sessionId].product.toLowerCase().includes("sac") ||
+                        sessions[sessionId].product.toLowerCase().includes("bàn phím") ||
+                        sessions[sessionId].product.toLowerCase().includes("ban phim") ||
+                        sessions[sessionId].product.toLowerCase().includes("loa") ||
+                        sessions[sessionId].product.toLowerCase().includes("thẻ nhớ") ||
+                        sessions[sessionId].product.toLowerCase().includes("the nho") ||
+                        sessions[sessionId].product.toLowerCase().includes("usb") ||
+                        sessions[sessionId].product.toLowerCase().includes("đồng hồ") ||
+                        sessions[sessionId].product.toLowerCase().includes("dong ho") ||
+                        sessions[sessionId].product.toLowerCase().includes("gậy") ||
+                        sessions[sessionId].product.toLowerCase().includes("giá đỡ") ||
+                        sessions[sessionId].product.toLowerCase().includes("gay tu suong") ||
+                        sessions[sessionId].product.toLowerCase().includes("dán màn hình") ||
+                        sessions[sessionId].product.toLowerCase().includes("cường lực") ||
+                        sessions[sessionId].product.toLowerCase().includes("dây cáp") ||
+                        sessions[sessionId].product.toLowerCase().includes("day cap") ||
+
+                        entities[i].value.toLowerCase().includes("ốp lưng") ||
+                        entities[i].value.toLowerCase().includes("op lung") ||
+                        entities[i].value.toLowerCase().includes("tai nghe") ||
+                        entities[i].value.toLowerCase().includes("tai phone") ||
+                        entities[i].value.toLowerCase().includes("pin") ||
+                        entities[i].value.toLowerCase().includes("sạc") ||
+                        entities[i].value.toLowerCase().includes("sac") ||
+                        entities[i].value.toLowerCase().includes("bàn phím") ||
+                        entities[i].value.toLowerCase().includes("ban phim") ||
+                        entities[i].value.toLowerCase().includes("loa") ||
+                        entities[i].value.toLowerCase().includes("thẻ nhớ") ||
+                        entities[i].value.toLowerCase().includes("the nho") ||
+                        entities[i].value.toLowerCase().includes("usb") ||
+                        entities[i].value.toLowerCase().includes("đồng hồ") ||
+                        entities[i].value.toLowerCase().includes("dong ho") ||
+                        entities[i].value.toLowerCase().includes("gậy") ||
+                        entities[i].value.toLowerCase().includes("giá đỡ") ||
+                        entities[i].value.toLowerCase().includes("gay tu suong") ||
+                        entities[i].value.toLowerCase().includes("dán màn hình") ||
+                        entities[i].value.toLowerCase().includes("cường lực") ||
+                        entities[i].value.toLowerCase().includes("dây cáp") ||
+                        entities[i].value.toLowerCase().includes("day cap"))
+                    ) {
+
+                        sessions[sessionId].product += " " + entities[i].value;//gộp  sản phẩm lại
+                    }
+                    else {
+                        sessions[sessionId].product = entities[i].value;
+                    }
+
+                }
+                if (entities[i].entity === "storage")//bộ nhớ lưu trữ
+                {
+                    if (sessions[sessionId].product != null) {
+                        sessions[sessionId].product += " " + entities[i].entity;
+                    }
                 }
                 if (entities[i].entity === "color") {
                     sessions[sessionId].color = entities[i].value;
@@ -1238,6 +1298,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("đồng hồ") ||
                         keyword.toLowerCase().includes("dong ho") ||
                         keyword.toLowerCase().includes("gậy") ||
+                        keyword.toLowerCase().includes("giá đỡ") ||
                         keyword.toLowerCase().includes("dán màn hình") ||
                         keyword.toLowerCase().includes("cường lực") ||
                         keyword.toLowerCase().includes("tai phone") ||
@@ -1428,6 +1489,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("đồng hồ") ||
                         keyword.toLowerCase().includes("dong ho") ||
                         keyword.toLowerCase().includes("gậy") ||
+                        keyword.toLowerCase().includes("giá đỡ") ||
                         keyword.toLowerCase().includes("dán màn hình") ||
                         keyword.toLowerCase().includes("cường lực") ||
                         keyword.toLowerCase().includes("tai phone") ||
@@ -2105,6 +2167,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("đồng hồ") ||
                         keyword.toLowerCase().includes("dong ho") ||
                         keyword.toLowerCase().includes("gậy") ||
+                        keyword.toLowerCase().includes("giá đỡ") ||
                         keyword.toLowerCase().includes("gay tu suong") ||
                         keyword.toLowerCase().includes("dán màn hình") ||
                         keyword.toLowerCase().includes("tai phone") ||
@@ -2926,7 +2989,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent == "ask_guarantee") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                resultanswer = "Về các dịch vụ liên quan đến bảo hành như thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin... <br />";
+                resultanswer = "Về các dịch vụ liên quan đến bảo hành như thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin, hỏng nguồn...Dịch vụ hỗ trợ Online chỉ giải đáp cho quý khách các vấn đề liên quan đến mua bán thôi ạ.<br />";
                 resultanswer += "Kính mong quý khách đem máy đến cửa hàng Thế Giới Di Động gần nhất để được phục vụ, báo giá chi tiết và chính xác nhất ạ.";
                 resultanswer += "Rất xin lỗi vì sự bất tiện này."
 
@@ -2947,6 +3010,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 resultanswer = "Chức năng KIỂM TRA ĐƠN HÀNG hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001062 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. Xin cảm ơn";
             }
+
 
             else {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
