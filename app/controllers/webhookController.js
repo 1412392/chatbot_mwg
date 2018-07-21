@@ -2961,6 +2961,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 questionTitle = "Giao hàng";
                 resultanswer = "Chức năng giao hàng đang được phát triển... Xin lỗi bạn vì sự bất tiện này!";
+                resultanswer += "Bạn có thể tham khảo thông tin về chính sách giao hàng ở đây <a href='https://www.thegioididong.com/giao-hang' target='_blank'>https://www.thegioididong.com/giao-hang</a>";
+                resultanswer += "Hỗ trợ gấp, xin gọi 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ gấp ạ.";
                 resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
 
                 //suggest kh
@@ -2990,8 +2992,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent == "ask_guarantee") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                resultanswer = "Về các dịch vụ liên quan đến bảo hành như thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin, hỏng nguồn...Dịch vụ hỗ trợ Online chỉ giải đáp cho quý khách các vấn đề liên quan đến mua bán thôi ạ.<br />";
+                resultanswer = "Về các dịch vụ liên quan đến bảo hành như <span style='font-style:italic'>thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin, hỏng nguồn...</span>";
                 resultanswer += "Kính mong quý khách đem máy đến cửa hàng Thế Giới Di Động gần nhất để được phục vụ, báo giá chi tiết và chính xác nhất ạ.";
+                resultanswer += "Dịch vụ hỗ trợ Online chỉ giải đáp cho quý khách các vấn đề liên quan đến mua bán thôi ạ.";
                 resultanswer += "Rất xin lỗi vì sự bất tiện này."
 
 
