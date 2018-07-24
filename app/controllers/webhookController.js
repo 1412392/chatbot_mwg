@@ -1100,10 +1100,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             for (var i = 0; i < entities.length; i++) {
 
-                sessions[sessionId].currentvalue = entities[i].value.replace('_',' ');
+                sessions[sessionId].currentvalue = entities[i].value.replace('_', ' ');
                 if (entities[i].entity === "product") {
                     if (entities[i].value.includes("cường lực")) {
-                        entities[i].value = entities[i].value.replace("cường lực", "màn hình").replace('_',' ');
+                        entities[i].value = entities[i].value.replace("cường lực", "màn hình").replace('_', ' ');
                     }
                     //phụ kiện 
                     if (sessions[sessionId].product != null && (
@@ -1130,48 +1130,48 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         sessions[sessionId].product.toLowerCase().includes("dây cáp") ||
                         sessions[sessionId].product.toLowerCase().includes("day cap") ||
 
-                        entities[i].value.toLowerCase().replace('_',' ').includes("ốp lưng") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("op lung") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("tai nghe") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("tai phone") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("pin") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("sạc") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("sac") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("bàn phím") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("ban phim") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("loa") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("thẻ nhớ") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("the nho") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("usb") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("đồng hồ") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("dong ho") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("gậy") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("giá đỡ") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("gay tu suong") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("dán màn hình") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("cường lực") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("dây cáp") ||
-                        entities[i].value.toLowerCase().replace('_',' ').includes("day cap"))
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("ốp lưng") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("op lung") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("tai nghe") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("tai phone") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("pin") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("sạc") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("sac") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("bàn phím") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("ban phim") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("loa") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("thẻ nhớ") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("the nho") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("usb") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("đồng hồ") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("dong ho") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("gậy") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("giá đỡ") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("gay tu suong") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("dán màn hình") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("cường lực") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("dây cáp") ||
+                        entities[i].value.toLowerCase().replace('_', ' ').includes("day cap"))
                     ) {
 
-                        sessions[sessionId].product += " " + entities[i].value.replace('_',' ');//gộp  sản phẩm lại
+                        sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');//gộp  sản phẩm lại
                     }
                     else {
-                        sessions[sessionId].product = entities[i].value.replace('_',' ');
+                        sessions[sessionId].product = entities[i].value.replace('_', ' ');
                     }
 
                 }
                 if (entities[i].entity === "storage")//bộ nhớ lưu trữ
                 {
                     if (sessions[sessionId].product != null) {
-                        sessions[sessionId].product += " " + entities[i].entity.replace('_',' ');
+                        sessions[sessionId].product += " " + entities[i].entity.replace('_', ' ');
                     }
                 }
                 if (entities[i].entity === "color") {
-                    sessions[sessionId].color = entities[i].value.replace('_',' ');
+                    sessions[sessionId].color = entities[i].value.replace('_', ' ');
                 }
                 if (entities[i].entity === "price") {
-                    sessions[sessionId].price = entities[i].value.replace('_',' ');
+                    sessions[sessionId].price = entities[i].value.replace('_', ' ');
                 }
                 if (entities[i].entity === "province") {
 
@@ -1180,11 +1180,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     if (sessions[sessionId].province)
                         sessions[sessionId].district = null;
 
-                    sessions[sessionId].province = entities[i].value.replace('_',' ');
+                    sessions[sessionId].province = entities[i].value.replace('_', ' ');
 
                 }
                 if (entities[i].entity === "district") {
-                    sessions[sessionId].district = entities[i].value.replace('_',' ');
+                    sessions[sessionId].district = entities[i].value.replace('_', ' ');
 
                 }
 
@@ -2306,29 +2306,20 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     var type = "template";
 
                                                                     questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + provinceName;
-                                                                    var jsonmessageStore = '{' +
-                                                                        '"username":' + '"' + sender + '"' + ',' +
-                                                                        '"siteid":' + '"' + siteid + '"' + ',' +
-                                                                        '"messagetype":"template"' + ',' +
-                                                                        '"replyobject":' + '{' +
-                                                                        '"username":' + '"' + replyobject.username + '"' + ',' +
-                                                                        '"message":' + '"' + replyobject.message + '"' + ',' +
-                                                                        '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                                                                        '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                                                                        '"sentAt":' + replyobject.sentAt + ',' +
-                                                                        '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                                                                        '"gender":' + replyobject.gender + ',' +
-                                                                        '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                                                                        '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                                                                        '"isbot":' + replyobject.isbot +
-                                                                        '}' + ',' +
-                                                                        '"messagecontentobject":' + '{' +
-                                                                        '"elements":' + '[' +
-                                                                        '{' +
-                                                                        '"title":' + '"' + questionTitle + '"' + ',' +
-                                                                        '"buttons":' + '[';
-
-
+                                                                    var jsonmessageStore = {
+                                                                        username: sender,
+                                                                        siteid: siteid,
+                                                                        messagetype: "template",
+                                                                        replyobject: replyobject,
+                                                                        messagecontentobject: {
+                                                                            elements: [
+                                                                                {
+                                                                                    title: questionTitle,
+                                                                                    buttons: []
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    };
                                                                     var length = result.GetStoreInStock2016Result.StoreBO.length;
 
                                                                     // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
@@ -2337,39 +2328,19 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
                                                                         //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
 
-                                                                        if (i == (length - 1)) {
-
-                                                                            jsonmessageStore += '{' +
-                                                                                '"type":"web_url"' + ',' +
-                                                                                '"title":' + '"' + (i + 1) + storeBO.webAddressField + '"' + ',' +
-                                                                                '"url":' + '"' + "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + '"' + '}';
-
-
-                                                                        }
-                                                                        else {
-                                                                            jsonmessageStore += '{' +
-                                                                                '"type":"web_url"' + ',' +
-                                                                                '"title":' + '"' + storeBO.webAddressField + '"' + ',' +
-                                                                                '"url":' + '"' + "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + '"' + '}' + ',';
-
-                                                                        }
-
-
+                                                                        jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+                                                                            type: "web_url",
+                                                                            title: (i + 1) + ". " + storeBO.webAddressField,
+                                                                            url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+                                                                        });
                                                                     }
-                                                                    //resultanswer += "..................";
-
-
 
                                                                     //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                     //    .catch(console.error);
-
-                                                                    jsonmessageStore +=
-                                                                        ']' +
-                                                                        '}' + ']' + '}' + '}';
                                                                     // console.log(jsonmessageStore);
 
-                                                                    var bodystring = JSON.parse(jsonmessageStore);
-                                                                    var bodyjson = JSON.stringify(bodystring);
+                                                                    //  var bodystring = JSON.parse(jsonmessageStore);
+                                                                    var bodyjson = JSON.stringify(jsonmessageStore);
 
 
                                                                     //console.log("===============BUTTON URL STORE===================");
@@ -2477,27 +2448,21 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var type = "template";
 
 
-                                                                        var jsonmessageStore = '{' +
-                                                                            '"username":' + '"' + sender + '"' + ',' +
-                                                                            '"siteid":' + '"' + siteid + '"' + ',' +
-                                                                            '"messagetype":"template"' + ',' +
-                                                                            '"replyobject":' + '{' +
-                                                                            '"username":' + '"' + replyobject.username + '"' + ',' +
-                                                                            '"message":' + '"' + replyobject.message + '"' + ',' +
-                                                                            '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                                                                            '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                                                                            '"sentAt":' + replyobject.sentAt + ',' +
-                                                                            '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                                                                            '"gender":' + replyobject.gender + ',' +
-                                                                            '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                                                                            '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                                                                            '"isbot":' + replyobject.isbot +
-                                                                            '}' + ',' +
-                                                                            '"messagecontentobject":' + '{' +
-                                                                            '"elements":' + '[' +
-                                                                            '{' +
-                                                                            '"title":' + '"' + questionTitle + '"' + ',' +
-                                                                            '"buttons":' + '[';
+                                                                        var jsonmessageStore = {
+                                                                            username: sender,
+                                                                            siteid: siteid,
+                                                                            messagetype: "template",
+                                                                            replyobject: replyobject,
+                                                                            messagecontentobject: {
+                                                                                elements: [
+                                                                                    {
+                                                                                        title: questionTitle,
+                                                                                        buttons: []
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        };
+
                                                                         var length = result.GetStoreInStock2016Result.StoreBO.length;
 
                                                                         for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
@@ -2507,33 +2472,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                 // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
 
 
-                                                                                if (i == (length - 1)) {
-
-                                                                                    jsonmessageStore += '{' +
-                                                                                        '"type":"web_url"' + ',' +
-                                                                                        '"title":' + '"' + (i + 1) + storeBO.webAddressField + '"' + ',' +
-                                                                                        '"url":' + '"' + "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + '"' + '}';
-
-
-                                                                                }
-                                                                                else {
-                                                                                    jsonmessageStore += '{' +
-                                                                                        '"type":"web_url"' + ',' +
-                                                                                        '"title":' + '"' + (i + 1) + storeBO.webAddressField + '"' + ',' +
-                                                                                        '"url":' + '"' + "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + '"' + '}' + ',';
-
-                                                                                }
+                                                                                jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+                                                                                    type: "web_url",
+                                                                                    title: (i + 1) + ". " + storeBO.webAddressField,
+                                                                                    url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+                                                                                });
 
                                                                             }
 
                                                                         }
-
-                                                                        jsonmessageStore +=
-                                                                            ']' +
-                                                                            '}' + ']' + '}' + '}';
-
-                                                                        var bodystring = JSON.parse(jsonmessageStore);
-                                                                        var bodyjson = JSON.stringify(bodystring);
+                                                                        //  var bodystring = JSON.parse(jsonmessageStore);
+                                                                        var bodyjson = JSON.stringify(jsonmessageStore);
 
 
                                                                         //console.log("===============BUTTON URL STORE===================");
