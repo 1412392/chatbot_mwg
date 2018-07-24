@@ -2916,7 +2916,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 questionTitle = "Tư vấn sản phẩm.";
 
-                resultanswer += "<br />Chức năng tư vấn sản phẩm đang phát triển. Xin lỗi vì sự bất tiện này!"
+                resultanswer += "<br />Chức năng tư vấn sản phẩm đang phát triển. Xin lỗi vì sự bất tiện này!";
+                resultanswer += "Quý khách có thể truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất! ";
+                resultanswer += "Hoặc liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
                 resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
                 intent = "ask_consultant";
                 sessions[sessionId].prev_intent = "ask_consultant";
@@ -2960,9 +2962,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 questionTitle = "Giao hàng";
-                resultanswer = "Chức năng giao hàng đang được phát triển... Xin lỗi bạn vì sự bất tiện này!";
-                resultanswer += "Bạn có thể tham khảo thông tin về chính sách giao hàng ở đây <a href='https://www.thegioididong.com/giao-hang' target='_blank'>https://www.thegioididong.com/giao-hang</a>";
-                resultanswer += "Hỗ trợ gấp, xin gọi 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ gấp ạ.";
+                resultanswer = "Chúng tôi hỗ trợ giao hàng trên toàn quốc.";
+                resultanswer += " Bạn có thể tham khảo thông tin về chính sách, chi phí giao hàng ở đây <a href='https://www.thegioididong.com/giao-hang' target='_blank'>https://www.thegioididong.com/giao-hang</a><br/>";
+                resultanswer += "Hỗ trợ gấp, xin gọi 18001060 (MIỄN PHÍ CUỘC GỌI) để được tư vấn cụ thể.<br/>";
                 resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
 
                 //suggest kh
@@ -2973,7 +2975,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 questionTitle = "So sánh";
-                resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập https://www.thegioididong.com/hoi-dap để được trả lời cụ thể hơn nha bạn!";
+                resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất!";
 
                 resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
 
@@ -2994,7 +2996,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 resultanswer = "Về các dịch vụ liên quan đến bảo hành như <span style='font-style:italic'>thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin, hỏng nguồn...</span>";
                 resultanswer += "Kính mong quý khách đem máy đến cửa hàng Thế Giới Di Động gần nhất để được phục vụ, báo giá chi tiết và chính xác nhất ạ.";
-                resultanswer += "Dịch vụ hỗ trợ Online chỉ giải đáp cho quý khách các vấn đề liên quan đến mua bán thôi ạ.";
+                resultanswer += "Dịch vụ hỗ trợ Online chỉ giải đáp cho quý khách các vấn đề liên quan đến mua bán thôi ạ. Quý khách có thể xem chính sách bảo hành tại đây <a href='https://www.thegioididong.com/chinh-sach-bao-hanh-san-pham' targer='_blank'>Chính sách bảo hành</a><br/>";
                 resultanswer += "Rất xin lỗi vì sự bất tiện này."
 
 
@@ -3007,7 +3009,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent == "ask_return") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                resultanswer = "Chức năng ĐỔI TRẢ VÀ MUA LẠI hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001064 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. Xin cảm ơn";
+                resultanswer = "Chức năng ĐỔI TRẢ VÀ MUA LẠI hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001064 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. <br/>";
+                resultanswer += "Quý khách có thể tham khảo chính sách đổi trả tại đây <a href='https://www.thegioididong.com/chinh-sach-bao-hanh-san-pham' targer='_blank'>Chính sách đổi trả</a><br/>";
+                resultanswer += "Xin cảm ơn";
             }
             else if (intent == "ask_order") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
