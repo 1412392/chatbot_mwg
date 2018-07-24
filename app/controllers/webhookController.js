@@ -1453,6 +1453,128 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 intent = "ask_promotion";
                 //sessions[sessionId].prev_intent = "ask_promotion";
             }
+
+           
+
+            else if (intent === "offense") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+                var rn = randomNumber(offense.length);
+                resultanswer += offense[rn];
+
+                //var resultanswer2 = "Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
+
+                intent = "offense";
+                sessions[sessionId].prev_intent = "offense";
+            }
+
+            else if (intent === "ask_consultant") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Tư vấn sản phẩm.";
+
+                resultanswer += "<br />Chức năng tư vấn sản phẩm đang phát triển. Xin lỗi vì sự bất tiện này!";
+                resultanswer += "Quý khách có thể truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất! ";
+                resultanswer += "Hoặc liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
+                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                intent = "ask_consultant";
+                sessions[sessionId].prev_intent = "ask_consultant";
+
+                sessions[sessionId].product = null;
+            }
+
+
+            else if (intent === "ask_name") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Hỏi tên";
+                var rn = randomNumber(ask_name.length);
+                resultanswer = ask_name[rn];
+
+                intent = "ask_name";
+                sessions[sessionId].prev_intent = "ask_name";
+            }
+
+            else if (intent === "felling_love") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Cảm xúc";
+                resultanswer = "Cảm ơn bạn. Rất hân hạnh được phục vụ bạn. !" + "<br />";
+
+                intent = "felling_love";
+                sessions[sessionId].prev_intent = "felling_love";
+            }
+
+            else if (intent === "felling_price") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Cảm xúc giá";
+                resultanswer = "Chất lượng sản phẩm ở Thế Giới Di Động được cam kết là chất lượng và chính hãng nha bạn. Giá cả rất hợp lý cho người mua ạ. " + "<br />";
+
+                //suggest kh
+                intent = "felling_price";
+                sessions[sessionId].prev_intent = "felling_price";
+            }
+            else if (intent === "ask_delivery") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Giao hàng";
+                resultanswer = "Chúng tôi hỗ trợ giao hàng trên toàn quốc.";
+                resultanswer += " Bạn có thể tham khảo thông tin về chính sách, chi phí giao hàng ở đây <a href='https://www.thegioididong.com/giao-hang' target='_blank'>https://www.thegioididong.com/giao-hang</a><br/>";
+                resultanswer += "Hỗ trợ gấp, xin gọi 18001060 (MIỄN PHÍ CUỘC GỌI) để được tư vấn cụ thể.<br/>";
+                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+
+                //suggest kh
+                intent = "ask_delivery";
+                sessions[sessionId].prev_intent = "ask_delivery";
+            }
+            else if (intent === "ask_compare") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "So sánh";
+                resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất!";
+
+                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+
+                //suggest kh
+                intent = "ask_compare";
+                sessions[sessionId].prev_intent = "ask_compare";
+            }
+            else if (intent == "ask_helper") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                resultanswer = "Danh sách tổng đài hỗ trợ của TGDD (TẤT CẢ CUỘC GỌI MIỄN PHÍ): <br />";
+                resultanswer += "<ul><li> Gọi mua hàng 1800.1060 (7: 30 - 22: 00)</li> <li> Gọi khiếu nại 1800.1062 (8: 00 - 21: 30)</li> <li> Gọi bảo hành 1800.1064 (8: 00 - 21: 00)</li> <li>Hỗ trợ kỹ thuật 1800.1763 (7: 30 - 22: 00) </li> </ul>";
+
+
+            }
+            else if (intent == "ask_guarantee") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                resultanswer = "Về các dịch vụ liên quan đến bảo hành như <span style='font-style:italic'>thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin, hỏng nguồn...</span>";
+                resultanswer += "Kính mong quý khách đem máy đến cửa hàng Thế Giới Di Động gần nhất để được phục vụ, báo giá chi tiết và chính xác nhất ạ.";
+                resultanswer += "Dịch vụ hỗ trợ Online chỉ giải đáp cho quý khách các vấn đề liên quan đến mua bán thôi ạ. Quý khách có thể xem chính sách bảo hành tại đây <a href='https://www.thegioididong.com/chinh-sach-bao-hanh-san-pham' targer='_blank'>Chính sách bảo hành</a><br/>";
+                resultanswer += "Rất xin lỗi vì sự bất tiện này."
+
+
+            }
+            else if (intent == "ans_tel") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                resultanswer = "Cảm ơn bạn.Chúng tôi sẽ liên hệ bạn sớm nhất có thể. Bạn cần tư vấn hỗ trợ gì nữa không ạ?";
+            }
+            else if (intent == "ask_return") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                resultanswer = "Chức năng ĐỔI TRẢ VÀ MUA LẠI hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001064 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. <br/>";
+                resultanswer += "Quý khách có thể tham khảo chính sách đổi trả tại đây <a href='https://www.thegioididong.com/chinh-sach-bao-hanh-san-pham' targer='_blank'>Chính sách đổi trả</a><br/>";
+                resultanswer += "Xin cảm ơn";
+            }
+            else if (intent == "ask_order") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                resultanswer = "Chức năng KIỂM TRA ĐƠN HÀNG hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001062 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. Xin cảm ơn";
+            }
+
             else if (intent === "ask_instalment" || sessions[sessionId].prev_intent === "ask_instalment") {
 
                 questionTitle = "Thông tin trả góp!";
@@ -2100,8 +2222,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 }
 
-                intent = "ask_instalment";
-                sessions[sessionId].prev_intent = "ask_instalment";
+
+                if (sessions[sessionId].prev_intent === "ask_instalment" && intent != "ask_instalment") {//nếu đã hỏi tra gop trước mà hiện tại câu này không còn hỏi km nữa thì reset
+                    sessions[sessionId].prev_intent = null;
+                }
+                if (intent === "ask_instalment") {//nếu câu hiện tại đang hỏi km 
+                    sessions[sessionId].prev_intent = "ask_instalment";
+                }
             }
             else if (intent === "ask_stock" || intent === "ask_price" || intent === "ask_old_stock") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
@@ -2847,125 +2974,6 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     resultanswer = unknowproduct[rn];
                 }
 
-            }
-
-            else if (intent === "offense") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-                var rn = randomNumber(offense.length);
-                resultanswer += offense[rn];
-
-                //var resultanswer2 = "Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
-
-                intent = "offense";
-                sessions[sessionId].prev_intent = "offense";
-            }
-
-            else if (intent === "ask_consultant") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                questionTitle = "Tư vấn sản phẩm.";
-
-                resultanswer += "<br />Chức năng tư vấn sản phẩm đang phát triển. Xin lỗi vì sự bất tiện này!";
-                resultanswer += "Quý khách có thể truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất! ";
-                resultanswer += "Hoặc liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
-                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
-                intent = "ask_consultant";
-                sessions[sessionId].prev_intent = "ask_consultant";
-
-                sessions[sessionId].product = null;
-            }
-
-
-            else if (intent === "ask_name") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                questionTitle = "Hỏi tên";
-                var rn = randomNumber(ask_name.length);
-                resultanswer = ask_name[rn];
-
-                intent = "ask_name";
-                sessions[sessionId].prev_intent = "ask_name";
-            }
-
-            else if (intent === "felling_love") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                questionTitle = "Cảm xúc";
-                resultanswer = "Cảm ơn bạn. Rất hân hạnh được phục vụ bạn. !" + "<br />";
-
-                intent = "felling_love";
-                sessions[sessionId].prev_intent = "felling_love";
-            }
-
-            else if (intent === "felling_price") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                questionTitle = "Cảm xúc giá";
-                resultanswer = "Chất lượng sản phẩm ở Thế Giới Di Động được cam kết là chất lượng và chính hãng nha bạn. Giá cả rất hợp lý cho người mua ạ. " + "<br />";
-
-                //suggest kh
-                intent = "felling_price";
-                sessions[sessionId].prev_intent = "felling_price";
-            }
-            else if (intent === "ask_delivery") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                questionTitle = "Giao hàng";
-                resultanswer = "Chúng tôi hỗ trợ giao hàng trên toàn quốc.";
-                resultanswer += " Bạn có thể tham khảo thông tin về chính sách, chi phí giao hàng ở đây <a href='https://www.thegioididong.com/giao-hang' target='_blank'>https://www.thegioididong.com/giao-hang</a><br/>";
-                resultanswer += "Hỗ trợ gấp, xin gọi 18001060 (MIỄN PHÍ CUỘC GỌI) để được tư vấn cụ thể.<br/>";
-                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
-
-                //suggest kh
-                intent = "ask_delivery";
-                sessions[sessionId].prev_intent = "ask_delivery";
-            }
-            else if (intent === "ask_compare") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                questionTitle = "So sánh";
-                resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất!";
-
-                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
-
-                //suggest kh
-                intent = "ask_compare";
-                sessions[sessionId].prev_intent = "ask_compare";
-            }
-            else if (intent == "ask_helper") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                resultanswer = "Danh sách tổng đài hỗ trợ của TGDD (TẤT CẢ CUỘC GỌI MIỄN PHÍ): <br />";
-                resultanswer += "<ul><li> Gọi mua hàng 1800.1060 (7: 30 - 22: 00)</li> <li> Gọi khiếu nại 1800.1062 (8: 00 - 21: 30)</li> <li> Gọi bảo hành 1800.1064 (8: 00 - 21: 00)</li> <li>Hỗ trợ kỹ thuật 1800.1763 (7: 30 - 22: 00) </li> </ul>";
-
-
-            }
-            else if (intent == "ask_guarantee") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                resultanswer = "Về các dịch vụ liên quan đến bảo hành như <span style='font-style:italic'>thay màn hình, thay phụ kiện, hư hỏng do lỗi nhà sản xuất, lỗi nóng máy, lỗi tụt pin, hỏng nguồn...</span>";
-                resultanswer += "Kính mong quý khách đem máy đến cửa hàng Thế Giới Di Động gần nhất để được phục vụ, báo giá chi tiết và chính xác nhất ạ.";
-                resultanswer += "Dịch vụ hỗ trợ Online chỉ giải đáp cho quý khách các vấn đề liên quan đến mua bán thôi ạ. Quý khách có thể xem chính sách bảo hành tại đây <a href='https://www.thegioididong.com/chinh-sach-bao-hanh-san-pham' targer='_blank'>Chính sách bảo hành</a><br/>";
-                resultanswer += "Rất xin lỗi vì sự bất tiện này."
-
-
-            }
-            else if (intent == "ans_tel") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                resultanswer = "Cảm ơn bạn.Chúng tôi sẽ liên hệ bạn sớm nhất có thể. Bạn cần tư vấn hỗ trợ gì nữa không ạ?";
-            }
-            else if (intent == "ask_return") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                resultanswer = "Chức năng ĐỔI TRẢ VÀ MUA LẠI hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001064 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. <br/>";
-                resultanswer += "Quý khách có thể tham khảo chính sách đổi trả tại đây <a href='https://www.thegioididong.com/chinh-sach-bao-hanh-san-pham' targer='_blank'>Chính sách đổi trả</a><br/>";
-                resultanswer += "Xin cảm ơn";
-            }
-            else if (intent == "ask_order") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
-
-                resultanswer = "Chức năng KIỂM TRA ĐƠN HÀNG hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001062 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. Xin cảm ơn";
             }
 
 
