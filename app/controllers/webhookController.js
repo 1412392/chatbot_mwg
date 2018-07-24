@@ -1100,10 +1100,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             for (var i = 0; i < entities.length; i++) {
 
-                sessions[sessionId].currentvalue = entities[i].value;
+                sessions[sessionId].currentvalue = entities[i].value.replace('_',' ');
                 if (entities[i].entity === "product") {
                     if (entities[i].value.includes("cường lực")) {
-                        entities[i].value = entities[i].value.replace("cường lực", "màn hình");
+                        entities[i].value = entities[i].value.replace("cường lực", "màn hình").replace('_',' ');
                     }
                     //phụ kiện 
                     if (sessions[sessionId].product != null && (
@@ -1130,48 +1130,48 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         sessions[sessionId].product.toLowerCase().includes("dây cáp") ||
                         sessions[sessionId].product.toLowerCase().includes("day cap") ||
 
-                        entities[i].value.toLowerCase().includes("ốp lưng") ||
-                        entities[i].value.toLowerCase().includes("op lung") ||
-                        entities[i].value.toLowerCase().includes("tai nghe") ||
-                        entities[i].value.toLowerCase().includes("tai phone") ||
-                        entities[i].value.toLowerCase().includes("pin") ||
-                        entities[i].value.toLowerCase().includes("sạc") ||
-                        entities[i].value.toLowerCase().includes("sac") ||
-                        entities[i].value.toLowerCase().includes("bàn phím") ||
-                        entities[i].value.toLowerCase().includes("ban phim") ||
-                        entities[i].value.toLowerCase().includes("loa") ||
-                        entities[i].value.toLowerCase().includes("thẻ nhớ") ||
-                        entities[i].value.toLowerCase().includes("the nho") ||
-                        entities[i].value.toLowerCase().includes("usb") ||
-                        entities[i].value.toLowerCase().includes("đồng hồ") ||
-                        entities[i].value.toLowerCase().includes("dong ho") ||
-                        entities[i].value.toLowerCase().includes("gậy") ||
-                        entities[i].value.toLowerCase().includes("giá đỡ") ||
-                        entities[i].value.toLowerCase().includes("gay tu suong") ||
-                        entities[i].value.toLowerCase().includes("dán màn hình") ||
-                        entities[i].value.toLowerCase().includes("cường lực") ||
-                        entities[i].value.toLowerCase().includes("dây cáp") ||
-                        entities[i].value.toLowerCase().includes("day cap"))
+                        entities[i].value.toLowerCase().replace('_',' ').includes("ốp lưng") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("op lung") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("tai nghe") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("tai phone") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("pin") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("sạc") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("sac") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("bàn phím") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("ban phim") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("loa") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("thẻ nhớ") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("the nho") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("usb") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("đồng hồ") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("dong ho") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("gậy") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("giá đỡ") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("gay tu suong") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("dán màn hình") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("cường lực") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("dây cáp") ||
+                        entities[i].value.toLowerCase().replace('_',' ').includes("day cap"))
                     ) {
 
-                        sessions[sessionId].product += " " + entities[i].value;//gộp  sản phẩm lại
+                        sessions[sessionId].product += " " + entities[i].value.replace('_',' ');//gộp  sản phẩm lại
                     }
                     else {
-                        sessions[sessionId].product = entities[i].value;
+                        sessions[sessionId].product = entities[i].value.replace('_',' ');
                     }
 
                 }
                 if (entities[i].entity === "storage")//bộ nhớ lưu trữ
                 {
                     if (sessions[sessionId].product != null) {
-                        sessions[sessionId].product += " " + entities[i].entity;
+                        sessions[sessionId].product += " " + entities[i].entity.replace('_',' ');
                     }
                 }
                 if (entities[i].entity === "color") {
-                    sessions[sessionId].color = entities[i].value;
+                    sessions[sessionId].color = entities[i].value.replace('_',' ');
                 }
                 if (entities[i].entity === "price") {
-                    sessions[sessionId].price = entities[i].value;
+                    sessions[sessionId].price = entities[i].value.replace('_',' ');
                 }
                 if (entities[i].entity === "province") {
 
@@ -1180,11 +1180,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     if (sessions[sessionId].province)
                         sessions[sessionId].district = null;
 
-                    sessions[sessionId].province = entities[i].value;
+                    sessions[sessionId].province = entities[i].value.replace('_',' ');
 
                 }
                 if (entities[i].entity === "district") {
-                    sessions[sessionId].district = entities[i].value;
+                    sessions[sessionId].district = entities[i].value.replace('_',' ');
 
                 }
 
@@ -2986,7 +2986,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent == "ask_helper") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                resultanswer = "Danh sách tổng đài hỗ trợ của TGDD: <br />";
+                resultanswer = "Danh sách tổng đài hỗ trợ của TGDD (TẤT CẢ CUỘC GỌI MIỄN PHÍ): <br />";
                 resultanswer += "<ul><li> Gọi mua hàng 1800.1060 (7: 30 - 22: 00)</li> <li> Gọi khiếu nại 1800.1062 (8: 00 - 21: 30)</li> <li> Gọi bảo hành 1800.1064 (8: 00 - 21: 00)</li> <li>Hỗ trợ kỹ thuật 1800.1763 (7: 30 - 22: 00) </li> </ul>";
 
 
