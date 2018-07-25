@@ -1774,6 +1774,22 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         }, 1000);
 
                                                                     }
+                                                                    else {
+                                                                        resultanswer = "Công ty " + (sessions[sessionId].financialCompany === 8 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + " không hỗ trợ gói trả góp 0% cho sản phẩm này.</br>";
+                                                                        setTimeout(() => {
+                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                                .catch(console.error);
+                                                                        }, 500);
+
+                                                                        questionTitle = "Lựa chọn khác";
+                                                                        var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, questionTitle);
+
+                                                                        setTimeout(() => {
+                                                                            SentToClientButton(sender, anotheroptionbutton)
+                                                                                .catch(console.error);
+
+                                                                        }, 700);
+                                                                    }
                                                                 }
                                                                 else {
                                                                     resultanswer = "Công ty " + (sessions[sessionId].financialCompany === 8 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + " không hỗ trợ gói trả góp 0% cho sản phẩm này.</br>";
