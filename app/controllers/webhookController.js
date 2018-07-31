@@ -76,10 +76,11 @@ const format_currency = (price) => {
 const sessions = {};
 
 const isIncludeAccessoryKeyword = (keyword) => {
-    lstAccessoryKeyword.forEach(element => {
-        if (keyword.toLowerCase().includes(element))
+
+    for (var i = 0; i < lstAccessoryKeyword.length; i++) {
+        if (keyword.toLowerCase().includes(lstAccessoryKeyword[i]))
             return true;
-    });
+    }
     return false;
 };
 
