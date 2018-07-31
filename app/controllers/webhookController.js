@@ -1290,6 +1290,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     var argsSearchProduct = "";
 
                     if (keyword.toLowerCase().includes("ốp lưng") ||
+                        keyword.toLowerCase().includes("ốp") ||
                         keyword.toLowerCase().includes("op lung") ||
                         keyword.toLowerCase().includes("tai nghe") ||
                         keyword.toLowerCase().includes("pin") ||
@@ -1308,6 +1309,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("dán màn hình") ||
                         keyword.toLowerCase().includes("cường lực") ||
                         keyword.toLowerCase().includes("tai phone") ||
+                        keyword.toLowerCase().includes("túi") ||
                         keyword.toLowerCase().includes("gay tu suong"))//search phụ kiện
                     {
                         argsSearchProduct = {
@@ -1571,13 +1573,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 resultanswer = "Chức năng ĐỔI TRẢ VÀ MUA LẠI hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001064 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. <br/>";
-                resultanswer += "Quý khách có thể tham khảo chính sách đổi trả tại đây <a href='https://www.thegioididong.com/chinh-sach-bao-hanh-san-pham' targer='_blank'>Chính sách đổi trả</a><br/>";
+                resultanswer += "Quý khách có thể tham khảo chính sách đổi trả tại đây <a href='https://www.thegioididong.com/thu-cu-doi-moi' targer='_blank'>Chính sách đổi trả, thu cũ đổi mới</a><br/>";
                 resultanswer += "Xin cảm ơn";
             }
             else if (intent == "ask_order") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                resultanswer = "Chức năng KIỂM TRA ĐƠN HÀNG hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001062 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ. Xin cảm ơn";
+                resultanswer = "Chức năng KIỂM TRA ĐƠN HÀNG và ĐẶT HÀNG ONLINE hiện tại đang phát triển cho BOT. Xin quý khách vui lòng thông cảm. Quý khách có thể liên hệ tổng đài 18001062 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ hoặc quý khách có thể đặt hàng trực tiếp trên web. Xin cảm ơn";
             }
 
             else if (intent === "ask_instalment" || sessions[sessionId].prev_intent === "ask_instalment") {
@@ -1603,6 +1605,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     var argsSearchProduct = "";
 
                     if (keyword.toLowerCase().includes("ốp lưng") ||
+                        keyword.toLowerCase().includes("ốp") ||
                         keyword.toLowerCase().includes("op lung") ||
                         keyword.toLowerCase().includes("tai nghe") ||
                         keyword.toLowerCase().includes("pin") ||
@@ -1621,7 +1624,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("dán màn hình") ||
                         keyword.toLowerCase().includes("cường lực") ||
                         keyword.toLowerCase().includes("tai phone") ||
-                        keyword.toLowerCase().includes("gay tu suong"))//search phụ kiện
+                        keyword.toLowerCase().includes("gay tu suong") ||
+                        keyword.toLowerCase().includes("túi"))//search phụ kiện
                     {
                         argsSearchProduct = {
                             q: keyword,
@@ -2341,6 +2345,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     //console.log(keyword.toLowerCase());
 
                     if (keyword.toLowerCase().includes("ốp lưng") ||
+                        keyword.toLowerCase().includes("ốp") ||
                         keyword.toLowerCase().includes("op lung") ||
                         keyword.toLowerCase().includes("tai nghe") ||
                         keyword.toLowerCase().includes("pin") ||
@@ -2359,6 +2364,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         keyword.toLowerCase().includes("gay tu suong") ||
                         keyword.toLowerCase().includes("dán màn hình") ||
                         keyword.toLowerCase().includes("tai phone") ||
+                        keyword.toLowerCase().includes("túi") ||
                         keyword.toLowerCase().includes("cường lực"))//search phụ kiện
                     {
                         argsSearchProduct = {
