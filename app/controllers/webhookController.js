@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://89f4255b.ngrok.io/chatbot";
+var severResponse = "https://44c45dc5.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1116,16 +1116,19 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].color = null;
             }
 
+
+            var productIndex = 0;
             for (var i = 0; i < entities.length; i++) {
 
                 sessions[sessionId].currentvalue = entities[i].value.replace('_', ' ');
                 if (entities[i].entity === "product") {
+                    productIndex++;
+
                     if (entities[i].value.includes("cường lực")) {
                         entities[i].value = entities[i].value.replace("cường lực", "màn hình").replace('_', ' ');
                     }
                     //phụ kiện 
-                    if (sessions[sessionId].product != null && (
-                        isIncludeAccessoryKeyword(sessions[sessionId].product)
+                    if (productIndex > 1 && (isIncludeAccessoryKeyword(sessions[sessionId].product)
                         || isIncludeAccessoryKeyword(entities[i].value.toLowerCase().replace('_', ' ')))) {
                         sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');//gộp  sản phẩm lại
                     }
@@ -1256,6 +1259,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     var keyword = productName;
 
                     var argsSearchProduct = "";
+
 
                     if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
                     {
@@ -2269,6 +2273,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     var argsSearchProduct = "";
 
                     //console.log(keyword.toLowerCase());
+                    console.log(keyword);
+                    console.log(isIncludeAccessoryKeyword(keyword));
 
                     if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
                     {
