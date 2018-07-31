@@ -45,6 +45,10 @@ var listBriefID = [
     "",
     "CMND + Hộ khẩu + Hóa đơn điện/nước/internet + Chứng minh thu nhập"//8
 ];
+var lstAccessoryKeyword = [
+    "ốp", "op lung", "bluetooth", "tai nghe", "tai phone", "pin", "sạc", "sac", "bàn phím", "ban phim", "loa", "thẻ nhớ", "the nho", "usb",
+    "đồng hồ", "dong ho", "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
+];
 
 var isGetExampleAnswer = false;
 
@@ -70,6 +74,14 @@ const format_currency = (price) => {
 
 }
 const sessions = {};
+
+const isIncludeAccessoryKeyword = (keyword) => {
+    lstAccessoryKeyword.forEach(element => {
+        if (keyword.toLowerCase().includes(element))
+            return true;
+    });
+    return false;
+};
 
 const findOrCreateSession = (fbid) => {
     let sessionId;
@@ -1112,53 +1124,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                     //phụ kiện 
                     if (sessions[sessionId].product != null && (
-                        sessions[sessionId].product.toLowerCase().includes("ốp lưng") ||
-                        sessions[sessionId].product.toLowerCase().includes("op lung") ||
-                        sessions[sessionId].product.toLowerCase().includes("tai nghe") ||
-                        sessions[sessionId].product.toLowerCase().includes("tai phone") ||
-                        sessions[sessionId].product.toLowerCase().includes("pin") ||
-                        sessions[sessionId].product.toLowerCase().includes("sạc") ||
-                        sessions[sessionId].product.toLowerCase().includes("sac") ||
-                        sessions[sessionId].product.toLowerCase().includes("bàn phím") ||
-                        sessions[sessionId].product.toLowerCase().includes("ban phim") ||
-                        sessions[sessionId].product.toLowerCase().includes("loa") ||
-                        sessions[sessionId].product.toLowerCase().includes("thẻ nhớ") ||
-                        sessions[sessionId].product.toLowerCase().includes("the nho") ||
-                        sessions[sessionId].product.toLowerCase().includes("usb") ||
-                        sessions[sessionId].product.toLowerCase().includes("đồng hồ") ||
-                        sessions[sessionId].product.toLowerCase().includes("dong ho") ||
-                        sessions[sessionId].product.toLowerCase().includes("gậy") ||
-                        sessions[sessionId].product.toLowerCase().includes("giá đỡ") ||
-                        sessions[sessionId].product.toLowerCase().includes("gay tu suong") ||
-                        sessions[sessionId].product.toLowerCase().includes("dán màn hình") ||
-                        sessions[sessionId].product.toLowerCase().includes("cường lực") ||
-                        sessions[sessionId].product.toLowerCase().includes("dây cáp") ||
-                        sessions[sessionId].product.toLowerCase().includes("day cap") ||
-
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("ốp lưng") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("op lung") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("tai nghe") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("tai phone") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("pin") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("sạc") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("sac") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("bàn phím") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("ban phim") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("loa") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("thẻ nhớ") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("the nho") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("usb") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("đồng hồ") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("dong ho") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("gậy") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("giá đỡ") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("gay tu suong") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("dán màn hình") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("cường lực") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("dây cáp") ||
-                        entities[i].value.toLowerCase().replace('_', ' ').includes("day cap"))
-                    ) {
-
+                        isIncludeAccessoryKeyword(sessions[sessionId].product)
+                        || isIncludeAccessoryKeyword(entities[i].value.toLowerCase().replace('_', ' ')))) {
                         sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');//gộp  sản phẩm lại
                     }
                     else {
@@ -1289,28 +1256,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                     var argsSearchProduct = "";
 
-                    if (keyword.toLowerCase().includes("ốp lưng") ||
-                        keyword.toLowerCase().includes("ốp") ||
-                        keyword.toLowerCase().includes("op lung") ||
-                        keyword.toLowerCase().includes("tai nghe") ||
-                        keyword.toLowerCase().includes("pin") ||
-                        keyword.toLowerCase().includes("sạc") ||
-                        keyword.toLowerCase().includes("sac") ||
-                        keyword.toLowerCase().includes("bàn phím") ||
-                        keyword.toLowerCase().includes("ban phim") ||
-                        keyword.toLowerCase().includes("loa") ||
-                        keyword.toLowerCase().includes("thẻ nhớ") ||
-                        keyword.toLowerCase().includes("the nho") ||
-                        keyword.toLowerCase().includes("usb") ||
-                        keyword.toLowerCase().includes("đồng hồ") ||
-                        keyword.toLowerCase().includes("dong ho") ||
-                        keyword.toLowerCase().includes("gậy") ||
-                        keyword.toLowerCase().includes("giá đỡ") ||
-                        keyword.toLowerCase().includes("dán màn hình") ||
-                        keyword.toLowerCase().includes("cường lực") ||
-                        keyword.toLowerCase().includes("tai phone") ||
-                        keyword.toLowerCase().includes("túi") ||
-                        keyword.toLowerCase().includes("gay tu suong"))//search phụ kiện
+                    if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
                     {
                         argsSearchProduct = {
                             q: keyword,
@@ -1604,28 +1550,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     var keyword = productName;
                     var argsSearchProduct = "";
 
-                    if (keyword.toLowerCase().includes("ốp lưng") ||
-                        keyword.toLowerCase().includes("ốp") ||
-                        keyword.toLowerCase().includes("op lung") ||
-                        keyword.toLowerCase().includes("tai nghe") ||
-                        keyword.toLowerCase().includes("pin") ||
-                        keyword.toLowerCase().includes("sạc") ||
-                        keyword.toLowerCase().includes("sac") ||
-                        keyword.toLowerCase().includes("bàn phím") ||
-                        keyword.toLowerCase().includes("ban phim") ||
-                        keyword.toLowerCase().includes("loa") ||
-                        keyword.toLowerCase().includes("thẻ nhớ") ||
-                        keyword.toLowerCase().includes("the nho") ||
-                        keyword.toLowerCase().includes("usb") ||
-                        keyword.toLowerCase().includes("đồng hồ") ||
-                        keyword.toLowerCase().includes("dong ho") ||
-                        keyword.toLowerCase().includes("gậy") ||
-                        keyword.toLowerCase().includes("giá đỡ") ||
-                        keyword.toLowerCase().includes("dán màn hình") ||
-                        keyword.toLowerCase().includes("cường lực") ||
-                        keyword.toLowerCase().includes("tai phone") ||
-                        keyword.toLowerCase().includes("gay tu suong") ||
-                        keyword.toLowerCase().includes("túi"))//search phụ kiện
+                    if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
                     {
                         argsSearchProduct = {
                             q: keyword,
@@ -2344,28 +2269,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                     //console.log(keyword.toLowerCase());
 
-                    if (keyword.toLowerCase().includes("ốp lưng") ||
-                        keyword.toLowerCase().includes("ốp") ||
-                        keyword.toLowerCase().includes("op lung") ||
-                        keyword.toLowerCase().includes("tai nghe") ||
-                        keyword.toLowerCase().includes("pin") ||
-                        keyword.toLowerCase().includes("sạc") ||
-                        keyword.toLowerCase().includes("sac") ||
-                        keyword.toLowerCase().includes("bàn phím") ||
-                        keyword.toLowerCase().includes("ban phim") ||
-                        keyword.toLowerCase().includes("loa") ||
-                        keyword.toLowerCase().includes("thẻ nhớ") ||
-                        keyword.toLowerCase().includes("the nho") ||
-                        keyword.toLowerCase().includes("usb") ||
-                        keyword.toLowerCase().includes("đồng hồ") ||
-                        keyword.toLowerCase().includes("dong ho") ||
-                        keyword.toLowerCase().includes("gậy") ||
-                        keyword.toLowerCase().includes("giá đỡ") ||
-                        keyword.toLowerCase().includes("gay tu suong") ||
-                        keyword.toLowerCase().includes("dán màn hình") ||
-                        keyword.toLowerCase().includes("tai phone") ||
-                        keyword.toLowerCase().includes("túi") ||
-                        keyword.toLowerCase().includes("cường lực"))//search phụ kiện
+                    if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
                     {
                         argsSearchProduct = {
                             q: keyword,
