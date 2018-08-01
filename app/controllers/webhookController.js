@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://44c45dc5.ngrok.io/chatbot";
+var severResponse = "https://41ba82a1.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1431,14 +1431,42 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 questionTitle = "Tư vấn sản phẩm.";
 
                 resultanswer += "<br />Chức năng tư vấn sản phẩm đang phát triển. Xin lỗi vì sự bất tiện này!";
-                resultanswer += "Quý khách có thể truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất! ";
+                resultanswer += "Quý khách có thể truy cập trang <a href='https://www.thegioididong.com/hoi-dap' target='_blank'>Diễn đàn hỏi đáp</a> của TGDD để được tư vấn tốt nhất! ";
                 resultanswer += "Hoặc liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
                 resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
                 intent = "ask_consultant";
                 sessions[sessionId].prev_intent = "ask_consultant";
 
-                sessions[sessionId].product = null;
+                //sessions[sessionId].product = null;
             }
+            else if (intent === "ask_configuration") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Hỏi về cấu hình sản phẩm";
+
+                resultanswer += "<br />Chức năng trả lời thông tin về CẤU HÌNH SẢN PHẨM hiện đang được phát triển cho BOT. Xin lỗi vì sự bất tiện này!";
+                resultanswer += "Quý khách có thể truy cập trang <a href='https://www.thegioididong.com/hoi-dap' target='_blank'>Diễn đàn hỏi đáp</a> của TGDD để được tư vấn tốt nhất! ";
+                resultanswer += "Hoặc liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
+                intent = "ask_configuration";
+                sessions[sessionId].prev_intent = "ask_configuration";
+
+                //sessions[sessionId].product = null;
+            }
+            else if (intent === "ask_technique") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Hỏi về kỹ thuật";
+
+                resultanswer += "<br />Rất tiếc. BOT không hỗ trợ được các vấn đề vễ KỸ THUẬT rồi ạ. Vui lòng chat trực tiếp với nhân viên hoặc mang tới siêu thị TGDD gần nhất để được hỗ trợ ạ. Xin lỗi vì sự bất tiện này!";
+                resultanswer += "Hoặc liên hệ tổng đài 1800 1763 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ các vấn đề KỸ THUẬT một cách tận tình nhất ạ. <br/>";
+                resultanswer += "Hoặc quý khách cũng có thể truy cập trang <a href='https://www.thegioididong.com/hoi-dap' target='_blank'>Diễn đàn hỏi đáp</a> của TGDD để được tư vấn tốt nhất! ";
+
+                intent = "ask_technique";
+                sessions[sessionId].prev_intent = "ask_technique";
+
+                //sessions[sessionId].product = null;
+            }
+
 
 
             else if (intent === "ask_name") {
@@ -1489,7 +1517,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 questionTitle = "So sánh";
-                resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập trang hỏi đáp https://www.thegioididong.com/hoi-dap của TGDD để được tư vấn tốt nhất!";
+                resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập trang <a href='https://www.thegioididong.com/hoi-dap' target='_blank'>Diễn đàn hỏi đáp</a> của TGDD để được tư vấn tốt nhất!";
 
                 resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
 
@@ -1970,63 +1998,66 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     ProductId: -1,
                                                                     SiteId: 1
                                                                 }
+                                                                sessions[sessionId].isBeforeAskeMonthInstalment = true;
                                                                 APIGetNormalInstallment(urlwcfProduct, argsGetListMonth, function (allpackages) {
                                                                     console.log(allpackages);
                                                                     console.log(argsGetListMonth);
                                                                     if (allpackages.GetListNormalInstallmentResult) {
                                                                         if (allpackages.GetListNormalInstallmentResult.InstallmentBO) {
                                                                             sessions[sessionId].InstalmentMonth = [];
-                                                                            allpackages.GetListNormalInstallmentResult.InstallmentBO.forEach(element => {
+                                                                            for (var i = 0; i < allpackages.GetListNormalInstallmentResult.InstallmentBO.length; i++) {
                                                                                 //console.log(element);
                                                                                 //khác số % trả trước
+                                                                                var element = allpackages.GetListNormalInstallmentResult.InstallmentBO[i];
                                                                                 if (parseInt(element.PaymentPercentFrom) === parseInt(sessions[sessionId].percent_instalment)) {
                                                                                     if (!sessions[sessionId].InstalmentMonth.includes(parseInt(element.PaymentMonth))) {
                                                                                         sessions[sessionId].InstalmentMonth.push(parseInt(element.PaymentMonth));
                                                                                     }
                                                                                 }
-                                                                            });
-                                                                        }
-                                                                        setTimeout(() => {
-                                                                            if (sessions[sessionId].InstalmentMonth.length === 0) {
-                                                                                resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp cho trả trước " + sessions[sessionId].percent_instalment + "%. Mời chọn lại.</span></br>";
-
-                                                                                setTimeout(() => {
-                                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                                        .catch(console.error);
-                                                                                }, 400);
-
-                                                                                questionTitle = "Lựa chọn khác";
-                                                                                var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
-
-                                                                                setTimeout(() => {
-                                                                                    SentToClientButton(sender, anotheroptionbutton)
-                                                                                        .catch(console.error);
-
-                                                                                }, 800);
-
-
-                                                                                return;
                                                                             }
+                                                                        }
 
-                                                                            sessions[sessionId].InstalmentMonth.sort(function (a, b) { return a - b });
-                                                                            // sessions[sessionId].InstalmentMonth.forEach(element => {
-                                                                            //     console.log(element);
-                                                                            // });
-                                                                            resultanswer = "<br />6. <span style='font-style:italic;'>Xin mời chọn số tháng trả góp?</span></br>";
-                                                                            sessions[sessionId].isLatestAskMonthInstalment = true;
-                                                                            sessions[sessionId].isAskedMonthInstalment = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
-                                                                            var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, "Số tháng góp", sessions[sessionId].InstalmentMonth);
-
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                                .catch(console.error);
+                                                                        if (sessions[sessionId].InstalmentMonth.length === 0) {
+                                                                            resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp cho trả trước " + sessions[sessionId].percent_instalment + "%. Mời chọn lại.</span></br>";
 
                                                                             setTimeout(() => {
-                                                                                SentToClientButton(sender, jsonbuttonMI)
+                                                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                                     .catch(console.error);
-                                                                            }, 600)
+                                                                            }, 400);
+
+                                                                            questionTitle = "Lựa chọn khác";
+                                                                            var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+
+                                                                            setTimeout(() => {
+                                                                                SentToClientButton(sender, anotheroptionbutton)
+                                                                                    .catch(console.error);
+
+                                                                            }, 800);
+
 
                                                                             return;
-                                                                        }, 1000);
+                                                                        }
+
+                                                                        sessions[sessionId].InstalmentMonth.sort(function (a, b) { return a - b });
+                                                                        // sessions[sessionId].InstalmentMonth.forEach(element => {
+                                                                        //     console.log(element);
+                                                                        // });
+                                                                        resultanswer = "<br />6. <span style='font-style:italic;'>Xin mời chọn số tháng trả góp?</span></br>";
+                                                                        sessions[sessionId].isLatestAskMonthInstalment = true;
+                                                                        sessions[sessionId].isAskedMonthInstalment = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
+                                                                        var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, "Số tháng góp", sessions[sessionId].InstalmentMonth);
+
+                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                            .catch(console.error);
+                                                                        sessions[sessionId].isBeforeAskeMonthInstalment = false;
+
+                                                                        setTimeout(() => {
+                                                                            SentToClientButton(sender, jsonbuttonMI)
+                                                                                .catch(console.error);
+                                                                        }, 600)
+
+                                                                        return;
+
 
                                                                     }
                                                                     else {//không có số tháng phù hợp cho % này
@@ -2176,8 +2207,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                         }
 
-                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                            .catch(console.error);
+                                                        if (!sessions[sessionId].isBeforeAskeMonthInstalment) {
+                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                .catch(console.error);
+                                                        }
 
                                                     }
                                                 });
