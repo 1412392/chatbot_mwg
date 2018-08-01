@@ -1915,7 +1915,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             resultanswer = "<br/>5. <span style='font-style:italic;'>Bạn muốn trả trước bao nhiêu %? (vui lòng chỉ nhập số TRÒN CHỤC và nằm trong phạm vi từ 10 đến 80 (<span style='color:red;font-style:italic'>Một số sản phẩm có hỗ trợ trả góp 0% nên có thể nhập 0</span>), ví dụ: 0,20,30...</span></br>";
                                                             sessions[sessionId].isLatestAskPercentInstalment = true;
                                                             sessions[sessionId].isAskedPercentInstalment = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
-
+                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                .catch(console.error);
+                                                            return;
                                                         }
                                                         //lấy danh sách tháng dựa vào giấy tờ và % trả trước
                                                         else if ((!sessions[sessionId].isAskedMonthInstalment && sessions[sessionId].isAskedGID &&
