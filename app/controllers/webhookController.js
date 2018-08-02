@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://41ba82a1.ngrok.io/chatbot";
+var severResponse = "https://e79f49cb.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -197,6 +197,11 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
                                     type: "postback",
                                     title: "Thông tin trả góp",
                                     payload: "4"
+                                },
+                                {
+                                    type: "postback",
+                                    title: "Kiểm tra đơn hàng",
+                                    payload: "5"
                                 }
                             ]
                         }
@@ -208,6 +213,8 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
             contentlogs += "<button " + "type=button>" + "Xem tồn kho sản phẩm" + "</button>" + "<br />";
             contentlogs += "<button " + "type=button>" + "Xem giá sản phẩm" + "</button>" + "<br />";
             contentlogs += "<button " + "type=button>" + "Xem khuyến mãi sản phẩm" + "</button>" + "<br />";
+            contentlogs += "<button " + "type=button>" + "Thông tin trả góp" + "</button>" + "<br />";
+            contentlogs += "<button " + "type=button>" + "Kiểm tra đơn hàng" + "</button>" + "<br />";
             //contentlogs += "<button " + "type=button>" + "Thông tin trả góp" + "</button>" + "<br />";
 
             tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
@@ -598,6 +605,16 @@ const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle) => 
                                 type: "postback",
                                 title: "Xem gói trả góp thường",
                                 payload: 11
+                            },
+                            {
+                                type: "postback",
+                                title: "Xem tồn kho",
+                                payload: 2
+                            },
+                            {
+                                type: "postback",
+                                title: "Xem khuyễn mãi của sản phẩm",
+                                payload: 3
                             }
 
                         ]
@@ -633,8 +650,23 @@ const AnotherOptionNormalInstalment = (sender, siteid, replyobject, questionTitl
                             },
                             {
                                 type: "postback",
+                                title: "Chọn lại công ty tài chính",
+                                payload: 10
+                            },
+                            {
+                                type: "postback",
                                 title: "Hỏi sản phẩm khác",
                                 payload: 1
+                            },
+                            {
+                                type: "postback",
+                                title: "Xem tồn kho",
+                                payload: 2
+                            },
+                            {
+                                type: "postback",
+                                title: "Xem khuyễn mãi của sản phẩm",
+                                payload: 3
                             }
                             // {
                             //     type: "postback",
@@ -1452,6 +1484,19 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 //sessions[sessionId].product = null;
             }
+            else if (intent === "ask_transfermoney") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Hỏi về dịch vụ chuyển tiền";
+
+                resultanswer += "<br/>Thông tin chi tiết về DỊCH VỤ CHUYỂN-NHẬN TIỀN, bạn vui lòng tham khảo tại đây nhé: <a href='https://www.thegioididong.com/chuyen-tien' target='_blank'>Dịch vụ chuyển tiền</a> ";
+                resultanswer += "<br/>Bạn có thể liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
+                intent = "ask_transfermoney";
+                sessions[sessionId].prev_intent = "ask_transfermoney";
+
+                //sessions[sessionId].product = null;
+            }
+
             else if (intent === "ask_technique") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
@@ -2099,11 +2144,25 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             console.log("===cate===" + categoryID);
                                                             console.log("===BreadID===" + sessions[sessionId].BriefID);
 
+                                                            //ctytc
+                                                            var finalCTTC = -1;
+                                                            if (sessions[sessionId].financialCompany) {
+                                                                if (parseInt(sessions[sessionId].financialCompany) === 8) {
+                                                                    finalCTTC = 1;
+                                                                }
+                                                                else if (parseInt(sessions[sessionId].financialCompany) === 9) {
+                                                                    finalCTTC = 3;
+
+                                                                }
+                                                                else {
+                                                                    finalCTTC = -1;
+                                                                }
+                                                            }
                                                             //lấy gói trả góp đưa ra
                                                             var argsInstalmentResult = {
                                                                 CategoryId: categoryID,
                                                                 Price: productPrice,
-                                                                CompanyId: -1,
+                                                                CompanyId: finalCTTC,
                                                                 Percent: parseInt(sessions[sessionId].percent_instalment),
                                                                 Month: parseInt(sessions[sessionId].month_instalment),
                                                                 BriefId: sessions[sessionId].BriefID,
@@ -3151,7 +3210,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
                 getJsonAndAnalyze(url, sender, sessionId, percent, replyobject, siteid);
             }
             else {
-                resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng chỉ nhập số TRÒN CHỤC và nằm trong khoảng từ 10% đến 80%."
+                resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng chỉ nhập số TRÒN CHỤC và nằm trong khoảng từ 0% đến 80%."
                 SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
                     .catch(console.error);
 
