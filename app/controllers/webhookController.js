@@ -197,12 +197,12 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
                                     type: "postback",
                                     title: "Thông tin trả góp",
                                     payload: "4"
-                                },
-                                {
-                                    type: "postback",
-                                    title: "Kiểm tra đơn hàng",
-                                    payload: "5"
                                 }
+                                // {
+                                //     type: "postback",
+                                //     title: "Kiểm tra đơn hàng",
+                                //     payload: "5"
+                                // }
                             ]
                         }
                     ]
@@ -1508,6 +1508,20 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 intent = "ask_technique";
                 sessions[sessionId].prev_intent = "ask_technique";
+
+                //sessions[sessionId].product = null;
+            }
+            else if (intent === "ask_sim_card") {
+                sessions[sessionId].isLatestAskNormalInstallment = false;
+
+                questionTitle = "Hỏi về sim, thẻ cào";
+
+                resultanswer += "<br />Để mua SIM, THẺ CÀO ĐIỆN THOẠI, THẺ GAME (Zing,Gate,Garena,Vcoin...)... quý khách vui lòng vào <a href='https://www.thegioididong.com/sim-so-dep' target='_blank'>https://www.thegioididong.com/sim-so-dep</a> để xem và mua nhé!";
+                resultanswer += "Hoặc liên hệ tổng đài 1800 1060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ các vấn đề MUA HÀNG một cách tận tình nhất ạ. <br/>";
+                resultanswer += "Chức năng mua hàng trực tiếp từ BOT sẽ được phát triển sớm nhất cho BOT trong tương lai. Xin quý khách thông cảm vì sự bất tiện này !";
+
+                intent = "ask_sim_card";
+                sessions[sessionId].prev_intent = "ask_sim_card";
 
                 //sessions[sessionId].product = null;
             }
