@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://e79f49cb.ngrok.io/chatbot";
+var severResponse = "https://b0e4828b.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -334,56 +334,33 @@ function SendToUserListColor(productID, productName, sender, siteid, replyobject
             var type = "template";
             questionTitle = "Danh sách màu sắc";
 
-            var jsoncolortemplate = '{' +
-                '"username":' + '"' + sender + '"' + ',' +
-                '"siteid":' + '"' + siteid + '"' + ',' +
-                '"messagetype":"template"' + ',' +
-                '"replyobject":' + '{' +
-                '"username":' + '"' + replyobject.username + '"' + ',' +
-                '"message":' + '"' + replyobject.message + '"' + ',' +
-                '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                '"sentAt":' + replyobject.sentAt + ',' +
-                '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                '"gender":' + replyobject.gender + ',' +
-                '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                '"isbot":' + replyobject.isbot +
-                '}' + ',' +
-                '"messagecontentobject":' + '{' +
-                '"elements":' + '[' +
-                '{' +
-                '"title":' + '"' + questionTitle + '"' + ',' +
-                '"buttons":' + '[';
-
+            var jsoncolortemplate = {
+                username: sender,
+                siteid: siteid,
+                messagetype: "template",
+                replyobject: replyobject,
+                messagecontentobject: {
+                    elements: [
+                        {
+                            title: questionTitle,
+                            buttons: []
+                        }
+                    ]
+                }
+            };
 
             for (var i = 0; i < length; i++) {
                 var colorBo = result.GetProductColorByProductIDLangResult.ProductColorBO[i];
                 //console.log(colorBo);                                                                           
-                if (i == (length - 1)) {
-                    jsoncolortemplate += '{' +
-                        '"type":"postback"' + ',' +
-                        '"title":' + '"' + colorBo.ColorName + '"' + ',' +
-                        '"payload":' + '"' + colorBo.ProductCode + '"' + '}';
-
-
-                }
-                else {
-                    jsoncolortemplate += '{' +
-
-
-                        '"type":"postback"' + ',' +
-                        '"title":' + '"' + colorBo.ColorName + '"' + ',' +
-                        '"payload":' + '"' + colorBo.ProductCode + '"' + '}' + ',';
-
-                }
+                jsoncolortemplate.messagecontentobject.elements[0].buttons.push({
+                    type: "postback",
+                    title: colorBo.ColorName,
+                    payload: colorBo.ProductCode
+                });
             }
-            jsoncolortemplate +=
-                ']' +
-                '}' + ']' + '}' + '}';
 
-            var bodystring = JSON.parse(jsoncolortemplate);
-            var bodyjson = JSON.stringify(bodystring);
+
+            var bodyjson = JSON.stringify(jsoncolortemplate);
 
             // console.log(bodyjson);
             //xóa màu cũ đi
@@ -2793,53 +2770,33 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                 var type = "template";
                                                                 questionTitle = "Ý bạn có phải là ?";
-
-                                                                var jsonmessageDistrict = '{' +
-                                                                    '"username":' + '"' + sender + '"' + ',' +
-                                                                    '"siteid":' + '"' + siteid + '"' + ',' +
-                                                                    '"messagetype":"template"' + ',' +
-                                                                    '"replyobject":' + '{' +
-                                                                    '"username":' + '"' + replyobject.username + '"' + ',' +
-                                                                    '"message":' + '"' + replyobject.message + '"' + ',' +
-                                                                    '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                                                                    '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                                                                    '"sentAt":' + replyobject.sentAt + ',' +
-                                                                    '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                                                                    '"gender":' + replyobject.gender + ',' +
-                                                                    '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                                                                    '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                                                                    '"isbot":' + replyobject.isbot +
-                                                                    '}' + ',' +
-                                                                    '"messagecontentobject":' + '{' +
-                                                                    '"elements":' + '[' +
-                                                                    '{' +
-                                                                    '"title":' + '"' + questionTitle + '"' + ',' +
-                                                                    '"buttons":' + '[';
+                                                                var jsonmessageDistrict = {
+                                                                    username: sender,
+                                                                    siteid: siteid,
+                                                                    messagetype: "template",
+                                                                    replyobject: replyobject,
+                                                                    messagecontentobject: {
+                                                                        elements: [
+                                                                            {
+                                                                                title: questionTitle,
+                                                                                buttons: []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                };
 
                                                                 for (var i = 0; i < result.length; i++) {//lấy tối đa 6
                                                                     if (i > 5) break;
                                                                     var resultEach = result[i]._source;
-                                                                    if (i == result.length - 1) {
-                                                                        jsonmessageDistrict += '{' +
-                                                                            '"type":"postback"' + ',' +
-                                                                            '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                                                            '"payload":' + '"' + resultEach.districtID + '"' + '}';
-
-                                                                    }
-                                                                    else {
-                                                                        jsonmessageDistrict += '{' +
-                                                                            '"type":"postback"' + ',' +
-                                                                            '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                                                            '"payload":' + '"' + resultEach.districtID + '"' + '}' + ',';
-                                                                    }
+                                                                    jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+                                                                        type: "postback",
+                                                                        title: resultEach.districtName,
+                                                                        payload: resultEach.districtID
+                                                                    });
 
                                                                 }
-                                                                jsonmessageDistrict +=
-                                                                    ']' +
-                                                                    '}' + ']' + '}' + '}';
 
-                                                                var bodystring = JSON.parse(jsonmessageDistrict);
-                                                                var bodyjson = JSON.stringify(bodystring);
+                                                                var bodyjson = JSON.stringify(jsonmessageDistrict);
 
                                                                 //console.log(bodyjson);
                                                                 SentToClientButton(sender, bodyjson)
@@ -2869,55 +2826,32 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                     var type = "template";
                                                                     questionTitle = "Ý bạn là ?";
-
-                                                                    var jsonmessageDistrict = '{' +
-                                                                        '"username":' + '"' + sender + '"' + ',' +
-                                                                        '"siteid":' + '"' + siteid + '"' + ',' +
-                                                                        '"messagetype":"template"' + ',' +
-                                                                        '"replyobject":' + '{' +
-                                                                        '"username":' + '"' + replyobject.username + '"' + ',' +
-                                                                        '"message":' + '"' + replyobject.message + '"' + ',' +
-                                                                        '"fullname":' + '"' + replyobject.fullname + '"' + ',' +
-                                                                        '"currenturl":' + '"' + replyobject.currenturl + '"' + ',' +
-                                                                        '"sentAt":' + replyobject.sentAt + ',' +
-                                                                        '"userType":' + '"' + replyobject.userType + '"' + ',' +
-                                                                        '"gender":' + replyobject.gender + ',' +
-                                                                        '"roomId":' + '"' + replyobject.roomId + '"' + ',' +
-                                                                        '"msgid":' + '"' + replyobject.msgid + '"' + ',' +
-                                                                        '"isbot":' + replyobject.isbot +
-                                                                        '}' + ',' +
-                                                                        '"messagecontentobject":' + '{' +
-                                                                        '"elements":' + '[' +
-                                                                        '{' +
-                                                                        '"title":' + '"' + questionTitle + '"' + ',' +
-                                                                        '"buttons":' + '[';
+                                                                    var jsonmessageDistrict = {
+                                                                        username: sender,
+                                                                        siteid: siteid,
+                                                                        messagetype: "template",
+                                                                        replyobject: replyobject,
+                                                                        messagecontentobject: {
+                                                                            elements: [
+                                                                                {
+                                                                                    title: questionTitle,
+                                                                                    buttons: []
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    };
 
                                                                     for (var i = 0; i < result.length; i++) {//lấy tối đa 6
                                                                         if (i > 5) break;
                                                                         var resultEach = result[i]._source;
-                                                                        if (i == result.length - 1 || i == 5) {
-
-
-                                                                            jsonmessageDistrict += '{' +
-                                                                                '"type":"postback"' + ',' +
-                                                                                '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                                                                '"payload":' + '"' + resultEach.districtID + '"' + '}';
-                                                                        }
-                                                                        else {
-
-                                                                            jsonmessageDistrict += '{' +
-                                                                                '"type":"postback"' + ',' +
-                                                                                '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                                                                '"payload":' + '"' + resultEach.districtID + '"' + '}' + ',';
-                                                                        }
+                                                                        jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+                                                                            type: "postback",
+                                                                            title: resultEach.districtName,
+                                                                            payload: resultEach.districtID
+                                                                        });
 
                                                                     }
-                                                                    jsonmessageDistrict +=
-                                                                        ']' +
-                                                                        '}' + ']' + '}' + '}';
-
-                                                                    var bodystring = JSON.parse(jsonmessageDistrict);
-                                                                    var bodyjson = JSON.stringify(bodystring);
+                                                                    var bodyjson = JSON.stringify(jsonmessageDistrict);
 
                                                                     //console.log(bodyjson);
                                                                     SentToClientButton(sender, bodyjson)
@@ -3407,13 +3341,21 @@ var webhookController = {
         const gender = data.gender;
         const sessionId = findOrCreateSession(sender);
         sessions[sessionId].isPreAskColor = false;
-
+        var isAdminChat = false;
+        if (data.replyobject.userType === 'a')//admin, skip qua
+        {
+            isAdminChat = true;
+            tracechat.logChatHistory(data.replyobject.customerusername, data, 2, isAdminChat);//1 là câu hỏi, 2 là câu trả lời
+            res.sendStatus(200);
+            return;
+        }
         //trace chat history
-        tracechat.logChatHistory(sender, data, 1);//1 là câu hỏi, 2 là câu trả lời
+        tracechat.logChatHistory(sender, data, 1, isAdminChat);//1 là câu hỏi, 2 là câu trả lời
 
         //
 
         var replyobject = data.replyobject;
+
 
         if (!data.postbackobject.title) {//xu ly message tu user
 

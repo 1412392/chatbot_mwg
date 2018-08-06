@@ -47,7 +47,7 @@ const checkFileExist = (newfile, dirname) => {
     });
 }
 module.exports = {
-    logChatHistory: function (sessionID, message, who) {
+    logChatHistory: function (sessionID, message, who, isAdminChat) {
         console.log("session  " + sessionID);
         var filename = PATH + sessionID + ".txt";
 
@@ -71,7 +71,12 @@ module.exports = {
                 }
                 else {
                     if (message.length < 2) return; //rác
-                    writeFile(filename, "BOT-" + message + "<br />" + "\n");
+                    if (isAdminChat) {
+                        writeFile(filename, "ADMIN-" + message.messageobject.content.replace(/\n/g, '') + "<br />" + "\n");
+                    }
+                    else {
+                        writeFile(filename, "BOT-" + message + "<br />" + "\n");
+                    }
                 }
 
             }, 1000);
