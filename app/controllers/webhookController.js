@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://b0e4828b.ngrok.io/chatbot";
+var severResponse = "https://9377defd.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 

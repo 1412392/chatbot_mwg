@@ -1,6 +1,3 @@
-Đây là hệ thống trả lời tự động của TGDD. Hiện tại mình chỉ hỗ trợ TỰ ĐỘNG các vấn đề bên dưới. Nếu bạn có các thắc mắc khác, vui lòng liên hệ với nhân viên chúng tôi. Tất cả thông tin chỉ mang tính chất THAM KHẢO. Vui lòng sử dụng tiếng việt có dấu
-Mình là BOT tự động. Mình rất vui được hỗ trợ bạn. Vui lòng chọn thắc mắc của bạn ở bên dưới. Nhớ sử dụng tiếng việt có dấu để được hỗ trợ chính xác nhất ạ
-Mình là BOT tự động. Bạn có thắc mắc gì cần giải đáp ạ? Hiện tại mình chỉ hỗ trợ được các vấn đề bên dưới. Thông tin mình cung cấp chỉ mang tính chất THAM KHẢO. Vui lòng sử dụng tiếng việt có dấu ạ
-Chào mừng bạn đến trang mua sắm của Thế Giới Di Động. Mình xin giải đáp tất cả các thắc mắc của bạn. Vui lòng chọn các vấn đề bên dưới và sử dụng tiếng việt có dấu để giao tiếp ạ
-Rất hân hạnh được phục vụ bạn.Mình là BOT. Nếu bạn có thắc mắc gì thì chat với mình nhé. Nhớ gõ tiếng việt có dấu để được phục vụ tốt nhất nha bạn. Lưu ý: Thông tin chỉ mang tính chất THAM KHẢO
-Chào mừng bạn đến trang mua sắm của Thế Giới Di Động. Mình xin giải đáp tất cả các thắc mắc của bạn. Vui lòng chọn các vấn đề bên dưới và sử dụng tiếng việt có dấu để giao tiếp ạ. Hiện tại đang trong quá trình nâng cấp, nếu có vấn đề gì sai sót xin vui lòng bỏ qua.
+Kính chào quý khách. Em có thể hỗ trợ gì cho quý khách ạ?
+Chào mừng quý khách đến với thế giới mua sắm online của Thế giới di động. Quý khách cần hỗ trợ gì không ạ?
+Kính chào quý khách. Rất sẵn lòng được phục vụ quý khách ạ.
