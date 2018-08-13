@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://9377defd.ngrok.io/chatbot";
+var severResponse = "https://d03f9298.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -329,7 +329,7 @@ function SendToUserListColor(productID, productName, sender, siteid, replyobject
 
             //}
 
-            //resultanswer += "<br />CHỌN MÀU SẮC BẠN QUAN TÂM CHO SẢN PHẨM ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
+            //resultanswer += "<br />CHỌN MÀU SẮC "+sessions[sessionId].gender+"  QUAN TÂM CHO SẢN PHẨM ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
 
             var type = "template";
             questionTitle = "Danh sách màu sắc";
@@ -388,7 +388,7 @@ function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobje
             var length = result.GetDistricByProvinceResult.DistrictBO.length;
             var arrDistrictBO = result.GetDistricByProvinceResult.DistrictBO;
             resultanswer = "";
-            //resultanswer += "<br />CHỌN QUẬN/HUYỆN CỦA BẠN ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
+            //resultanswer += "<br />CHỌN QUẬN/HUYỆN CỦA "+sessions[sessionId].gender+"  ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
 
             var type = "template";
             questionTitle = "Danh sách quận/huyện";
@@ -997,7 +997,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].isLatestAskGID = false;
                     sessions[sessionId].isAskedGID = false;
 
-                    SentToClient(sender, "Rất tiếc. Nếu bạn không có CMND thì bạn không thể thực hiện thủ tục mua hàng trả góp được. Xin lỗi vì sự bất tiện này.", questionTitle, button_payload_state, "", replyobject, siteid)
+                    SentToClient(sender, "Rất tiếc. Nếu " + sessions[sessionId].gender + "  không có CMND thì " + sessions[sessionId].gender + "  không thể thực hiện thủ tục mua hàng trả góp được. Xin lỗi vì sự bất tiện này.", questionTitle, button_payload_state, "", replyobject, siteid)
                         .catch(console.error);
                     return;
                 }
@@ -1089,7 +1089,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 else if (button_payload_state === 6)//gợi ý lại danh sách màu (trường hợp này đã có product)
                 {
-                    questionTitle = "Vui lòng chọn màu sắc bạn quan tâm";
+                    questionTitle = "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm";
 
                     //console.log(sessions[sessionId].productID);
                     SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle);
@@ -1098,7 +1098,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
                 else if (button_payload_state === 7)//gợi ý lại danh sách quận huyện (đã có product, province)
                 {
-                    questionTitle = "Chọn quận/huyện nơi bạn ở";
+                    questionTitle = "Chọn quận/huyện nơi " + sessions[sessionId].gender + "  ở";
                     SendToUserListDistrict(sessions[sessionId].productID, sessions[sessionId].provinveID, sender, siteid, replyobject, questionTitle);
                     return;
                 }
@@ -1109,7 +1109,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
 
                 else if (button_payload_state === "NORMAL" || button_payload_state === "BAD" || button_payload_state === "GOOD") {
-                    SentToClient(sender, "Cảm ơn bạn đã đánh giá. Rất vui được phục vụ bạn.", questionTitle, button_payload_state, "", replyobject, siteid)
+                    SentToClient(sender, "Cảm ơn " + sessions[sessionId].gender + "  đã đánh giá. Rất vui được phục vụ " + sessions[sessionId].gender + " .", questionTitle, button_payload_state, "", replyobject, siteid)
                         .catch(console.error);
                     return;
                 }
@@ -1182,7 +1182,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             //nếu đã có trong session
 
             questionTitle = "Xin chào!";
-            resultanswer = "Mình là BOT. Mình chưa rõ câu hỏi của bạn lắm. Vui lòng chọn thông tin cần quan tâm!";
+            resultanswer = "Mình là BOT. Mình chưa rõ câu hỏi của " + sessions[sessionId].gender + "  lắm. Vui lòng chọn thông tin cần quan tâm!";
 
 
         }
@@ -1213,7 +1213,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             if (intent === "greet") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                if (customer_question.toLowerCase() === "chào bạn" && (sessions[sessionId].prev_intent === "ask_price" || sessions[sessionId].prev_intent === "ask_stock"
+                if (customer_question.toLowerCase() === "chào " + sessions[sessionId].gender + " " && (sessions[sessionId].prev_intent === "ask_price" || sessions[sessionId].prev_intent === "ask_stock"
                     || sessions[sessionId].prev_intent === "ask_promotion" || sessions[sessionId].prev_intent === "ask_delivery"
                     || sessions[sessionId].prev_intent === "thankyou" || sessions[sessionId].prev_intent === "felling_love")) {
                     intent = "goodbye";
@@ -1327,14 +1327,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
 
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -1428,7 +1428,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 var rn = randomNumber(offense.length);
                 resultanswer += offense[rn];
 
-                //var resultanswer2 = "Bạn có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
+                //var resultanswer2 = ""+sessions[sessionId].gender+"  có rảnh không? Rảnh thì mua điện thoại ở công ty Thế Giới Di Động của mình. Bảo đảm là \"Danh bất hư truyền\". :p"
 
                 intent = "offense";
                 sessions[sessionId].prev_intent = "offense";
@@ -1442,7 +1442,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 resultanswer += "<br />Chức năng tư vấn sản phẩm đang phát triển. Xin lỗi vì sự bất tiện này!";
                 resultanswer += "Quý khách có thể truy cập trang <a href='https://www.thegioididong.com/hoi-dap' target='_blank'>Diễn đàn hỏi đáp</a> của TGDD để được tư vấn tốt nhất! ";
                 resultanswer += "Hoặc liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
-                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                resultanswer += "" + sessions[sessionId].gender + "  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho " + sessions[sessionId].gender + "  tốt hơn. ";
                 intent = "ask_consultant";
                 sessions[sessionId].prev_intent = "ask_consultant";
 
@@ -1466,8 +1466,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 questionTitle = "Hỏi về dịch vụ chuyển tiền";
 
-                resultanswer += "<br/>Thông tin chi tiết về DỊCH VỤ CHUYỂN-NHẬN TIỀN, bạn vui lòng tham khảo tại đây nhé: <a href='https://www.thegioididong.com/chuyen-tien' target='_blank'>Dịch vụ chuyển tiền</a> ";
-                resultanswer += "<br/>Bạn có thể liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
+                resultanswer += "<br/>Thông tin chi tiết về DỊCH VỤ CHUYỂN-NHẬN TIỀN, " + sessions[sessionId].gender + "  vui lòng tham khảo tại đây nhé: <a href='https://www.thegioididong.com/chuyen-tien' target='_blank'>Dịch vụ chuyển tiền</a> ";
+                resultanswer += "<br/>" + sessions[sessionId].gender + "  có thể liên hệ tổng đài 18001060 (MIỄN PHÍ CUỘC GỌI) để được hỗ trợ tận tình. <br/>";
                 intent = "ask_transfermoney";
                 sessions[sessionId].prev_intent = "ask_transfermoney";
 
@@ -1520,7 +1520,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 questionTitle = "Cảm xúc";
-                resultanswer = "Cảm ơn bạn. Rất hân hạnh được phục vụ bạn. !" + "<br />";
+                resultanswer = "Cảm ơn " + sessions[sessionId].gender + " . Rất hân hạnh được phục vụ " + sessions[sessionId].gender + " . !" + "<br />";
 
                 intent = "felling_love";
                 sessions[sessionId].prev_intent = "felling_love";
@@ -1530,7 +1530,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
                 questionTitle = "Cảm xúc giá";
-                resultanswer = "Chất lượng sản phẩm ở Thế Giới Di Động được cam kết là chất lượng và chính hãng nha bạn. Giá cả rất hợp lý cho người mua ạ. " + "<br />";
+                resultanswer = "Chất lượng sản phẩm ở Thế Giới Di Động được cam kết là chất lượng và chính hãng nha " + sessions[sessionId].gender + " . Giá cả rất hợp lý cho người mua ạ. " + "<br />";
 
                 //suggest kh
                 intent = "felling_price";
@@ -1541,9 +1541,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 questionTitle = "Giao hàng";
                 resultanswer = "Chúng tôi hỗ trợ giao hàng trên toàn quốc.";
-                resultanswer += " Bạn có thể tham khảo thông tin về chính sách, chi phí giao hàng ở đây <a href='https://www.thegioididong.com/giao-hang' target='_blank'>https://www.thegioididong.com/giao-hang</a><br/>";
+                resultanswer += " " + sessions[sessionId].gender + "  có thể tham khảo thông tin về chính sách, chi phí giao hàng ở đây <a href='https://www.thegioididong.com/giao-hang' target='_blank'>https://www.thegioididong.com/giao-hang</a><br/>";
                 resultanswer += "Hỗ trợ gấp, xin gọi 18001060 (MIỄN PHÍ CUỘC GỌI) để được tư vấn cụ thể.<br/>";
-                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                resultanswer += "" + sessions[sessionId].gender + "  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho " + sessions[sessionId].gender + "  tốt hơn. ";
 
                 //suggest kh
                 intent = "ask_delivery";
@@ -1555,7 +1555,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 questionTitle = "So sánh";
                 resultanswer = "Muốn so sánh lựa chọn, vui lòng truy cập trang <a href='https://www.thegioididong.com/hoi-dap' target='_blank'>Diễn đàn hỏi đáp</a> của TGDD để được tư vấn tốt nhất!";
 
-                resultanswer += "Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                resultanswer += "" + sessions[sessionId].gender + "  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho " + sessions[sessionId].gender + "  tốt hơn. ";
 
                 //suggest kh
                 intent = "ask_compare";
@@ -1582,7 +1582,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             else if (intent == "ans_tel") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                resultanswer = "Cảm ơn bạn.Chúng tôi sẽ liên hệ bạn sớm nhất có thể. Bạn cần tư vấn hỗ trợ gì nữa không ạ?";
+                resultanswer = "Cảm ơn " + sessions[sessionId].gender + " .Chúng tôi sẽ liên hệ " + sessions[sessionId].gender + "  sớm nhất có thể. " + sessions[sessionId].gender + "  cần tư vấn hỗ trợ gì nữa không ạ?";
             }
             else if (intent == "ask_return") {
                 sessions[sessionId].isLatestAskNormalInstallment = false;
@@ -1601,14 +1601,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 questionTitle = "Thông tin trả góp!";
                 if (/*!sessions[sessionId].financialCompany ||*/ sessions[sessionId].prev_intent != "ask_instalment") {
-                    resultanswer += "<p style='color:red;font-style: italic;'>Để mua hàng trả góp, tuổi của bạn phải lớn hớn 20 và nhỏ hơn 60, và bắt buộc phải có CMND chính chủ.Lưu ý tất cả các giấy tờ phải còn hạn sử dụng. Chấp nhận bản photo phải có CÔNG CHỨNG không quá 6 tháng.</p>";
+                    resultanswer += "<p style='color:red;font-style: italic;'>Để mua hàng trả góp, tuổi của " + sessions[sessionId].gender + "  phải lớn hớn 20 và nhỏ hơn 60, và bắt buộc phải có CMND chính chủ.Lưu ý tất cả các giấy tờ phải còn hạn sử dụng. Chấp nhận bản photo phải có CÔNG CHỨNG không quá 6 tháng.</p>";
                 }
                 else {
                     resultanswer = "";
                 }
                 if (!sessions[sessionId].product) {
 
-                    resultanswer += "Bạn muốn hỏi thông tin trả góp cho sản phẩm nào ạ?";
+                    resultanswer += "" + sessions[sessionId].gender + "  muốn hỏi thông tin trả góp cho sản phẩm nào ạ?";
 
                 }
                 else {
@@ -1672,14 +1672,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
 
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                 .catch(console.error);
@@ -1861,14 +1861,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         if (!sessions[sessionId].isAskedGID || sessions[sessionId].isLatestAskGID /*chưa bị reset (phá ngang câu hỏi)*/) {
                                                             if (sessions[sessionId].isLatestAskNormalInstallment) {
 
-                                                                resultanswer += "<br />Mời bạn thêm một số thông tin sau để xem góp trả góp thường phù hợp nhất. </br> ";
+                                                                resultanswer += "<br />Mời " + sessions[sessionId].gender + "  thêm một số thông tin sau để xem góp trả góp thường phù hợp nhất. </br> ";
 
                                                             }
                                                             else {
-                                                                resultanswer += "<br />Sản phẩm này <span style='font-style:italic;color:red'>không hỗ trợ trả góp 0%</span>. Mời bạn thêm một số thông tin sau để xem góp trả góp thường phù hợp nhất. </br> ";
+                                                                resultanswer += "<br />Sản phẩm này <span style='font-style:italic;color:red'>không hỗ trợ trả góp 0%</span>. Mời " + sessions[sessionId].gender + "  thêm một số thông tin sau để xem góp trả góp thường phù hợp nhất. </br> ";
                                                             }
 
-                                                            resultanswer += "<br />1. <span style='font-style:italic;'>Bạn có CMND chính chủ không? (chấp nhận bản photo có công chứng không quá 6 tháng)?</span></br>";
+                                                            resultanswer += "<br />1. <span style='font-style:italic;'>" + sessions[sessionId].gender + "  có CMND chính chủ không? (chấp nhận bản photo có công chứng không quá 6 tháng)?</span></br>";
                                                             sessions[sessionId].isLatestAskGID = true;
                                                             sessions[sessionId].isAskedGID = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
                                                             var jsonbuttonYN = getButtonYESNO(productID, productName, sender, siteid, replyobject, "Chứng minh nhân dân");
@@ -1887,7 +1887,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         }
                                                         //hỏi BLX
                                                         else if ((!sessions[sessionId].isAskedBLX && sessions[sessionId].isAskedGID) || sessions[sessionId].isLatestAskBLX) {
-                                                            resultanswer = "<br />2. <span style='font-style:italic;'>Bạn có Bằng Lái Xe không? (chấp nhận bản photo có công chứng không quá 6 tháng)?</span></br>";
+                                                            resultanswer = "<br />2. <span style='font-style:italic;'>" + sessions[sessionId].gender + "  có Bằng Lái Xe không? (chấp nhận bản photo có công chứng không quá 6 tháng)?</span></br>";
                                                             sessions[sessionId].isLatestAskBLX = true;
                                                             sessions[sessionId].isAskedBLX = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
                                                             var jsonbuttonYN = getButtonYESNO(productID, productName, sender, siteid, replyobject, "Bằng lái xe");
@@ -1907,7 +1907,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         //hỏi SHK
                                                         else if ((!sessions[sessionId].isAskedSHK && sessions[sessionId].isAskedGID &&
                                                             sessions[sessionId].isAskedBLX) || sessions[sessionId].isLatestAskSHK) {
-                                                            resultanswer = "<br />3. <span style='font-style:italic;'>Bạn có Sổ Hộ Khẩu không? (Lưu ý: Sổ hộ khẩu phải có tên bạn. Chấp nhận bản photo có công chứng không quá 6 tháng)?</span></br>";
+                                                            resultanswer = "<br />3. <span style='font-style:italic;'>" + sessions[sessionId].gender + "  có Sổ Hộ Khẩu không? (Lưu ý: Sổ hộ khẩu phải có tên " + sessions[sessionId].gender + " . Chấp nhận bản photo có công chứng không quá 6 tháng)?</span></br>";
                                                             sessions[sessionId].isLatestAskSHK = true;
                                                             sessions[sessionId].isAskedSHK = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
 
@@ -1928,7 +1928,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         //hỏi HDDN
                                                         else if ((!sessions[sessionId].isAskedHDDN && sessions[sessionId].isAskedGID &&
                                                             sessions[sessionId].isAskedBLX && sessions[sessionId].isAskedSHK) || sessions[sessionId].isLatestAskHDDN) {
-                                                            resultanswer = "<br />4. <span style='font-style:italic;'>Bạn có Hóa đơn điện/nước/internet không? (Lưu ý: Hóa đơn phải là hóa đơn không quá 3 tháng)?</span></br>";
+                                                            resultanswer = "<br />4. <span style='font-style:italic;'>" + sessions[sessionId].gender + "  có Hóa đơn điện/nước/internet không? (Lưu ý: Hóa đơn phải là hóa đơn không quá 3 tháng)?</span></br>";
                                                             sessions[sessionId].isLatestAskHDDN = true;
                                                             sessions[sessionId].isAskedHDDN = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
                                                             var jsonbuttonYN = getButtonYESNO(productID, productName, sender, siteid, replyobject, "Hóa đơn điện nước");
@@ -1948,7 +1948,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         else if ((!sessions[sessionId].isAskedPercentInstalment && sessions[sessionId].isAskedHDDN &&
                                                             sessions[sessionId].isAskedGID && sessions[sessionId].isAskedBLX && sessions[sessionId].isAskedSHK) || sessions[sessionId].isLatestAskPercentInstalment) {
 
-                                                            resultanswer = "<br/>5. <span style='font-style:italic;'>Bạn muốn trả trước bao nhiêu %? (vui lòng chỉ nhập số TRÒN CHỤC và nằm trong phạm vi từ 10 đến 80 (<span style='color:red;font-style:italic'>Một số sản phẩm có hỗ trợ trả góp 0% nên có thể nhập 0</span>), ví dụ: 0,20,30...</span></br>";
+                                                            resultanswer = "<br/>5. <span style='font-style:italic;'>" + sessions[sessionId].gender + "  muốn trả trước bao nhiêu %? (vui lòng chỉ nhập số TRÒN CHỤC và nằm trong phạm vi từ 10 đến 80 (<span style='color:red;font-style:italic'>Một số sản phẩm có hỗ trợ trả góp 0% nên có thể nhập 0</span>), ví dụ: 0,20,30...</span></br>";
                                                             sessions[sessionId].isLatestAskPercentInstalment = true;
                                                             sessions[sessionId].isAskedPercentInstalment = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -2018,7 +2018,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
 
-                                                                SentToClient(sender, "<span style='color:red'>Rất tiếc. Giấy tờ bạn cung cấp không đủ điều kiện để trả góp. Xin lỗi vì sự bất tiện này.</span>", questionTitle, button_payload_state, "", replyobject, siteid)
+                                                                SentToClient(sender, "<span style='color:red'>Rất tiếc. Giấy tờ " + sessions[sessionId].gender + "  cung cấp không đủ điều kiện để trả góp. Xin lỗi vì sự bất tiện này.</span>", questionTitle, button_payload_state, "", replyobject, siteid)
                                                                     .catch(console.error);
                                                                 return;
                                                             }
@@ -2269,10 +2269,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                 //nếu không có...
                                             }
                                             else {
-                                                resultanswer += "<br />Sản phẩm này hiện tại không hỗ trợ bất kỳ hình thức trả góp nào. Bạn có thể hỏi sản phẩm khác hoặc bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                                                resultanswer += "<br />Sản phẩm này hiện tại không hỗ trợ bất kỳ hình thức trả góp nào. " + sessions[sessionId].gender + "  có thể hỏi sản phẩm khác hoặc " + sessions[sessionId].gender + "  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho " + sessions[sessionId].gender + "  tốt hơn. ";
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                     .catch(console.error);
-                                                // resultanswer += "<br />Bạn có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho bạn tốt hơn. ";
+                                                // resultanswer += "<br />"+sessions[sessionId].gender+"  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho "+sessions[sessionId].gender+"  tốt hơn. ";
 
                                             }
                                         }
@@ -2432,14 +2432,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                             if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
                                                 (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
-                                                resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                     .catch(console.error);
                                             }
                                             else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                resultanswer += "<br />" + "Sản phẩm bạn hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -2552,7 +2552,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                 }
                                                                 else {//hết hàng
-                                                                    SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của bạn! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                    SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                         .catch(console.error);
 
                                                                 }
@@ -2563,7 +2563,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         else {
 
                                                             sessions[sessionId].province = null;
-                                                            SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố bạn đang ở. Vui lòng cung cấp tỉnh/Thành trước. (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                            SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố " + sessions[sessionId].gender + "  đang ở. Vui lòng cung cấp tỉnh/Thành trước. (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                 .catch(console.error);
 
                                                         }
@@ -2700,7 +2700,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                         }
                                                                         else {
-                                                                            resultanswer += "Vui lòng chọn màu sắc bạn quan tâm để xem danh sách cửa hàng còn hàng!";
+                                                                            resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
                                                                             SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle);
                                                                             return;
                                                                         }
@@ -2709,7 +2709,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                         //}//end if color
                                                                         //else {
-                                                                        //resultanswer = "Vui lòng chọn màu sắc bạn quan tâm để xem danh sách cửa hàng còn hàng!"
+                                                                        //resultanswer = "Vui lòng chọn màu sắc "+sessions[sessionId].gender+"  quan tâm để xem danh sách cửa hàng còn hàng!"
                                                                         //}
 
                                                                     }//end if(result)
@@ -2720,7 +2720,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         if (color && hasNumber(color)) {
 
 
-                                                                            resultanswer = "Rất tiếc. Sản phẩm có màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của bạn! Vui lòng chọn lại."
+                                                                            resultanswer = "Rất tiếc. Sản phẩm có màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " ! Vui lòng chọn lại."
 
                                                                             //đưa ra ôption
 
@@ -2742,7 +2742,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                         }
                                                                         else {
-                                                                            resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của bạn! Vui lòng chọn lại khu vực lân cận.";
+                                                                            resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
 
                                                                             //suggest khu vực
                                                                             var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
@@ -2765,11 +2765,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (3 kết quả tối đa)
 
                                                                 resultanswer = "";
-                                                                resultanswer += "Ý BẠN LÀ GÌ ?<br /> ";
+                                                                resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
 
 
                                                                 var type = "template";
-                                                                questionTitle = "Ý bạn có phải là ?";
+                                                                questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
                                                                 var jsonmessageDistrict = {
                                                                     username: sender,
                                                                     siteid: siteid,
@@ -2821,11 +2821,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                                                                     resultanswer = "";
-                                                                    resultanswer += "CÓ PHẢI Ý BẠN LÀ CÁC ĐỊA CHỈ DƯỚI ĐÂY KHÔNG ?<br /> ";
+                                                                    resultanswer += "CÓ PHẢI Ý " + sessions[sessionId].gender + "  LÀ CÁC ĐỊA CHỈ DƯỚI ĐÂY KHÔNG ?<br /> ";
 
 
                                                                     var type = "template";
-                                                                    questionTitle = "Ý bạn là ?";
+                                                                    questionTitle = "Ý " + sessions[sessionId].gender + "  là ?";
                                                                     var jsonmessageDistrict = {
                                                                         username: sender,
                                                                         siteid: siteid,
@@ -2860,7 +2860,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                 else {
 
-                                                                    SentToClient(sender, "Bạn đang ở Tỉnh/Thành phố nào ạ? (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                    SentToClient(sender, "" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                         .catch(console.error);
                                                                 }
 
@@ -2885,7 +2885,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                 }//end if(product && province)
                                                 else if (!province && district)//khong có tỉnh, chỉ có huyện/quận
                                                 {
-                                                    resultanswer = "<br />Bạn đang ở Tỉnh/Thành phố nào ạ? Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...";
+                                                    resultanswer = "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...";
                                                 }
                                                 else {//chỉ có product
 
@@ -3001,7 +3001,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 if (intent === "greet") {
                 }
                 else {
-                    resultanswer = "Mình chưa rõ câu hỏi của bạn lắm. Bạn vui lòng cung cấp rõ thông tin cần hỏi như: tên sản phẩm, giá cả, địa chỉ...Cảm ơn bạn";
+                    resultanswer = "Mình chưa rõ câu hỏi của " + sessions[sessionId].gender + "  lắm. " + sessions[sessionId].gender + "  vui lòng cung cấp rõ thông tin cần hỏi như: tên sản phẩm, giá cả, địa chỉ...Cảm ơn " + sessions[sessionId].gender + " ";
                 }
             }
 
@@ -3028,7 +3028,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
             getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
             return;
         }
-        resultanswer = "Bạn muốn hỏi thông tin sản phẩm nào ạ?"
+        resultanswer = "" + sessions[sessionId].gender + "  muốn hỏi thông tin sản phẩm nào ạ?"
         sessions[sessionId].prev_intent = "ask_stock";
     }
     else if (button_payload_state === "2") {
@@ -3040,7 +3040,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
             getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
             return;
         }
-        resultanswer = "Bạn muốn hỏi giá sản phẩm nào ạ?"
+        resultanswer = "" + sessions[sessionId].gender + "  muốn hỏi giá sản phẩm nào ạ?"
         sessions[sessionId].prev_intent = "ask_price";
     }
     else if (button_payload_state === "3") {
@@ -3052,7 +3052,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
             getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
             return;
         }
-        resultanswer = "Bạn muốn xem khuyến mãi của sản phẩm nào ạ?"
+        resultanswer = "" + sessions[sessionId].gender + "  muốn xem khuyến mãi của sản phẩm nào ạ?"
 
         sessions[sessionId].prev_intent = "ask_promotion";
     }
@@ -3132,7 +3132,7 @@ const responseRepeatChooseFinancialCompany = (sender, sessionId, button_payload_
         var rn = randomNumber(unknowproduct.length);
         var resultanswer = unknowproduct[rn];
         if (!resultanswer) {//trường hợp chưa load xong file từ data
-            resultanswer = "Không hiểu sản phẩm bạn đang muốn hỏi là gì?";
+            resultanswer = "Không hiểu sản phẩm " + sessions[sessionId].gender + "  đang muốn hỏi là gì?";
         }
 
         SentToClient(sender, resultanswer, "", button_payload_state, "", replyobject, siteid)
@@ -3349,6 +3349,19 @@ var webhookController = {
             res.sendStatus(200);
             return;
         }
+        //gender
+        if (parseInt(data.replyobject.gender) === 1) {
+            sessions[sessionId].gender = "anh";
+
+        }
+        else if (parseInt(data.replyobject.gender) === 2) {
+            sessions[sessionId].gender = "chị";
+        }
+        else {
+            sessions[sessionId].gender = "bạn";
+        }
+
+
         //trace chat history
         tracechat.logChatHistory(sender, data, 1, isAdminChat);//1 là câu hỏi, 2 là câu trả lời
 
@@ -3368,7 +3381,7 @@ var webhookController = {
             if (messagetype == 2) {
                 // We received an attachment
                 // Let's reply with an automatic message
-                SentToClient(sender, 'Bạn đáng yêu quá trời. ', "", "", "", replyobject, siteid)
+                SentToClient(sender, '"+sessions[sessionId].gender+"  đáng yêu quá trời. ', "", "", "", replyobject, siteid)
                     .catch(console.error);
             } else {
 
