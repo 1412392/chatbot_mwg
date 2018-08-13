@@ -70,7 +70,7 @@ module.exports = {
                     }
                 }
                 else {
-                    if (message.length < 2) return; //rác
+                    if (message && message.length < 2) return; //rác
                     if (isAdminChat) {
                         writeFile(filename, "ADMIN-" + message.messageobject.content.replace(/\n/g, '') + "<br />" + "\n");
                     }
