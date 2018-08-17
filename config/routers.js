@@ -14,7 +14,8 @@ module.exports=function(app)
 
 	var webhookRouter=Router()
 		.get('/',controllers.webhook.index)
-		.post('/',controllers.webhook.postmessage);
+		.post('/',controllers.webhook.postmessage)
+		.post('/processsubmit',controllers.webhook.processsubmit);
 
 
 	app.use('/webhook',webhookRouter);

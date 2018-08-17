@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://d03f9298.ngrok.io/chatbot";
+var severResponse = "https://ebb181fc.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -124,8 +124,11 @@ const SentToClientButton = (id, text) => {
     }
     // console.log(contentlogs);
     // console.log("============SentToClientButton===============");
+    var messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
 
-    tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
+    tracechat.logChatHistory(id, contentlogs, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
+
+    jsonparse.messageID = messageID;
 
     //console.log(text);
     return fetch(severResponse, {
@@ -133,7 +136,7 @@ const SentToClientButton = (id, text) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: text,
+        body: JSON.stringify(jsonparse),
         json: true
     })
         .then(rsp => rsp.json())
@@ -163,9 +166,12 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
     if (state === 0)//câu hỏi do user send, không phải từ postback
     {
         if (intent == "greet") {
+            var messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
+
             body = JSON.stringify({
                 username: id,
                 siteid: siteid,
+                messageID: messageID,
                 messagetype: "template",
                 replyobject: replyobject,
                 messagecontentobject: {
@@ -216,16 +222,20 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
             contentlogs += "<button " + "type=button>" + "Thông tin trả góp" + "</button>" + "<br />";
             contentlogs += "<button " + "type=button>" + "Kiểm tra đơn hàng" + "</button>" + "<br />";
             //contentlogs += "<button " + "type=button>" + "Thông tin trả góp" + "</button>" + "<br />";
-
-            tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
+           
+            tracechat.logChatHistory(id, contentlogs, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
 
         }
         else if (intent == "option_whenoutcolorstock") {
+            let messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
+
+
             body = JSON.stringify({
                 username: id,
                 siteid: siteid,
                 messagetype: "template",
                 replyobject: replyobject,
+                messageID: messageID,
                 messagecontentobject: {
                     elements: [
                         {
@@ -257,32 +267,40 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
             contentlogs += "<button " + "type=button>" + "Chọn lại màu" + "</button>" + "<br />";
             contentlogs += "<button " + "type=button>" + "Chọn lại quận/huyện" + "</button>" + "<br />";
 
-            tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
+            tracechat.logChatHistory(id, contentlogs, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
 
         }
         else {
+            let messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
+
             body = JSON.stringify({
                 username: id,
                 siteid: siteid,
+                messageID: messageID,
                 replyobject: replyobject,
                 messagetype: "text",
                 messagecontentobject: text
             });
 
-            tracechat.logChatHistory(id, text, 2);//1 là câu hỏi, 2 là câu trả lời
+
+            tracechat.logChatHistory(id, text, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
 
         }
 
     }
     else {
+        var messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
+
         body = JSON.stringify({
             username: id,
             siteid: siteid,
+            messageID: messageID,
             replyobject: replyobject,
             messagetype: "text",
             messagecontentobject: text
         });
-        tracechat.logChatHistory(id, text, 2);//1 là câu hỏi, 2 là câu trả lời
+
+        tracechat.logChatHistory(id, text, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
 
     }
 
@@ -466,10 +484,11 @@ function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobje
 }
 
 const fbEvaluate = (id, replyobject, siteid) => {
-
+    var messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
     var body = JSON.stringify({
         username: id,
         siteid: siteid,
+        messageID: messageID,
         messagetype: "template",
         replyobject: replyobject,
         messagecontentobject: {
@@ -504,7 +523,7 @@ const fbEvaluate = (id, replyobject, siteid) => {
     contentlogs += "<button " + "type=button>" + "Trung bình" + "</button>" + "<br />";
     contentlogs += "<button " + "type=button>" + "Tệ" + "</button>" + "<br />";
 
-    tracechat.logChatHistory(id, contentlogs, 2);//1 là câu hỏi, 2 là câu trả lời
+    tracechat.logChatHistory(id, contentlogs, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
 
 
     //
@@ -3325,13 +3344,20 @@ var webhookController = {
 
             });
         }
-
+        var messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
         var data = (req.body);
 
         // var data = JSON.parse(JSON.stringify((req.body)));
         console.log("=============DATA POST XUONG======================");
         console.log(data);
         console.log("===================================");
+        if (data.replyobject.userType === 'a')//admin, skip qua
+        {
+            isAdminChat = true;
+            tracechat.logChatHistory(data.replyobject.roomId, data, 2, isAdminChat, messageID);//1 là câu hỏi, 2 là câu trả lời
+            res.sendStatus(200);
+            return;
+        }
 
 
         const sender = data.username;
@@ -3342,13 +3368,7 @@ var webhookController = {
         const sessionId = findOrCreateSession(sender);
         sessions[sessionId].isPreAskColor = false;
         var isAdminChat = false;
-        if (data.replyobject.userType === 'a')//admin, skip qua
-        {
-            isAdminChat = true;
-            tracechat.logChatHistory(data.replyobject.customerusername, data, 2, isAdminChat);//1 là câu hỏi, 2 là câu trả lời
-            res.sendStatus(200);
-            return;
-        }
+
         //gender
         if (parseInt(data.replyobject.gender) === 1) {
             sessions[sessionId].gender = "anh";
@@ -3363,7 +3383,7 @@ var webhookController = {
 
 
         //trace chat history
-        tracechat.logChatHistory(sender, data, 1, isAdminChat);//1 là câu hỏi, 2 là câu trả lời
+        tracechat.logChatHistory(sender, data, 1, isAdminChat, messageID);//1 là câu hỏi, 2 là câu trả lời
 
         //
 
@@ -3505,6 +3525,24 @@ var webhookController = {
         res.sendStatus(200);
 
     },
+    processsubmit: function (req, res) {//xử lý message accept or deny from admin
+        //console.log("==============Nhan message admin ========");
+      //  console.log(req.body);
+        var obj = req.body;
+
+        var result = tracechat.editMessage(obj.roomId, obj.messageID, obj.isaccepted, obj);//1 là câu hỏi, 2 là câu trả lời
+
+        setTimeout(() => {
+            if (result) { res.sendStatus(200); }
+            else {
+
+                res.sendStatus(500);
+            }
+
+        }, 100);
+
+
+    }
 };
 
 module.exports = webhookController;
