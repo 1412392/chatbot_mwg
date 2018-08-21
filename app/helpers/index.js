@@ -74,7 +74,7 @@ module.exports = {
                 }
             }
             else {
-                if (message && message.length < 2) return; //rác
+                if (!message || (message && message.length < 2)) return; //rác
                 if (isAdminChat) {
                     messobj.content = message.messageobject.content.replace(/\n/g, '') + "<br />";
                     messobj.isaccept = 1;
@@ -86,7 +86,8 @@ module.exports = {
                 }
             }
 
-
+            if (messobj.content.length < 2) return;
+            
             client.rpush(sessionID, JSON.stringify(messobj), function (err, reply) {
 
                 if (err) {
