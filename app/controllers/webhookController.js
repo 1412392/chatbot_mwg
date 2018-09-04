@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://7295896b.ngrok.io/chatbot";
+var severResponse = "https://9c4a5db8.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1086,7 +1086,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].isLatestAskGID = false;
                     sessions[sessionId].isAskedGID = false;
 
-                    SentToClient(sender, "Rất tiếc. Nếu " + sessions[sessionId].gender + "  không có CMND thì " + sessions[sessionId].gender + "  không thể thực hiện thủ tục mua hàng trả góp được. Xin lỗi vì sự bất tiện này.", questionTitle, button_payload_state, "", replyobject, siteid)
+                    SentToClient(sender, "Rất tiếc. Nếu " + sessions[sessionId].gender + "  không có CMND thì " + sessions[sessionId].gender + "  không thể thực hiện thủ tục mua hàng trả góp được. Xin lỗi vì sự bất tiện này.", questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                         .catch(console.error);
                     return;
                 }
@@ -1772,13 +1772,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                             resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
-                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
                                             resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
 
-                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else {
@@ -1798,7 +1798,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     if (result && !sessions[sessionId].isLatestAskNormalInstallment) {
                                                         resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói <span style='color:green'>trả góp 0%</span>. (<span style='color:green'>trả góp 0%</span> là gói trả góp đặc biệt rất hấp dẫn, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br> ";
                                                         //send ds ctytc
-                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                             .catch(console.error);
 
                                                         if (!sessions[sessionId].financialCompany) {
@@ -1807,7 +1807,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             //console.log(jsonbuttonFinancialCompany);
 
                                                             setTimeout(() => {
-                                                                SentToClientButton(sender, jsonbuttonFinancialCompany, intent)
+                                                                SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment")
                                                                     .catch(console.error);
 
                                                             }, 1000);
@@ -1861,7 +1861,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                                                                         setTimeout(() => {
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                 .catch(console.error);
                                                                         }, 800);
 
@@ -1869,7 +1869,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                         setTimeout(() => {
-                                                                            SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                                 .catch(console.error);
 
                                                                         }, 1000);
@@ -1878,7 +1878,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     else {
                                                                         resultanswer = "Công ty " + (sessions[sessionId].financialCompany === 8 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + " không hỗ trợ gói trả góp 0% cho sản phẩm này.</br>";
                                                                         setTimeout(() => {
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                 .catch(console.error);
                                                                         }, 500);
 
@@ -1886,7 +1886,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                         setTimeout(() => {
-                                                                            SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                                 .catch(console.error);
 
                                                                         }, 700);
@@ -1895,7 +1895,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 else {
                                                                     resultanswer = "Công ty " + (sessions[sessionId].financialCompany === 8 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + " không hỗ trợ gói trả góp 0% cho sản phẩm này.</br>";
                                                                     setTimeout(() => {
-                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                             .catch(console.error);
                                                                     }, 500);
 
@@ -1903,7 +1903,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                     setTimeout(() => {
-                                                                        SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                             .catch(console.error);
 
                                                                     }, 700);
@@ -2065,7 +2065,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             sessions[sessionId].isAskedBrief = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
                                                             var jsonbuttonBrief = getButtonListBrief(productID, productName, sender, siteid, replyobject, "Giấy tờ");
 
-                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                 .catch(console.error);
 
                                                             setTimeout(() => {
@@ -2083,7 +2083,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             resultanswer = "<br/>2. <span style='font-style:italic;'>" + sessions[sessionId].gender + "  muốn trả trước bao nhiêu %? (vui lòng chỉ nhập số TRÒN CHỤC và nằm trong phạm vi từ 10 đến 80 (<span style='color:red;font-style:italic'>Một số sản phẩm có hỗ trợ trả góp 0% nên có thể nhập 0</span>), ví dụ: 0,20,30...</span></br>";
                                                             sessions[sessionId].isLatestAskPercentInstalment = true;
                                                             sessions[sessionId].isAskedPercentInstalment = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
-                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                 .catch(console.error);
                                                             return;
                                                         }
@@ -2151,7 +2151,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
 
-                                                                SentToClient(sender, "<span style='color:red'>Rất tiếc. Giấy tờ " + sessions[sessionId].gender + "  cung cấp không đủ điều kiện để trả góp. Xin lỗi vì sự bất tiện này.</span>", questionTitle, button_payload_state, "", replyobject, siteid)
+                                                                SentToClient(sender, "<span style='color:red'>Rất tiếc. Giấy tờ " + sessions[sessionId].gender + "  cung cấp không đủ điều kiện để trả góp. Xin lỗi vì sự bất tiện này.</span>", questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                     .catch(console.error);
                                                                 return;
                                                             }
@@ -2171,8 +2171,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 }
                                                                 sessions[sessionId].isBeforeAskeMonthInstalment = true;
                                                                 APIGetNormalInstallment(urlwcfProduct, argsGetListMonth, function (allpackages) {
-                                                                    console.log(allpackages);
-                                                                    console.log(argsGetListMonth);
+                                                                    //console.log(allpackages);
+                                                                    //console.log(argsGetListMonth);
                                                                     if (allpackages.GetListNormalInstallment2018Result) {
                                                                         if (allpackages.GetListNormalInstallment2018Result.InstallmentBO) {
                                                                             sessions[sessionId].InstalmentMonth = [];
@@ -2192,7 +2192,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp cho trả trước " + sessions[sessionId].percent_instalment + "%. Mời chọn lại.</span></br>";
 
                                                                             setTimeout(() => {
-                                                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                     .catch(console.error);
                                                                             }, 400);
 
@@ -2200,7 +2200,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                             setTimeout(() => {
-                                                                                SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                                SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                                     .catch(console.error);
 
                                                                             }, 800);
@@ -2218,12 +2218,12 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         sessions[sessionId].isAskedMonthInstalment = true;//sẽ bị reset khi hết vòng hỏi này, hoặc khách hàng chọn hỏi sp khác, hỏi lại
                                                                         var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, "Số tháng góp", sessions[sessionId].InstalmentMonth);
 
-                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                             .catch(console.error);
                                                                         sessions[sessionId].isBeforeAskeMonthInstalment = false;
 
                                                                         setTimeout(() => {
-                                                                            SentToClientButton(sender, jsonbuttonMI, intent)
+                                                                            SentToClientButton(sender, jsonbuttonMI, "ask_instalment")
                                                                                 .catch(console.error);
                                                                         }, 600)
 
@@ -2235,7 +2235,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp cho trả trước " + sessions[sessionId].percent_instalment + "%. Mời chọn lại.</span></br>";
 
                                                                         setTimeout(() => {
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                 .catch(console.error);
                                                                         }, 400);
 
@@ -2243,7 +2243,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                         setTimeout(() => {
-                                                                            SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                                 .catch(console.error);
 
                                                                         }, 800);
@@ -2297,7 +2297,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 InventStatusId: 1
                                                             }
                                                             APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
-                                                                console.log(InstallmentResult);
+                                                                //console.log(InstallmentResult);
                                                                 if (InstallmentResult) {
                                                                     if (InstallmentResult.GetInstallmentResult2018Result) {
 
@@ -2333,7 +2333,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                                                                         setTimeout(() => {
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                 .catch(console.error);
                                                                         }, 800);
 
@@ -2341,7 +2341,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                         setTimeout(() => {
-                                                                            SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                                 .catch(console.error);
 
                                                                         }, 1500);
@@ -2350,7 +2350,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp với công ty " + finalCTTC === 1 ? "<span style='color:red'>HomeCredit</span>" : finalCTTC === 3 ? "<span style='color:green'>FECredit</span>" : "CHƯA CHỌN" + "</span></br>";
 
                                                                         setTimeout(() => {
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                 .catch(console.error);
                                                                         }, 400);
 
@@ -2358,7 +2358,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                         setTimeout(() => {
-                                                                            SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                                 .catch(console.error);
 
                                                                         }, 800);
@@ -2371,7 +2371,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp.</span></br>";
 
                                                                     setTimeout(() => {
-                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                             .catch(console.error);
                                                                     }, 400);
 
@@ -2379,7 +2379,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                     setTimeout(() => {
-                                                                        SentToClientButton(sender, anotheroptionbutton, intent)
+                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                             .catch(console.error);
 
                                                                     }, 800);
@@ -2394,7 +2394,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         }
 
                                                         if (!sessions[sessionId].isBeforeAskeMonthInstalment) {
-                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                 .catch(console.error);
                                                         }
 
@@ -2404,7 +2404,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                             }
                                             else {
                                                 resultanswer += "<br />Sản phẩm này hiện tại không hỗ trợ bất kỳ hình thức trả góp nào. " + sessions[sessionId].gender + "  có thể hỏi sản phẩm khác hoặc " + sessions[sessionId].gender + "  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho " + sessions[sessionId].gender + "  tốt hơn. ";
-                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                     .catch(console.error);
                                                 // resultanswer += "<br />"+sessions[sessionId].gender+"  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho "+sessions[sessionId].gender+"  tốt hơn. ";
 
@@ -2416,7 +2416,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                 else {
                                     resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>NGỪNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
-                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                         .catch(console.error);
                                 }
                             });
@@ -2426,7 +2426,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             var rn = randomNumber(productnotfound.length);
                             resultanswer = productnotfound[rn];
 
-                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                 .catch(console.error);
 
                         }
@@ -2436,698 +2436,698 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
 
 
-                if (sessions[sessionId].prev_intent === "ask_instalment" && intent != "ask_instalment") {//nếu đã hỏi tra gop trước mà hiện tại câu này không còn hỏi km nữa thì reset
+                if (sessions[sessionId].prev_intent === "ask_instalment" && intent != "ask_instalment") {//nếu đã hỏi tra gop trước mà hiện tại câu này không còn hỏi tg nữa thì reset
                     sessions[sessionId].prev_intent = null;
                 }
-                if (intent === "ask_instalment") {//nếu câu hiện tại đang hỏi km 
+                if (intent === "ask_instalment") {//nếu câu hiện tại đang hỏi tg
                     sessions[sessionId].prev_intent = "ask_instalment";
                 }
             }
-            else if (intent === "ask_stock" || intent === "ask_price" || intent === "ask_old_stock") {
-                sessions[sessionId].isLatestAskNormalInstallment = false;
+            // else if (intent === "ask_stock" || intent === "ask_price" || intent === "ask_old_stock") {
+            //     sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                if (intent === "ask_stock")
-                    sessions[sessionId].prev_intent = "ask_stock";
-                if (intent === "ask_price")
-                    sessions[sessionId].prev_intent = "ask_price";
-                if (intent === "ask_old_stock")
-                    sessions[sessionId].prev_intent = "ask_old_stock";
+            //     if (intent === "ask_stock")
+            //         sessions[sessionId].prev_intent = "ask_stock";
+            //     if (intent === "ask_price")
+            //         sessions[sessionId].prev_intent = "ask_price";
+            //     if (intent === "ask_old_stock")
+            //         sessions[sessionId].prev_intent = "ask_old_stock";
 
 
-                questionTitle = "Thông tin sản phẩm!";
-                //ten san pham, gia ca, dia chi, mau sac
+            //     questionTitle = "Thông tin sản phẩm!";
+            //     //ten san pham, gia ca, dia chi, mau sac
 
-                if (sessions[sessionId].product) {
+            //     if (sessions[sessionId].product) {
 
-                    var productName = sessions[sessionId].product;
-                    console.log(productName);
+            //         var productName = sessions[sessionId].product;
+            //         console.log(productName);
 
-                    //nếu có tỉnh,tp => lấy tên tỉnh,tp
-                    var province;
-                    var district;
-                    var color;
-                    if (sessions[sessionId].province) {
+            //         //nếu có tỉnh,tp => lấy tên tỉnh,tp
+            //         var province;
+            //         var district;
+            //         var color;
+            //         if (sessions[sessionId].province) {
 
-                        province = sessions[sessionId].province;
+            //             province = sessions[sessionId].province;
 
-                    }
-                    //nếu có quận.huyện =>lấy nó
-                    if (sessions[sessionId].district) {
+            //         }
+            //         //nếu có quận.huyện =>lấy nó
+            //         if (sessions[sessionId].district) {
 
-                        district = sessions[sessionId].district;
+            //             district = sessions[sessionId].district;
 
-                    }
+            //         }
 
-                    if (sessions[sessionId].color) {
-                        color = sessions[sessionId].color;
+            //         if (sessions[sessionId].color) {
+            //             color = sessions[sessionId].color;
 
-                    }
+            //         }
 
-                    var keyword = productName;
+            //         var keyword = productName;
 
-                    // var intRowCountRef=0;
-                    // var categoryLstRef=[];
-                    // var productTypeLstRef=[];
-                    // var categoryDefault=0;
-                    var argsSearchProduct = "";
+            //         // var intRowCountRef=0;
+            //         // var categoryLstRef=[];
+            //         // var productTypeLstRef=[];
+            //         // var categoryDefault=0;
+            //         var argsSearchProduct = "";
 
-                    //console.log(keyword.toLowerCase());
-                    console.log(keyword);
-                    console.log(isIncludeAccessoryKeyword(keyword));
+            //         //console.log(keyword.toLowerCase());
+            //         console.log(keyword);
+            //         console.log(isIncludeAccessoryKeyword(keyword));
 
-                    if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
-                    {
-                        argsSearchProduct = {
-                            q: keyword,
-                            CateID: -3
-                        };
-                    }
-                    else {
+            //         if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
+            //         {
+            //             argsSearchProduct = {
+            //                 q: keyword,
+            //                 CateID: -3
+            //             };
+            //         }
+            //         else {
 
-                        argsSearchProduct = {
-                            q: keyword,
-                            CateID: -4
-                        };
-                    }
+            //             argsSearchProduct = {
+            //                 q: keyword,
+            //                 CateID: -4
+            //             };
+            //         }
 
-                    if (intent === "ask_old_stock")//xử lý máy cũ
-                    {
-                        SentToClient(sender, "Chức năng tìm máy cũ đang được phát triển...Xin lỗi vì sự bất tiện này!", questionTitle, button_payload_state, intent, replyobject, siteid)
-                            .catch(console.error);
+            //         if (intent === "ask_old_stock")//xử lý máy cũ
+            //         {
+            //             SentToClient(sender, "Chức năng tìm máy cũ đang được phát triển...Xin lỗi vì sự bất tiện này!", questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                 .catch(console.error);
 
-                    }
-                    else {
+            //         }
+            //         else {
 
-                        APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+            //             APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
 
-                            //console.log(result);
-                            if (result.SearchProductPhiResult != null) {
+            //                 //console.log(result);
+            //                 if (result.SearchProductPhiResult != null) {
 
-                                //console.log("================KẾT QUẢ SEARCH===============");
-                                //console.log(result.SearchProductPhiResult);
+            //                     //console.log("================KẾT QUẢ SEARCH===============");
+            //                     //console.log(result.SearchProductPhiResult);
 
-                                //console.log("============================================");
+            //                     //console.log("============================================");
 
-                                var productID = result.SearchProductPhiResult.string[0];
-                                sessions[sessionId].productID = productID;
+            //                     var productID = result.SearchProductPhiResult.string[0];
+            //                     sessions[sessionId].productID = productID;
 
-                                var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
-                                var lstproduct = result;
+            //                     var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
+            //                     var lstproduct = result;
 
-                                APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+            //                     APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
 
-
-                                    if (result && result.GetProductResult.productErpPriceBOField) {
-                                        //lấy link sp
-                                        var argsProductDetailGetSeoURL = {
-                                            productCategoryLangBOField_uRLField: result.GetProductResult.productCategoryLangBOField.uRLField,
-                                            productCategoryLangBOField_categoryNameField: result.GetProductResult.productCategoryLangBOField.categoryNameField,
-                                            productCategoryBOField_uRLField: result.GetProductResult.productCategoryBOField.uRLField,
-                                            productCategoryBOField_categoryNameField: result.GetProductResult.productCategoryBOField.categoryNameField,
-                                            categoryNameField: result.GetProductResult.categoryNameField,
-                                            productLanguageBOField_productNameField: result.GetProductResult.productLanguageBOField.productNameField,
-                                            productLanguageBOField_uRLField: result.GetProductResult.productLanguageBOField.uRLField,
-                                            productNameField: result.GetProductResult.productNameField,
-                                            uRLField: result.GetProductResult.uRLField
-                                        };
-
-
-                                        // console.log(result);
-                                        resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
-                                            + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
-                                        //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
-                                        resultanswer += "<br /><img width='120' height='120' src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
-                                        //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
-                                        // console.log(resultanswer);
-
-                                        APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
-
-                                            resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
-
-                                            if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
-                                                (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
-                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
-
-
-                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                    .catch(console.error);
-                                            }
-                                            else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
-
-
-                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                    .catch(console.error);
-                                            }
-                                            else {
-
-                                                //nếu có tỉnh/tp mới, reset lại huyện
-
-                                                if (province && !district) {//có province, không có district
+
+            //                         if (result && result.GetProductResult.productErpPriceBOField) {
+            //                             //lấy link sp
+            //                             var argsProductDetailGetSeoURL = {
+            //                                 productCategoryLangBOField_uRLField: result.GetProductResult.productCategoryLangBOField.uRLField,
+            //                                 productCategoryLangBOField_categoryNameField: result.GetProductResult.productCategoryLangBOField.categoryNameField,
+            //                                 productCategoryBOField_uRLField: result.GetProductResult.productCategoryBOField.uRLField,
+            //                                 productCategoryBOField_categoryNameField: result.GetProductResult.productCategoryBOField.categoryNameField,
+            //                                 categoryNameField: result.GetProductResult.categoryNameField,
+            //                                 productLanguageBOField_productNameField: result.GetProductResult.productLanguageBOField.productNameField,
+            //                                 productLanguageBOField_uRLField: result.GetProductResult.productLanguageBOField.uRLField,
+            //                                 productNameField: result.GetProductResult.productNameField,
+            //                                 uRLField: result.GetProductResult.uRLField
+            //                             };
+
+
+            //                             // console.log(result);
+            //                             resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
+            //                                 + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
+            //                             //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
+            //                             resultanswer += "<br /><img width='120' height='120' src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+            //                             //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
+            //                             // console.log(resultanswer);
+
+            //                             APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
+
+            //                                 resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
+
+            //                                 if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
+            //                                     (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
+            //                                     resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+
+
+            //                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                         .catch(console.error);
+            //                                 }
+            //                                 else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
+            //                                     resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+
+
+            //                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                         .catch(console.error);
+            //                                 }
+            //                                 else {
+
+            //                                     //nếu có tỉnh/tp mới, reset lại huyện
+
+            //                                     if (province && !district) {//có province, không có district
 
-                                                    //lấy provinceID
+            //                                         //lấy provinceID
 
-                                                    var index = "locationdata";
-                                                    var type = "province";
-                                                    getElasticSearch(el, index, type, province, function callbackEL(err, result) {
-                                                        if (err) return err;
-                                                        //console.log(result);
-                                                        if (result.length != 0) {//district được tìm thấy
-                                                            var provinceID = result[0]._source.provinceID;
-                                                            var provinceName = result[0]._source.provinceName;
-                                                            sessions[sessionId].province = provinceName;
-                                                            sessions[sessionId].provinveID = provinceID;
+            //                                         var index = "locationdata";
+            //                                         var type = "province";
+            //                                         getElasticSearch(el, index, type, province, function callbackEL(err, result) {
+            //                                             if (err) return err;
+            //                                             //console.log(result);
+            //                                             if (result.length != 0) {//district được tìm thấy
+            //                                                 var provinceID = result[0]._source.provinceID;
+            //                                                 var provinceName = result[0]._source.provinceName;
+            //                                                 sessions[sessionId].province = provinceName;
+            //                                                 sessions[sessionId].provinveID = provinceID;
 
-                                                            //console.log(provinceID);
+            //                                                 //console.log(provinceID);
 
-                                                            //lấy danh sách siêu thị còn hàng
-                                                            var total = 0;
-                                                            var argsProductStock = "";
-                                                            if (hasNumber(color)) {
-                                                                argsProductStock = {
-                                                                    productID: parseInt(productID), productCode: color, provinceID: provinceID,
-                                                                    districtID: 0, pageSize: 30, pageIndex: pageIndexDefault, total
-                                                                };
-                                                            }
-                                                            else {
-                                                                argsProductStock = {
-                                                                    productID: parseInt(productID), productCode: null, provinceID: provinceID,
-                                                                    districtID: 0, pageSize: 30, pageIndex: pageIndexDefault, total
-                                                                };
-                                                            }
+            //                                                 //lấy danh sách siêu thị còn hàng
+            //                                                 var total = 0;
+            //                                                 var argsProductStock = "";
+            //                                                 if (hasNumber(color)) {
+            //                                                     argsProductStock = {
+            //                                                         productID: parseInt(productID), productCode: color, provinceID: provinceID,
+            //                                                         districtID: 0, pageSize: 30, pageIndex: pageIndexDefault, total
+            //                                                     };
+            //                                                 }
+            //                                                 else {
+            //                                                     argsProductStock = {
+            //                                                         productID: parseInt(productID), productCode: null, provinceID: provinceID,
+            //                                                         districtID: 0, pageSize: 30, pageIndex: pageIndexDefault, total
+            //                                                     };
+            //                                                 }
 
-                                                            APICheckInStock(urlApiCategory, argsProductStock, function getResult(result) {
-                                                                //console.log(argsProductStock);
+            //                                                 APICheckInStock(urlApiCategory, argsProductStock, function getResult(result) {
+            //                                                     //console.log(argsProductStock);
 
 
-                                                                // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                                // console.log(total);
-                                                                console.log(result);
-                                                                if (result.total) {//có hàng
-                                                                    resultanswer = "";
+            //                                                     // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
+            //                                                     // console.log(total);
+            //                                                     console.log(result);
+            //                                                     if (result.total) {//có hàng
+            //                                                         resultanswer = "";
 
-                                                                    var type = "template";
+            //                                                         var type = "template";
 
-                                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + provinceName;
-                                                                    var jsonmessageStore = {
-                                                                        username: sender,
-                                                                        siteid: siteid,
-                                                                        messagetype: "template",
-                                                                        replyobject: replyobject,
-                                                                        messagecontentobject: {
-                                                                            elements: [
-                                                                                {
-                                                                                    title: questionTitle,
-                                                                                    buttons: []
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                    };
-                                                                    var length = result.GetStoreInStock2016Result.StoreBO.length;
+            //                                                         questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + provinceName;
+            //                                                         var jsonmessageStore = {
+            //                                                             username: sender,
+            //                                                             siteid: siteid,
+            //                                                             messagetype: "template",
+            //                                                             replyobject: replyobject,
+            //                                                             messagecontentobject: {
+            //                                                                 elements: [
+            //                                                                     {
+            //                                                                         title: questionTitle,
+            //                                                                         buttons: []
+            //                                                                     }
+            //                                                                 ]
+            //                                                             }
+            //                                                         };
+            //                                                         var length = result.GetStoreInStock2016Result.StoreBO.length;
 
-                                                                    // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
-                                                                    for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
-                                                                        var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                                        //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                                        //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
-
-                                                                        jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                                            type: "web_url",
-                                                                            title: (i + 1) + ". " + storeBO.webAddressField,
-                                                                            url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                                        });
-                                                                    }
-
-                                                                    //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                    //    .catch(console.error);
-                                                                    // console.log(jsonmessageStore);
-
-                                                                    //  var bodystring = JSON.parse(jsonmessageStore);
-                                                                    var bodyjson = JSON.stringify(jsonmessageStore);
-
-
-                                                                    //console.log("===============BUTTON URL STORE===================");
-                                                                    //console.log(bodyjson);
-
-
-                                                                    SentToClientButton(sender, bodyjson, intent)
-                                                                        .catch(console.error);
-
-
-                                                                    //===========================================================================================
-
-
-                                                                    //lấy danh sách huyện của tỉnh đó
-
-                                                                    var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-
-                                                                    SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
-
-
-                                                                }
-                                                                else {//hết hàng
-                                                                    SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                        .catch(console.error);
-
-                                                                }
-
-                                                            });//end APIGetDistrictByProvince
-
-                                                        }
-                                                        else {
-
-                                                            sessions[sessionId].province = null;
-                                                            SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố " + sessions[sessionId].gender + "  đang ở. Vui lòng cung cấp tỉnh/Thành trước. (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                .catch(console.error);
-
-                                                        }
-
-                                                    });//end elastic
-
-
-
-                                                }
-                                                else if (province && district) {
-
-                                                    //console.log(province+"-"+district);
-
-
-                                                    //lấy danh sách cửa hàng còn hàng ở tỉnh, huyện  đó không theo màu
+            //                                                         // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
+            //                                                         for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
+            //                                                             var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
+            //                                                             //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
+            //                                                             //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
+
+            //                                                             jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+            //                                                                 type: "web_url",
+            //                                                                 title: (i + 1) + ". " + storeBO.webAddressField,
+            //                                                                 url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+            //                                                             });
+            //                                                         }
+
+            //                                                         //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                                         //    .catch(console.error);
+            //                                                         // console.log(jsonmessageStore);
+
+            //                                                         //  var bodystring = JSON.parse(jsonmessageStore);
+            //                                                         var bodyjson = JSON.stringify(jsonmessageStore);
+
+
+            //                                                         //console.log("===============BUTTON URL STORE===================");
+            //                                                         //console.log(bodyjson);
+
+
+            //                                                         SentToClientButton(sender, bodyjson, intent)
+            //                                                             .catch(console.error);
+
+
+            //                                                         //===========================================================================================
+
+
+            //                                                         //lấy danh sách huyện của tỉnh đó
+
+            //                                                         var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
+
+            //                                                         SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
+
+
+            //                                                     }
+            //                                                     else {//hết hàng
+            //                                                         SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                                             .catch(console.error);
+
+            //                                                     }
+
+            //                                                 });//end APIGetDistrictByProvince
+
+            //                                             }
+            //                                             else {
+
+            //                                                 sessions[sessionId].province = null;
+            //                                                 SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố " + sessions[sessionId].gender + "  đang ở. Vui lòng cung cấp tỉnh/Thành trước. (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                                     .catch(console.error);
+
+            //                                             }
+
+            //                                         });//end elastic
+
+
+
+            //                                     }
+            //                                     else if (province && district) {
+
+            //                                         //console.log(province+"-"+district);
+
+
+            //                                         //lấy danh sách cửa hàng còn hàng ở tỉnh, huyện  đó không theo màu
 
-                                                    var index = "locationdata";
-                                                    var type = "district";
-                                                    if (!(sessions[sessionId].provinveID))//th này là do detect đc cả tỉnh lẫn huyện trong 1 câu (phức tạp)
-                                                    {
-                                                        sessions[sessionId].provinveID = 3;//cho tránh trường hợp lỗi query elastic (lấy mặc định là HCM)
-                                                    }
-                                                    //tìm huyện theo tỉnh trước
-                                                    getElasticSearchDistrictAndProvince(el, index, type, district, sessions[sessionId].provinveID, function callbackEL(err, result) {
-                                                        if (err) return err;
-                                                        if (result.length != 0) {
-                                                            if (result.length == 1)//đã xác định đúng chính xác huyện và tỉnh đó
-                                                            {
-                                                                var provinceID = result[0]._source.provinceID;
-                                                                var districtID = result[0]._source.districtID;
-                                                                var districtName = result[0]._source.districtName;
-                                                                var provinceName = province;
+            //                                         var index = "locationdata";
+            //                                         var type = "district";
+            //                                         if (!(sessions[sessionId].provinveID))//th này là do detect đc cả tỉnh lẫn huyện trong 1 câu (phức tạp)
+            //                                         {
+            //                                             sessions[sessionId].provinveID = 3;//cho tránh trường hợp lỗi query elastic (lấy mặc định là HCM)
+            //                                         }
+            //                                         //tìm huyện theo tỉnh trước
+            //                                         getElasticSearchDistrictAndProvince(el, index, type, district, sessions[sessionId].provinveID, function callbackEL(err, result) {
+            //                                             if (err) return err;
+            //                                             if (result.length != 0) {
+            //                                                 if (result.length == 1)//đã xác định đúng chính xác huyện và tỉnh đó
+            //                                                 {
+            //                                                     var provinceID = result[0]._source.provinceID;
+            //                                                     var districtID = result[0]._source.districtID;
+            //                                                     var districtName = result[0]._source.districtName;
+            //                                                     var provinceName = province;
 
-                                                                //console.log(provinceID);
+            //                                                     //console.log(provinceID);
 
-                                                                //lấy danh sách siêu thị còn hàng
-                                                                var total = 0;
-                                                                var argsProductStock = "";
-                                                                if (hasNumber(color)) {
-                                                                    argsProductStock = {
-                                                                        productID: parseInt(productID), productCode: color, provinceID: parseInt(provinceID),
-                                                                        districtID: parseInt(districtID), pageSize: 20, pageIndex: pageIndexDefault, total
-                                                                    };
-                                                                }
-                                                                else {
-                                                                    argsProductStock = {
-                                                                        productID: parseInt(productID), productCode: null, provinceID: parseInt(provinceID),
-                                                                        districtID: parseInt(districtID), pageSize: 20, pageIndex: pageIndexDefault, total
-                                                                    };
-                                                                }
-                                                                APICheckInStock(urlApiCategory, argsProductStock, function getResult(result) {
-                                                                    //console.log(argsProductStock);
-                                                                    //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
+            //                                                     //lấy danh sách siêu thị còn hàng
+            //                                                     var total = 0;
+            //                                                     var argsProductStock = "";
+            //                                                     if (hasNumber(color)) {
+            //                                                         argsProductStock = {
+            //                                                             productID: parseInt(productID), productCode: color, provinceID: parseInt(provinceID),
+            //                                                             districtID: parseInt(districtID), pageSize: 20, pageIndex: pageIndexDefault, total
+            //                                                         };
+            //                                                     }
+            //                                                     else {
+            //                                                         argsProductStock = {
+            //                                                             productID: parseInt(productID), productCode: null, provinceID: parseInt(provinceID),
+            //                                                             districtID: parseInt(districtID), pageSize: 20, pageIndex: pageIndexDefault, total
+            //                                                         };
+            //                                                     }
+            //                                                     APICheckInStock(urlApiCategory, argsProductStock, function getResult(result) {
+            //                                                         //console.log(argsProductStock);
+            //                                                         //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
 
-                                                                    // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                                    console.log(result);
-                                                                    if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
+            //                                                         // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
+            //                                                         console.log(result);
+            //                                                         if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
 
-                                                                        // console.log(total);
-                                                                        resultanswer = "";
+            //                                                             // console.log(total);
+            //                                                             resultanswer = "";
 
-                                                                        if (color && hasNumber(color)) {
-                                                                            //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
-                                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
-                                                                        }
-                                                                        else {
-                                                                            //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
-                                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName + "," + provinceName;
-                                                                        }
+            //                                                             if (color && hasNumber(color)) {
+            //                                                                 //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
+            //                                                                 questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
+            //                                                             }
+            //                                                             else {
+            //                                                                 //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
+            //                                                                 questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName + "," + provinceName;
+            //                                                             }
 
-                                                                        var type = "template";
+            //                                                             var type = "template";
 
 
-                                                                        var jsonmessageStore = {
-                                                                            username: sender,
-                                                                            siteid: siteid,
-                                                                            messagetype: "template",
-                                                                            replyobject: replyobject,
-                                                                            messagecontentobject: {
-                                                                                elements: [
-                                                                                    {
-                                                                                        title: questionTitle,
-                                                                                        buttons: []
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        };
+            //                                                             var jsonmessageStore = {
+            //                                                                 username: sender,
+            //                                                                 siteid: siteid,
+            //                                                                 messagetype: "template",
+            //                                                                 replyobject: replyobject,
+            //                                                                 messagecontentobject: {
+            //                                                                     elements: [
+            //                                                                         {
+            //                                                                             title: questionTitle,
+            //                                                                             buttons: []
+            //                                                                         }
+            //                                                                     ]
+            //                                                                 }
+            //                                                             };
 
-                                                                        var length = result.GetStoreInStock2016Result.StoreBO.length;
+            //                                                             var length = result.GetStoreInStock2016Result.StoreBO.length;
 
-                                                                        for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
-                                                                            var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                                            if (storeBO.webAddressField && storeBO.webAddressField != "undefined") {
-                                                                                // resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                                                // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
+            //                                                             for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
+            //                                                                 var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
+            //                                                                 if (storeBO.webAddressField && storeBO.webAddressField != "undefined") {
+            //                                                                     // resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
+            //                                                                     // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
 
 
-                                                                                jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                                                    type: "web_url",
-                                                                                    title: (i + 1) + ". " + storeBO.webAddressField,
-                                                                                    url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                                                });
+            //                                                                     jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+            //                                                                         type: "web_url",
+            //                                                                         title: (i + 1) + ". " + storeBO.webAddressField,
+            //                                                                         url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+            //                                                                     });
 
-                                                                            }
+            //                                                                 }
 
-                                                                        }
-                                                                        //  var bodystring = JSON.parse(jsonmessageStore);
-                                                                        var bodyjson = JSON.stringify(jsonmessageStore);
+            //                                                             }
+            //                                                             //  var bodystring = JSON.parse(jsonmessageStore);
+            //                                                             var bodyjson = JSON.stringify(jsonmessageStore);
 
 
-                                                                        //console.log("===============BUTTON URL STORE===================");
-                                                                        //console.log(bodyjson);
+            //                                                             //console.log("===============BUTTON URL STORE===================");
+            //                                                             //console.log(bodyjson);
 
 
 
-                                                                        SentToClientButton(sender, bodyjson, intent)
-                                                                            .catch(console.error);
+            //                                                             SentToClientButton(sender, bodyjson, intent)
+            //                                                                 .catch(console.error);
 
-                                                                        //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                        //    .catch(console.error);
-                                                                        // resultanswer = "";
-                                                                        //nếu có hỏi màu, gợi ý thêm danh sách màu
-                                                                        //không hỏi thì kệ nó :v
-                                                                        //if (color) {
+            //                                                             //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                                             //    .catch(console.error);
+            //                                                             // resultanswer = "";
+            //                                                             //nếu có hỏi màu, gợi ý thêm danh sách màu
+            //                                                             //không hỏi thì kệ nó :v
+            //                                                             //if (color) {
 
 
 
-                                                                        if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
-                                                                            resultanswer = "";
-                                                                            setTimeout(() => {
-                                                                                SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                                    .catch(console.error);
-                                                                            }, 1500);
+            //                                                             if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
+            //                                                                 resultanswer = "";
+            //                                                                 setTimeout(() => {
+            //                                                                     SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
+            //                                                                         .catch(console.error);
+            //                                                                 }, 1500);
 
-                                                                        }
-                                                                        else {
-                                                                            resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
-                                                                            SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
-                                                                            return;
-                                                                        }
+            //                                                             }
+            //                                                             else {
+            //                                                                 resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
+            //                                                                 SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
+            //                                                                 return;
+            //                                                             }
 
 
 
-                                                                        //}//end if color
-                                                                        //else {
-                                                                        //resultanswer = "Vui lòng chọn màu sắc "+sessions[sessionId].gender+"  quan tâm để xem danh sách cửa hàng còn hàng!"
-                                                                        //}
+            //                                                             //}//end if color
+            //                                                             //else {
+            //                                                             //resultanswer = "Vui lòng chọn màu sắc "+sessions[sessionId].gender+"  quan tâm để xem danh sách cửa hàng còn hàng!"
+            //                                                             //}
 
-                                                                    }//end if(result)
-                                                                    else {
-                                                                        //sessions[sessionId].province = null;
-                                                                        //sessions[sessionId].district = null;
+            //                                                         }//end if(result)
+            //                                                         else {
+            //                                                             //sessions[sessionId].province = null;
+            //                                                             //sessions[sessionId].district = null;
 
-                                                                        if (color && hasNumber(color)) {
+            //                                                             if (color && hasNumber(color)) {
 
 
-                                                                            resultanswer = "Rất tiếc. Sản phẩm có màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " ! Vui lòng chọn lại."
+            //                                                                 resultanswer = "Rất tiếc. Sản phẩm có màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " ! Vui lòng chọn lại."
 
-                                                                            //đưa ra ôption
+            //                                                                 //đưa ra ôption
 
-                                                                            SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                                .catch(console.error);
+            //                                                                 SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
+            //                                                                     .catch(console.error);
 
-                                                                            resultanswer = "";
-                                                                            //suggest khu vực
+            //                                                                 resultanswer = "";
+            //                                                                 //suggest khu vực
 
 
-                                                                            //===================================================================
+            //                                                                 //===================================================================
 
 
 
-                                                                            //reset color
-                                                                            //sessions[sessionId].color = null;
-                                                                            //sessions[sessionId].colorname = null;
+            //                                                                 //reset color
+            //                                                                 //sessions[sessionId].color = null;
+            //                                                                 //sessions[sessionId].colorname = null;
 
 
-                                                                        }
-                                                                        else {
-                                                                            resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
+            //                                                             }
+            //                                                             else {
+            //                                                                 resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
 
-                                                                            //suggest khu vực
-                                                                            var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-                                                                            //=======================================================================
+            //                                                                 //suggest khu vực
+            //                                                                 var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
+            //                                                                 //=======================================================================
 
-                                                                            SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
+            //                                                                 SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
 
-                                                                            //=======================================================================
+            //                                                                 //=======================================================================
 
 
-                                                                        }
+            //                                                             }
 
-                                                                    }
+            //                                                         }
 
-                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                        .catch(console.error);
+            //                                                         SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                                             .catch(console.error);
 
-                                                                });//end APICheckInStock
-                                                            }
-                                                            else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (3 kết quả tối đa)
+            //                                                     });//end APICheckInStock
+            //                                                 }
+            //                                                 else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (3 kết quả tối đa)
 
-                                                                resultanswer = "";
-                                                                resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
+            //                                                     resultanswer = "";
+            //                                                     resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
 
 
-                                                                var type = "template";
-                                                                questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
-                                                                var jsonmessageDistrict = {
-                                                                    username: sender,
-                                                                    siteid: siteid,
-                                                                    messagetype: "template",
-                                                                    replyobject: replyobject,
-                                                                    messagecontentobject: {
-                                                                        elements: [
-                                                                            {
-                                                                                title: questionTitle,
-                                                                                buttons: []
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                };
+            //                                                     var type = "template";
+            //                                                     questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
+            //                                                     var jsonmessageDistrict = {
+            //                                                         username: sender,
+            //                                                         siteid: siteid,
+            //                                                         messagetype: "template",
+            //                                                         replyobject: replyobject,
+            //                                                         messagecontentobject: {
+            //                                                             elements: [
+            //                                                                 {
+            //                                                                     title: questionTitle,
+            //                                                                     buttons: []
+            //                                                                 }
+            //                                                             ]
+            //                                                         }
+            //                                                     };
 
-                                                                for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                                                    if (i > 5) break;
-                                                                    var resultEach = result[i]._source;
-                                                                    jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                                                                        type: "postback",
-                                                                        title: resultEach.districtName,
-                                                                        payload: resultEach.districtID
-                                                                    });
+            //                                                     for (var i = 0; i < result.length; i++) {//lấy tối đa 6
+            //                                                         if (i > 5) break;
+            //                                                         var resultEach = result[i]._source;
+            //                                                         jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+            //                                                             type: "postback",
+            //                                                             title: resultEach.districtName,
+            //                                                             payload: resultEach.districtID
+            //                                                         });
 
-                                                                }
+            //                                                     }
 
-                                                                var bodyjson = JSON.stringify(jsonmessageDistrict);
+            //                                                     var bodyjson = JSON.stringify(jsonmessageDistrict);
 
-                                                                //console.log(bodyjson);
-                                                                SentToClientButton(sender, bodyjson, intent)
-                                                                    .catch(console.error);
-                                                            }
+            //                                                     //console.log(bodyjson);
+            //                                                     SentToClientButton(sender, bodyjson, intent)
+            //                                                         .catch(console.error);
+            //                                                 }
 
-                                                        }
-                                                        else {//trường hợp này có thể là tỉnh/thành phố một đằng (ID) mà huyện/quận lại một nẻo
+            //                                             }
+            //                                             else {//trường hợp này có thể là tỉnh/thành phố một đằng (ID) mà huyện/quận lại một nẻo
 
-                                                            //Dùng elastic, search theo đơn vị nhỏ nhất là quận/huyện (không theo province ID), Suggest ra tầm 3 kết quả 
+            //                                                 //Dùng elastic, search theo đơn vị nhỏ nhất là quận/huyện (không theo province ID), Suggest ra tầm 3 kết quả 
 
-                                                            var index1 = "locationdata";
-                                                            var type1 = "district";
-                                                            getElasticSearch(el, index1, type1, province, function callbackEL(err, result) {
-                                                                if (err) return err;
-                                                                //console.log(result);
-                                                                if (result.length != 0) {//address được tìm thấy
-                                                                    var provinceID = result[0]._source.provinceID;
-                                                                    var districtName = result[0]._source.districtName;
-                                                                    sessions[sessionId].province = districtName.split(",");
-                                                                    sessions[sessionId].provinveID = provinceID;
+            //                                                 var index1 = "locationdata";
+            //                                                 var type1 = "district";
+            //                                                 getElasticSearch(el, index1, type1, province, function callbackEL(err, result) {
+            //                                                     if (err) return err;
+            //                                                     //console.log(result);
+            //                                                     if (result.length != 0) {//address được tìm thấy
+            //                                                         var provinceID = result[0]._source.provinceID;
+            //                                                         var districtName = result[0]._source.districtName;
+            //                                                         sessions[sessionId].province = districtName.split(",");
+            //                                                         sessions[sessionId].provinveID = provinceID;
 
 
-                                                                    resultanswer = "";
-                                                                    resultanswer += "CÓ PHẢI Ý " + sessions[sessionId].gender + "  LÀ CÁC ĐỊA CHỈ DƯỚI ĐÂY KHÔNG ?<br /> ";
+            //                                                         resultanswer = "";
+            //                                                         resultanswer += "CÓ PHẢI Ý " + sessions[sessionId].gender + "  LÀ CÁC ĐỊA CHỈ DƯỚI ĐÂY KHÔNG ?<br /> ";
 
 
-                                                                    var type = "template";
-                                                                    questionTitle = "Ý " + sessions[sessionId].gender + "  là ?";
-                                                                    var jsonmessageDistrict = {
-                                                                        username: sender,
-                                                                        siteid: siteid,
-                                                                        messagetype: "template",
-                                                                        replyobject: replyobject,
-                                                                        messagecontentobject: {
-                                                                            elements: [
-                                                                                {
-                                                                                    title: questionTitle,
-                                                                                    buttons: []
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                    };
+            //                                                         var type = "template";
+            //                                                         questionTitle = "Ý " + sessions[sessionId].gender + "  là ?";
+            //                                                         var jsonmessageDistrict = {
+            //                                                             username: sender,
+            //                                                             siteid: siteid,
+            //                                                             messagetype: "template",
+            //                                                             replyobject: replyobject,
+            //                                                             messagecontentobject: {
+            //                                                                 elements: [
+            //                                                                     {
+            //                                                                         title: questionTitle,
+            //                                                                         buttons: []
+            //                                                                     }
+            //                                                                 ]
+            //                                                             }
+            //                                                         };
 
-                                                                    for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                                                        if (i > 5) break;
-                                                                        var resultEach = result[i]._source;
-                                                                        jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                                                                            type: "postback",
-                                                                            title: resultEach.districtName,
-                                                                            payload: resultEach.districtID
-                                                                        });
+            //                                                         for (var i = 0; i < result.length; i++) {//lấy tối đa 6
+            //                                                             if (i > 5) break;
+            //                                                             var resultEach = result[i]._source;
+            //                                                             jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+            //                                                                 type: "postback",
+            //                                                                 title: resultEach.districtName,
+            //                                                                 payload: resultEach.districtID
+            //                                                             });
 
-                                                                    }
-                                                                    var bodyjson = JSON.stringify(jsonmessageDistrict);
+            //                                                         }
+            //                                                         var bodyjson = JSON.stringify(jsonmessageDistrict);
 
-                                                                    //console.log(bodyjson);
-                                                                    SentToClientButton(sender, bodyjson, intent)
-                                                                        .catch(console.error);
-                                                                }
+            //                                                         //console.log(bodyjson);
+            //                                                         SentToClientButton(sender, bodyjson, intent)
+            //                                                             .catch(console.error);
+            //                                                     }
 
-                                                                else {
+            //                                                     else {
 
-                                                                    SentToClient(sender, "" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                        .catch(console.error);
-                                                                }
+            //                                                         SentToClient(sender, "" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                                             .catch(console.error);
+            //                                                     }
 
 
 
-                                                            });//end getElasticSearch
+            //                                                 });//end getElasticSearch
 
 
-                                                            sessions[sessionId].district = null;
-                                                            //sessions[sessionId].province = null;
+            //                                                 sessions[sessionId].district = null;
+            //                                                 //sessions[sessionId].province = null;
 
 
-                                                            //fbMessage(sender, "Không nhận diện được địa chỉ. Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...", questionTitle, button_payload_state, intent)
-                                                            //    .catch(console.error);
+            //                                                 //fbMessage(sender, "Không nhận diện được địa chỉ. Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...", questionTitle, button_payload_state, intent)
+            //                                                 //    .catch(console.error);
 
-                                                        }
+            //                                             }
 
-                                                    });//end getElasticSearchDistrictAndProvince
+            //                                         });//end getElasticSearchDistrictAndProvince
 
-                                                    //suggest thêm màu để chọn                                        
+            //                                         //suggest thêm màu để chọn                                        
 
-                                                }//end if(product && province)
-                                                else if (!province && district)//khong có tỉnh, chỉ có huyện/quận
-                                                {
-                                                    resultanswer = "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...";
-                                                }
-                                                else {//chỉ có product
+            //                                     }//end if(product && province)
+            //                                     else if (!province && district)//khong có tỉnh, chỉ có huyện/quận
+            //                                     {
+            //                                         resultanswer = "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...";
+            //                                     }
+            //                                     else {//chỉ có product
 
-                                                    resultanswer += "<br />Vui lòng cung cấp tên tỉnh/thành phố để xem siêu thị có hàng (VIẾT HOA CHỮ ĐẦU) Ví dụ: Hồ Chí Minh, Phú Yên, Cần Thơ...";
+            //                                         resultanswer += "<br />Vui lòng cung cấp tên tỉnh/thành phố để xem siêu thị có hàng (VIẾT HOA CHỮ ĐẦU) Ví dụ: Hồ Chí Minh, Phú Yên, Cần Thơ...";
 
-                                                }
+            //                                     }
 
-                                                // console.log("Sản phẩm hỏi: " + productName);
-                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                    .catch(console.error);
-                                            }
+            //                                     // console.log("Sản phẩm hỏi: " + productName);
+            //                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                         .catch(console.error);
+            //                                 }
 
-                                        });
-                                    }
+            //                             });
+            //                         }
 
-                                    else {
-                                        resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
-                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                            .catch(console.error);
-                                    }
+            //                         else {
+            //                             resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+            //                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                                 .catch(console.error);
+            //                         }
 
 
 
-                                });
+            //                     });
 
 
-                                ////============================================================================================
-                                ////gợi ý thêm 3 sản phẩm liên quan
+            //                     ////============================================================================================
+            //                     ////gợi ý thêm 3 sản phẩm liên quan
 
-                                //questionTitle = "Danh sách sản phẩm liên quan !";
+            //                     //questionTitle = "Danh sách sản phẩm liên quan !";
 
-                                //var type = "template";
+            //                     //var type = "template";
 
-                                //var jsonmessageDistrict = '{' +
-                                //    '"recipient":' + '{' + '"id":' +
-                                //    '"' + sender + '"' +
-                                //    '},' +
-                                //    '"message":' + '{' +
-                                //    '"attachment":' + '{' +
-                                //    '"type":' + '"' + type + '"' + ',' +
-                                //    '"payload":' + '{' +
-                                //    '"template_type":"generic"' + ',' +
-                                //    '"elements":' + '[' +
-                                //    '{' +
-                                //    '"title":' + '"' + questionTitle + '"' + ',' +
-                                //    '"buttons":' + '[';
+            //                     //var jsonmessageDistrict = '{' +
+            //                     //    '"recipient":' + '{' + '"id":' +
+            //                     //    '"' + sender + '"' +
+            //                     //    '},' +
+            //                     //    '"message":' + '{' +
+            //                     //    '"attachment":' + '{' +
+            //                     //    '"type":' + '"' + type + '"' + ',' +
+            //                     //    '"payload":' + '{' +
+            //                     //    '"template_type":"generic"' + ',' +
+            //                     //    '"elements":' + '[' +
+            //                     //    '{' +
+            //                     //    '"title":' + '"' + questionTitle + '"' + ',' +
+            //                     //    '"buttons":' + '[';
 
-                                //for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                //    if (i > 2) break;
-                                //    var resultEach = result[i]._source;
-                                //    if (i == 2 || i == result.length - 1) {
+            //                     //for (var i = 0; i < result.length; i++) {//lấy tối đa 6
+            //                     //    if (i > 2) break;
+            //                     //    var resultEach = result[i]._source;
+            //                     //    if (i == 2 || i == result.length - 1) {
 
-                                //        jsonmessageDistrict += '{' +
-                                //            '"type":"postback"' + ',' +
-                                //            '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                //            '"payload":' + '"' + resultEach.districtID + '"' + '}';
+            //                     //        jsonmessageDistrict += '{' +
+            //                     //            '"type":"postback"' + ',' +
+            //                     //            '"title":' + '"' + resultEach.districtName + '"' + ',' +
+            //                     //            '"payload":' + '"' + resultEach.districtID + '"' + '}';
 
-                                //    }
-                                //    else {
-                                //        jsonmessageDistrict += '{' +
-                                //            '"type":"postback"' + ',' +
-                                //            '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                //            '"payload":' + '"' + resultEach.districtID + '"' + '}' + ',';
+            //                     //    }
+            //                     //    else {
+            //                     //        jsonmessageDistrict += '{' +
+            //                     //            '"type":"postback"' + ',' +
+            //                     //            '"title":' + '"' + resultEach.districtName + '"' + ',' +
+            //                     //            '"payload":' + '"' + resultEach.districtID + '"' + '}' + ',';
 
 
 
-                                //    }
+            //                     //    }
 
-                                //}
-                                //jsonmessageDistrict +=
-                                //    ']' +
-                                //    '}' +
-                                //    ']' +
-                                //    '}' +
-                                //    '}' +
-                                //    '}' +
-                                //    '}';
+            //                     //}
+            //                     //jsonmessageDistrict +=
+            //                     //    ']' +
+            //                     //    '}' +
+            //                     //    ']' +
+            //                     //    '}' +
+            //                     //    '}' +
+            //                     //    '}' +
+            //                     //    '}';
 
-                                //var bodystring = JSON.parse(jsonmessageDistrict);
+            //                     //var bodystring = JSON.parse(jsonmessageDistrict);
 
-                                //var bodyjson = JSON.stringify(bodystring);
+            //                     //var bodyjson = JSON.stringify(bodystring);
 
-                                ////console.log(bodyjson);
-                                //fbMessagebutton(sender, bodyjson)
-                                //    .catch(console.error);
-                                ////============================================================================================
-                            }
+            //                     ////console.log(bodyjson);
+            //                     //fbMessagebutton(sender, bodyjson)
+            //                     //    .catch(console.error);
+            //                     ////============================================================================================
+            //                 }
 
-                            else {
-                                var rn = randomNumber(productnotfound.length);
-                                resultanswer = productnotfound[rn];
+            //                 else {
+            //                     var rn = randomNumber(productnotfound.length);
+            //                     resultanswer = productnotfound[rn];
 
-                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                    .catch(console.error);
+            //                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+            //                         .catch(console.error);
 
-                            }
+            //                 }
 
-                        });
-                    }
+            //             });
+            //         }
 
-                }//end if (sessions[sessionId].product)
+            //     }//end if (sessions[sessionId].product)
 
-                else {
-                    var rn = randomNumber(unknowproduct.length);
-                    resultanswer = unknowproduct[rn];
-                }
+            //     else {
+            //         var rn = randomNumber(unknowproduct.length);
+            //         resultanswer = unknowproduct[rn];
+            //     }
 
-            }
+            // }
 
 
             else {
