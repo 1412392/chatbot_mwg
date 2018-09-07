@@ -154,13 +154,13 @@ module.exports = {
 
                     for (var i = 0; i < res.length; i++) {
                         var obj = JSON.parse(res[i]);
-                        console.log("===========================");
-                        console.log(obj);
+                        //console.log("===========================");
+                        //console.log(obj);
                         if (obj.messid === messageID) {
 
                             var newobj = obj;
                             newobj.isaccept = isaccept;
-                            console.log(newobj);
+                           // console.log(newobj);
 
                             client.lset(senderID, i, JSON.stringify(newobj), function (err, reply) {
                                 if (err) {
