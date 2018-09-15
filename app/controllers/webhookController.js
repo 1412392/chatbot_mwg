@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://a8ccc258.ngrok.io/chatbot";
+var severResponse = "https://4d38470d.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -2041,7 +2041,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
                 else if (subIntent === "how") {
                     resultanswer = "<p>Dạ, về thủ tục mua trả góp online: " + sessions[sessionId].gender + " chọn sản phẩm và gói trả góp phù hợp\
-                    ,sau đó đặt trên web và công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 24h ạ.</br>\
+                    ,sau đó đặt trên web và công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 24h ạ. Sau đó, " + sessions[sessionId].gender + " mang giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
                     Hoặc "+ sessions[sessionId].gender + " có thể ra trực tiếp siêu thị TGDD để làm thủ tục trả góp luôn ạ.</p>";
                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                         .catch(console.error);
@@ -2183,6 +2183,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         finalCompanySpecialInstalment = 3;
                                                                     }
                                                                 }
+                                                                else {
+                                                                    finalCompanySpecialInstalment = -1;
+                                                                }
 
                                                                 var argGetZeroPackage = {
                                                                     CompanyId: finalCompanySpecialInstalment,
@@ -2213,13 +2216,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             var argsInstalmentResult = {
                                                                                 CategoryId: -1,
                                                                                 Price: parseFloat(productPrice - desPrice),
-                                                                                CompanyId: sessions[sessionId].financialCompany === 8 ? 1 : 3,
+                                                                                CompanyId: finalCompanySpecialInstalment,
                                                                                 Percent: newPercent,
                                                                                 Month: parseInt(packageInfo.GetFeatureInstallment2018Result.PaymentMonth),
                                                                                 BriefId: parseInt(packageInfo.GetFeatureInstallment2018Result.BriefId),
                                                                                 ListDealId: -1,
                                                                                 ProductId: parseInt(productID),
-                                                                                CollectionFee: sessions[sessionId].financialCompany === 8 ? 11000 : 12000,
+                                                                                CollectionFee: finalCompanySpecialInstalment === 1 ? 11000 : finalCompanySpecialInstalment === 3 ? 12000 : 11000,
                                                                                 SiteId: 1,
                                                                                 InventStatusId: 1
                                                                             }
@@ -2230,7 +2233,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                                         //=====================================================
 
-                                                                                        resultanswer = "Thông tin gói trả góp 0% của " + (sessions[sessionId].financialCompany === 8 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + "</br>";
+                                                                                        resultanswer = "Thông tin gói trả góp 0% của " + (finalCompanySpecialInstalment === 1 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : finalCompanySpecialInstalment === 3 ? "<span style='color:green;font-weight:bold'>FE Credit</span>" : "") + "</br>";
                                                                                         var moneyPrepaid = (packageInfo.GetFeatureInstallment2018Result.PaymentPercentFrom / 100) * (parseFloat(productPrice) - desPrice);
                                                                                         resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency((productPrice - desPrice).toString()) + "đ</span></br>";
                                                                                         if (desPrice > 0) {
@@ -2773,7 +2776,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                     // return;
                 }
-                else if(subIntent === "needdobrief_again"){
+                else if (subIntent === "needdobrief_again") {
 
                 }
 
