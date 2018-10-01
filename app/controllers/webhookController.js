@@ -1397,7 +1397,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
             else {
                 intent = ASK_INSTALMENT_PACKAGE0D;
-                intent = sessions[sessionId].prev_intent;
+                // intent = sessions[sessionId].prev_intent;
+                sessions[sessionId].prev_intent = intent;
                 try {
                     var month = parseInt(button_payload_state.split('|')[0]);
                     sessions[sessionId].month_instalment = month;
@@ -2812,8 +2813,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 else if (subIntent === "package0d") {
                     questionTitle = "Trả góp 0đ";
                     if (!sessions[sessionId].product) {
-                        resultanswer = "Dạ, mua trả góp 0đ cần Hộ Khẩu+CMND và các sản phẩm tầm giá từ 2 triệu - 25 triệu đều hỗ trợ trả góp 0đ qua công ty FE Credit nha " + sessions[sessionId].gender + ", nhưng lãi suất sẽ tương đối cao ạ. Không biết " + sessions[sessionId].gender + " quan tâm đến\
-                     trả góp 0đ cho sản phẩm nào ạ? Em sẽ tính giúp chị thông tin trả góp";
+                        resultanswer = "Dạ, mua trả góp 0đ cần <span style='color:red'>Hộ Khẩu + CMND</span> và các sản phẩm tầm giá từ 2 triệu - 25 triệu đều hỗ trợ trả góp 0đ qua công ty <span style='color:green'>FE Credit</span> nha " + sessions[sessionId].gender + ", nhưng lãi suất sẽ tương đối cao ạ. Không biết " + sessions[sessionId].gender + " quan tâm đến\
+                     trả góp 0đ cho sản phẩm nào ạ? Em sẽ tính giúp "+ sessions[sessionId].gender + " thông tin trả góp";
                         SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                             .catch(console.error);
                         sessions[sessionId].isLatestAskProduct0d = true;
@@ -3126,7 +3127,12 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                     return;
                 }
-
+                else if (subIntent === "briefphoto") {
+                    return;
+                }
+                else if (subIntent === "cancontinuepayinstalment") {
+                    return;
+                }
 
 
             }
