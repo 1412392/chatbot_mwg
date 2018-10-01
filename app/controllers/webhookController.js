@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://7aec246d.ngrok.io/chatbot";
+var severResponse = "https://a19f5a10.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -2389,6 +2389,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             }
 
                                                             //hỏi giấy tờ
+                                                            //default giấy tờ luôn
+                                                            if (!sessions[sessionId].BriefID) {
+                                                                sessions[sessionId].BriefID = 2;//CMND+SHK/BLX
+                                                            }
 
                                                             if (!sessions[sessionId].BriefID) {
                                                                 //if (sessions[sessionId].isLatestAskNormalInstallment) {
@@ -2400,12 +2404,12 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 //  resultanswer += "<br />Sản phẩm này <span style='font-style:italic;color:red'>không hỗ trợ trả góp 0%</span>. Mời " + sessions[sessionId].gender + "  thêm một số thông tin sau để xem góp trả góp thường phù hợp nhất. </br> ";
                                                                 //}
 
-                                                                resultanswer += "<br />1. <span style='font-style:italic;'>" + sessions[sessionId].gender + " có giấy tờ nào dưới đây?</span></br>";
+                                                                resultanswer = "<br />1. <span style='font-style:italic;'>" + sessions[sessionId].gender + " có giấy tờ nào dưới đây?</span></br>";
                                                                 sessions[sessionId].isLatestAskBrief = true;
-                                                                var jsonbuttonBrief = getButtonListBrief(productID, productName, sender, siteid, replyobject, "Giấy tờ");
+                                                                var jsonbuttonBrief = getButtonListBrief(productID, productName, sender, siteid, replyobject, resultanswer);
 
-                                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                    .catch(console.error);
+                                                                // SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                //     .catch(console.error);
 
                                                                 setTimeout(() => {
                                                                     SentToClientButton(sender, jsonbuttonBrief, intent)
@@ -2487,14 +2491,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                         .catch(console.error);
                                                                                 }, 400);
 
-                                                                                questionTitle = "Lựa chọn khác";
-                                                                                var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+                                                                                // questionTitle = "Lựa chọn khác";
+                                                                                // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
-                                                                                setTimeout(() => {
-                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                                        .catch(console.error);
+                                                                                // setTimeout(() => {
+                                                                                //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                //         .catch(console.error);
 
-                                                                                }, 800);
+                                                                                // }, 800);
 
 
                                                                                 return;
@@ -2507,10 +2511,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             resultanswer = "<br />3. <span style='font-style:italic;'>" + sessions[sessionId].gender + " muốn trả góp trong vòng mấy tháng ạ?</span></br>";
                                                                             sessions[sessionId].isLatestAskMonthInstalment = true;
 
-                                                                            var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, "Số tháng góp", sessions[sessionId].InstalmentMonth);
+                                                                            var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, resultanswer, sessions[sessionId].InstalmentMonth);
 
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                                .catch(console.error);
+                                                                            // SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                            //     .catch(console.error);
                                                                             sessions[sessionId].isBeforeAskeMonthInstalment = false;
 
                                                                             setTimeout(() => {
@@ -2667,14 +2671,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                 .catch(console.error);
                                                                                         }, 800);
 
-                                                                                        questionTitle = "Lựa chọn khác";
-                                                                                        var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+                                                                                        // questionTitle = "Lựa chọn khác";
+                                                                                        // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
-                                                                                        setTimeout(() => {
-                                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                                                .catch(console.error);
+                                                                                        // setTimeout(() => {
+                                                                                        //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                        //         .catch(console.error);
 
-                                                                                        }, 1500);
+                                                                                        // }, 1500);
                                                                                     }
                                                                                     else {
                                                                                         resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp với công ty " + finalCTTC === 1 ? "<span style='color:red'>HomeCredit</span>" : finalCTTC === 3 ? "<span style='color:green'>FECredit</span>" : "CHƯA CHỌN" + "</span></br>";
@@ -2920,10 +2924,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     resultanswer += "<br /><span style='font-style:italic;'>" + sessions[sessionId].gender + " muốn trả góp trong vòng mấy tháng ạ?</span></br>";
                                                     sessions[sessionId].isLatestAskMonthInstalment = true;
 
-                                                    var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, "Số tháng góp", sessions[sessionId].InstalmentMonth);
+                                                    var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, resultanswer, sessions[sessionId].InstalmentMonth);
 
-                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                        .catch(console.error);
+                                                    // SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                    //     .catch(console.error);
 
 
                                                     setTimeout(() => {
