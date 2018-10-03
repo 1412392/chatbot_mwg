@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://a19f5a10.ngrok.io/chatbot";
+var severResponse = "https://8bcdae00.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1388,7 +1388,35 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
 
         }
+        else if (sessions[sessionId].isLatestAskMonth0dInstalment) {
+            if (intent) {
+                //khách hàng đã gián đoạn luồng chat này
 
+            }
+            else {
+                intent = ASK_INSTALMENT_PACKAGE0D;
+                // intent = sessions[sessionId].prev_intent;
+                sessions[sessionId].prev_intent = intent;
+                try {
+                    var month = parseInt(button_payload_state.split('|')[0]);
+                    sessions[sessionId].month_instalment = month;
+                    console.log("=====isLatestAskMonthInstalment====", month);
+                    console.log("=====intent====", intent);
+                    console.log("=====prev_intent====", sessions[sessionId].prev_intent);
+                }
+                catch (err) {
+                    try {
+                        var month = parseInt(button_payload_state);
+                        sessions[sessionId].month_instalment = month;
+                    } catch (error) {
+                        sessions[sessionId].month_instalment = 6;//lay mac dinh
+                    }
+
+                }
+
+            }
+
+        }
 
         else if (sessions[sessionId].isLatestAskMonthInstalment) {
             if (intent) {
@@ -1396,7 +1424,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
             else {
-                intent = ASK_INSTALMENT_PACKAGE0D;
+                intent = ASK_INSTALMENT_INFORMATION;
                 // intent = sessions[sessionId].prev_intent;
                 sessions[sessionId].prev_intent = intent;
                 try {
@@ -2082,16 +2110,16 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     resultanswer = "<p>Dạ, về thủ tục mua trả góp online: " + sessions[sessionId].gender + " chọn sản phẩm và gói trả góp phù hợp\
                     ,sau đó đặt trên web và công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 24h ạ. Sau đó, " + sessions[sessionId].gender + " mang giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
                     Hoặc "+ sessions[sessionId].gender + " có thể ra trực tiếp siêu thị TGDD để làm thủ tục trả góp luôn ạ.</p>";
-                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                        .catch(console.error);
+                    // SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                    //     .catch(console.error);
 
                     //send button briefsupport
-                    var jsonbuttonBrief = getButtonBriefSupport(sender, siteid, replyobject, "Hồ sơ yêu cầu");
+                    var jsonbuttonBrief = getButtonBriefSupport(sender, siteid, replyobject, resultanswer);
                     setTimeout(() => {
                         SentToClientButton(sender, jsonbuttonBrief, "ask_instalment+how")
                             .catch(console.error);
 
-                    }, 500);
+                    }, 100);
 
                     return;
                 }
@@ -2252,6 +2280,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             console.log("======% trả trước==========", newPercent);
 
                                                                             //lấy gói trả góp đưa ra
+                                                                            finalCompanySpecialInstalment = parseInt(packageInfo.GetFeatureInstallment2018Result.CompanyID);
+
                                                                             var argsInstalmentResult = {
                                                                                 CategoryId: -1,
                                                                                 Price: parseFloat(productPrice - desPrice),
@@ -2309,19 +2339,19 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                         resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
 
 
-                                                                                        setTimeout(() => {
-                                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                                                .catch(console.error);
-                                                                                        }, 800);
+                                                                                        // setTimeout(() => {
+                                                                                        //     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                                        //         .catch(console.error);
+                                                                                        // }, 800);
 
                                                                                         questionTitle = "Lựa chọn khác";
-                                                                                        var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, questionTitle);
+                                                                                        var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, resultanswer);
 
                                                                                         setTimeout(() => {
                                                                                             SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
                                                                                                 .catch(console.error);
 
-                                                                                        }, 1000);
+                                                                                        }, 100);
                                                                                     }
 
                                                                                 }
@@ -2909,21 +2939,21 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                 resultanswer += "<br /><span style='color:red'>Thông tin gói trả góp 0đ</span>. </br> ";
                                                 //send ds ctytc
 
-                                                if (sessions[sessionId].isLatestAskMonthInstalment) {
+                                                if (sessions[sessionId].isLatestAskMonth0dInstalment) {
                                                     if (sessions[sessionId].month_instalment) {
-                                                        sessions[sessionId].isLatestAskMonthInstalment = false;
+                                                        sessions[sessionId].isLatestAskMonth0dInstalment = false;
                                                         console.log("=======số tháng trả trước== " + sessions[sessionId].month_instalment);
                                                     }
                                                 }
 
 
                                                 if (!sessions[sessionId].month_instalment ||
-                                                    sessions[sessionId].isLatestAskMonthInstalment) {
+                                                    sessions[sessionId].isLatestAskMonth0dInstalment) {
 
                                                     // sessions[sessionId].isBeforeAskeMonthInstalment = true;
 
                                                     resultanswer += "<br /><span style='font-style:italic;'>" + sessions[sessionId].gender + " muốn trả góp trong vòng mấy tháng ạ?</span></br>";
-                                                    sessions[sessionId].isLatestAskMonthInstalment = true;
+                                                    sessions[sessionId].isLatestAskMonth0dInstalment = true;
 
                                                     var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, resultanswer, sessions[sessionId].InstalmentMonth);
 
@@ -3128,10 +3158,28 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     return;
                 }
                 else if (subIntent === "briefphoto") {
+                    questionTitle = "Giấy tờ photo công chứng";
+                    resultanswer = "Dạ theo quy định trả góp thì: </br>\
+                     1. CMND cần phải là bản gốc, <span style='color:red'>không chấp nhận bản photo công chứng</span></br>\
+                     2. Sổ hộ khẩu chấp nhận bản photo có công chứng không quá 3 tháng và phải đủ 16 trang (nguyên cuốn) ạ</br>";
+
+
+                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+briefphoto", replyobject, siteid)
+                        .catch(console.error);
                     return;
                 }
                 else if (subIntent === "cancontinuepayinstalment") {
+                    questionTitle = "Có thể mua góp tiếp?";
+                    resultanswer = "Dạ, có 2 trường hợp thế này: </br>\
+                     1. Nếu "+ sessions[sessionId].gender + " đã trả góp xong rồi thì " + sessions[sessionId].gender + " có thể mua trả góp tiếp tục ạ. Lúc này " + sessions[sessionId].gender + " cần phải làm lại hồ sơ ạ. </br>\
+                     2. Nếu "+ sessions[sessionId].gender + " vẫn đang trong quá trình trả góp thì " + sessions[sessionId].gender + " vẫn có thể làm hồ sơ trả góp tiếp. \
+                     Lưu ý: " + sessions[sessionId].gender + " nên chọn công ty tài chính khác để tỷ lệ duyệt hồ sơ thành công cao hơn ạ.</br>";
+
+
+                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+cancontinuepayinstalment", replyobject, siteid)
+                        .catch(console.error);
                     return;
+
                 }
 
 
