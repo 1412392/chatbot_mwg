@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://8bcdae00.ngrok.io/chatbot";
+var severResponse = "https://f260e19c.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -625,7 +625,7 @@ const getButtonBriefSupport = (sender, siteid, replyobject, questionTitle) => {
 
 }
 
-const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle) => {
+const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle, productPrice) => {
     var jsonmessageAnother =
         {
             username: sender,
@@ -663,6 +663,13 @@ const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle) => 
                 ]
             }
         };
+    if (productPrice <= 25000000 && productPrice > 2000000) {
+        jsonmessageAnother.messagecontentobject.elements[0].buttons.push({
+            type: "postback",
+            title: "Gói trả góp 0đ",
+            payload: "INSTALMENT_PACKAGE0D"
+        })
+    };
 
     var bodyjson = JSON.stringify(jsonmessageAnother);
     return bodyjson;
@@ -1340,7 +1347,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         var questionTitle = "";
         var customer_question = json.text;
 
-        var ishaveProductEntity = false, ishaveMonthInstalment = false, ishavePercentInstalment = false, ishaveProduct = false;;
+        var ishaveProductEntity = false, ishaveMonthInstalment = false,
+            ishavePercentInstalment = false, ishaveProduct = false, ishaveMoneyPrepaidInstalment = false;
 
 
         //==========================================================
@@ -1491,6 +1499,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].isLatestAskMonthInstalment = true;
             }
 
+            else if (button_payload_state === "INSTALMENT_PACKAGE0D") {
+                intent = ASK_INSTALMENT_PACKAGE0D;
+
+            }
+
             else {
                 //chỉ resset lại color (vì color sẽ khác với sp khác)
                 if (hasNumber(sessions[sessionId].color))//nó là productcode
@@ -1628,9 +1641,34 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                 }
 
+                if (entities[i].entity === "money_prepaid") {
+                    try {
+                        var moneyPrepaid = parseFloat(entities[i].value);
+                        if (moneyPrepaid < 400000) {
+                            //không hợp lệ số tiền trả trước
+                            sessions[sessionId].money_prepaid = null;
+                        }
+                        else {
+                            sessions[sessionId].money_prepaid = moneyPrepaid;
+                            ishaveMoneyPrepaidInstalment = true;
+                        }
+                    }
+                    catch (errr) {
+                        console.log("err when parse MoneyPrepaidInstalment", err);
+
+                    }
+                }
+
             }
         }
 
+        //xu ly rieng th oppo f9 6gb mà không nhận dc 6gb, chỉ nhận dc oppo f9 (4gb)
+        if (sessions[sessionId].product.toLowerCase().includes("f9") &&
+            (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+            if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 6GB";
+            }
+        }
 
 
         if (!intent && ((!sessions[sessionId].product) && (!sessions[sessionId].province) && (!sessions[sessionId].district))) {
@@ -2108,7 +2146,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
                 else if (subIntent === "how") {
                     resultanswer = "<p>Dạ, về thủ tục mua trả góp online: " + sessions[sessionId].gender + " chọn sản phẩm và gói trả góp phù hợp\
-                    ,sau đó đặt trên web và công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 24h ạ. Sau đó, " + sessions[sessionId].gender + " mang giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
+                    ,sau đó đặt trên web và công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 4h-14h ạ. Sau đó, " + sessions[sessionId].gender + " mang giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
                     Hoặc "+ sessions[sessionId].gender + " có thể ra trực tiếp siêu thị TGDD để làm thủ tục trả góp luôn ạ.</p>";
                     // SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                     //     .catch(console.error);
@@ -2345,7 +2383,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                         // }, 800);
 
                                                                                         questionTitle = "Lựa chọn khác";
-                                                                                        var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, resultanswer);
+                                                                                        var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, resultanswer, productPrice);
 
                                                                                         setTimeout(() => {
                                                                                             SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
@@ -2419,6 +2457,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 }
                                                             }
 
+                                                            //số tiền trả trước
+                                                            if (sessions[sessionId].money_prepaid) {
+                                                                var prepaidPercent = (productPrice / sessions[sessionId].money_prepaid) * 100;
+                                                                console.log("============số tiền trả trước==========", sessions[sessionId].money_prepaid);
+                                                                console.log("============% trả trước==========", prepaidPercent);
+                                                            }
+
                                                             //hỏi giấy tờ
                                                             //default giấy tờ luôn
                                                             if (!sessions[sessionId].BriefID) {
@@ -2453,7 +2498,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             }
                                                             else if ((sessions[sessionId].percent_instalment === null || typeof sessions[sessionId].percent_instalment === "undefined") || sessions[sessionId].isLatestAskPercentInstalment) {
 
-                                                                resultanswer = "<br/>2. <span style='font-style:italic;'>" + sessions[sessionId].gender + "  muốn trả trước bao nhiêu %? </span></br>";
+                                                                resultanswer = "<br/><span style='font-style:italic;'>" + sessions[sessionId].gender + "  muốn trả trước bao nhiêu %? </span></br>";
                                                                 sessions[sessionId].isLatestAskPercentInstalment = true;
                                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                     .catch(console.error);
@@ -2539,7 +2584,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             // sessions[sessionId].InstalmentMonth.forEach(element => {
                                                                             //     console.log(element);
                                                                             // });
-                                                                            resultanswer = "<br />3. <span style='font-style:italic;'>" + sessions[sessionId].gender + " muốn trả góp trong vòng mấy tháng ạ?</span></br>";
+                                                                            resultanswer = "<br /><span style='font-style:italic;'>" + sessions[sessionId].gender + " muốn trả góp trong vòng mấy tháng ạ?</span></br>";
                                                                             sessions[sessionId].isLatestAskMonthInstalment = true;
 
                                                                             var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, resultanswer, sessions[sessionId].InstalmentMonth);
@@ -2825,8 +2870,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             }
 
                             else {
-                                var rn = randomNumber(productnotfound.length);
-                                resultanswer = productnotfound[rn];
+                                // var rn = randomNumber(productnotfound.length);
+
+                                // resultanswer = productnotfound[rn];
+                                resultanswer = "Dạ không tìm thấy sản phẩm <span style='color:red'>" + productName + "</span>. " + sessions[sessionId].gender + " có thể nõi rõ và đúng tên sản phẩm để phục vụ tốt hơn ạ. Em cảm ơn " + sessions[sessionId].gender + "</br>";
+
 
                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                     .catch(console.error);
@@ -2838,6 +2886,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                 }
                 else if (subIntent === "issupportinstalment") {
+                    questionTitle = "Hỗ trợ trả góp";
+
 
                 }
                 else if (subIntent === "package0d") {
@@ -4047,6 +4097,13 @@ const responseRepeatChooseFinancialCompany_NormalInstalment = (sender, sessionId
 
     }
 }
+const responsePackage0d = (sender, sessionId, button_payload_state, replyobject, siteid) => {
+    var sever = severRasaQuery;
+    var url = encodeURI(sever);
+
+    var button_payload_state = company;
+    getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
+}
 
 const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, siteid) => {
     var sever = severRasaQuery;
@@ -4375,6 +4432,10 @@ var webhookController = {
             }
             else if (button_payload_state.toUpperCase() === "NORMALINSTALMENT_COMPANY") {
                 responseRepeatChooseFinancialCompany_NormalInstalment(sender, sessionId, button_payload_state, replyobject, siteid);
+            }
+            else if (button_payload_state.toUpperCase() === "INSTALMENT_PACKAGE0D") {
+                responsePackage0d(sender, sessionId, button_payload_state, replyobject, siteid);
+
             }
             else if (button_payload_state === "11")//muốn xem gói trả góp thương của sp đó
             {
