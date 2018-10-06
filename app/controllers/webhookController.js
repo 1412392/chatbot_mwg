@@ -1669,7 +1669,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         }
 
         //xu ly rieng th oppo f9 6gb mà không nhận dc 6gb, chỉ nhận dc oppo f9 (4gb)
-        if (sessions[sessionId].product.toLowerCase().includes("f9") &&
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("f9") &&
             (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
             if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
                 sessions[sessionId].product = sessions[sessionId].product + " 6GB";
