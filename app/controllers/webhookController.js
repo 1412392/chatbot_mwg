@@ -52,6 +52,10 @@ var lstAccessoryKeyword = [
     "ốp", "op lung", "bluetooth", "tai nghe", "tai phone", "pin", "sạc", "sac", "bàn phím", "ban phim", "loa", "thẻ nhớ", "the nho", "usb",
     "đồng hồ", "dong ho", "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
 ];
+var lstCommonProduct = [
+    "laptop", "iphone", "nokia", "huawei", "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung", "dell", "asus", "macbook", "hp",
+    "dán màn hình"
+];
 
 var isGetExampleAnswer = false;
 
@@ -666,7 +670,7 @@ const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle, pro
     if (productPrice <= 25000000 && productPrice > 2000000) {
         jsonmessageAnother.messagecontentobject.elements[0].buttons.push({
             type: "postback",
-            title: "Gói trả góp 0đ",
+            title: "Gói trả trước 0đ",
             payload: "INSTALMENT_PACKAGE0D"
         })
     };
@@ -2803,7 +2807,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                 buttons: [
                                                                                                     {
                                                                                                         type: "postback",
-                                                                                                        title: "Xem gói trả góp 0đ",
+                                                                                                        title: "Xem gói trả trước 0đ",
                                                                                                         payload: "INSTALMENT_PACKAGE0D"
                                                                                                     },
                                                                                                     {
@@ -2902,10 +2906,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 }
                 else if (subIntent === "package0d") {
-                    questionTitle = "Trả góp 0đ";
+                    questionTitle = "Trả trước 0đ";
                     if (!sessions[sessionId].product) {
-                        resultanswer = "Dạ, mua trả góp 0đ cần <span style='color:red'>Hộ Khẩu + CMND</span> và các sản phẩm tầm giá từ 2 triệu - 25 triệu đều hỗ trợ trả góp 0đ qua công ty <span style='color:green'>FE Credit</span> nha " + sessions[sessionId].gender + ", nhưng lãi suất sẽ tương đối cao ạ. Không biết " + sessions[sessionId].gender + " quan tâm đến\
-                     trả góp 0đ cho sản phẩm nào ạ? Em sẽ tính giúp "+ sessions[sessionId].gender + " thông tin trả góp";
+                        resultanswer = "Dạ, mua trả trước 0đ cần <span style='color:red'>Hộ Khẩu + CMND</span> và các sản phẩm tầm giá từ 2 triệu - 25 triệu đều hỗ trợ trả trước 0đ qua công ty <span style='color:green'>FE Credit</span> nha " + sessions[sessionId].gender + ", nhưng lãi suất sẽ tương đối cao ạ. Không biết " + sessions[sessionId].gender + " quan tâm đến\
+                     trả trước 0đ cho sản phẩm nào ạ? Em sẽ tính giúp "+ sessions[sessionId].gender + " thông tin trả góp";
                         SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                             .catch(console.error);
                         sessions[sessionId].isLatestAskProduct0d = true;
@@ -2913,7 +2917,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         return;
                     }
                     else {
-                        //  resultanswer = "Thông tin gói trả góp 0đ cho sản phẩm " + sessions[sessionId].product + "của <span style='color:green'>FE Credit</span>";
+                        //  resultanswer = "Thông tin gói trả trước 0đ cho sản phẩm " + sessions[sessionId].product + "của <span style='color:green'>FE Credit</span>";
                         //sau khi đã hỏi xong hết=> Bắt đầu đưa ra thông tin trả góp
 
                         var productName = sessions[sessionId].product;
@@ -2990,14 +2994,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                             }
                                             else {
                                                 if (productPrice <= 2000000 || productPrice > 25000000) {
-                                                    resultanswer += "<br /><span style='color:red'>Không hỗ trợ trả góp 0đ cho sản phẩm này</span>. </br> ";
+                                                    resultanswer += "<br /><span style='color:red'>Không hỗ trợ trả trước 0đ cho sản phẩm này</span>. </br> ";
 
                                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                         .catch(console.error);
                                                     return;
 
                                                 }
-                                                resultanswer += "<br /><span style='color:red'>Thông tin gói trả góp 0đ</span>. </br> ";
+                                                resultanswer += "<br /><span style='color:red'>Thông tin gói trả trước 0đ</span>. </br> ";
                                                 //send ds ctytc
 
                                                 if (sessions[sessionId].isLatestAskMonth0dInstalment) {
@@ -3077,7 +3081,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
                                                                 if (InstallmentResult) {
                                                                     if (InstallmentResult.GetInstallmentResult2018Result) {
-                                                                        resultanswer = "Thông tin gói trả góp 0đ của <span style='color:green;font-weight:bold'>FE Credit</span></br>";
+                                                                        resultanswer = "Thông tin gói trả trước 0đ của <span style='color:green;font-weight:bold'>FE Credit</span></br>";
                                                                         resultanswer += "Tên sản phẩm: <span style='font-weight:bold'>" + productNameField + "</span></br>";
                                                                         resultanswer += "Giá gốc: <span style='font-weight:bold'>" + format_currency(productOriginPrice.toString()) + "đ</span></br>";
 
@@ -3136,7 +3140,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         }, 1500);
                                                                     }
                                                                     else {
-                                                                        resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp 0đ nào</span></br>";
+                                                                        resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả trước 0đ nào</span></br>";
 
                                                                         setTimeout(() => {
                                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
