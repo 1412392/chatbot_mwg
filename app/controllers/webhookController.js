@@ -512,6 +512,7 @@ function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobje
 }
 
 const fbEvaluate = (id, replyobject, siteid) => {
+    return;
     var messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
     var body = JSON.stringify({
         username: id,
