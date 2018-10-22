@@ -1772,22 +1772,26 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         }
 
         //th sản phẩm Iphone bị sai tên
-        if (sessions[sessionId].product && !sessions[sessionId].product.toLocaleLowerCase().includes("iphone")
-            && sessions[sessionId].product.toLocaleLowerCase().includes("ip")) {
-            sessions[sessionId].product = sessions[sessionId].product.replace("ip", "iphone ");
+
+        if (sessions[sessionId].product) {
+            sessions[sessionId].product = sessions[sessionId].product.replace("ss", "samsung  ");
+            sessions[sessionId].product = sessions[sessionId].product.replace("j2pro", "j2 pro  ");
+            if (sessions[sessionId].product.toLocaleLowerCase().includes("pluss")) {
+                sessions[sessionId].product = sessions[sessionId].product.replace("pluss", "plus ");
+            }
+            if (!sessions[sessionId].product.toLocaleLowerCase().includes("iphone")
+                && sessions[sessionId].product.toLocaleLowerCase().includes("ip")) {
+                sessions[sessionId].product = sessions[sessionId].product.replace("ip", "iphone ");
+            }
+
+            if (!sessions[sessionId].product.toLocaleLowerCase().includes("plus")
+                && sessions[sessionId].product.toLocaleLowerCase().includes("pl")) {
+                sessions[sessionId].product = sessions[sessionId].product.replace("pl", "plus ");
+            }
+
         }
 
-        if (sessions[sessionId].product && !sessions[sessionId].product.toLocaleLowerCase().includes("plus")
-            && sessions[sessionId].product.toLocaleLowerCase().includes("pl")) {
-            sessions[sessionId].product = sessions[sessionId].product.replace("pl", "plus ");
-        }
 
-        sessions[sessionId].product = sessions[sessionId].product.replace("ss", "samsung  ");
-        sessions[sessionId].product = sessions[sessionId].product.replace("j2pro", "j2 pro  ");
-
-        if (sessions[sessionId].product && sessions[sessionId].product.toLocaleLowerCase().includes("pluss")) {
-            sessions[sessionId].product = sessions[sessionId].product.replace("pluss", "plus ");
-        }
 
 
 
