@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://a41812bc.ngrok.io/chatbot";
+var severResponse = "https://1b8ca5c2.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1666,7 +1666,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 if (entities[i].entity === "storage")//bộ nhớ lưu trữ
                 {
                     if (sessions[sessionId].product != null) {
-                        sessions[sessionId].product += " " + entities[i].entity.replace('_', ' ');
+                        sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');
                         ishaveProductEntity = true;
                     }
                 }
@@ -1734,6 +1734,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
         }
+        console.log("===product==", sessions[sessionId].product);
+
 
         //xu ly rieng th oppo f9 6gb mà không nhận dc 6gb, chỉ nhận dc oppo f9 (4gb)
         if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("f9") &&
@@ -1742,6 +1744,52 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].product = sessions[sessionId].product + " 6GB";
             }
         }
+
+        //xu ly iphone 
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
+            (!sessions[sessionId].product.toLowerCase().includes("32g") || !sessions[sessionId].product.toLowerCase().includes("32 g"))) {
+            if (customer_question.toLowerCase().includes("32g") || customer_question.toLowerCase().includes("32 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 32GB";
+            }
+        }
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
+            (!sessions[sessionId].product.toLowerCase().includes("64g") || !sessions[sessionId].product.toLowerCase().includes("64 g"))) {
+            if (customer_question.toLowerCase().includes("64g") || customer_question.toLowerCase().includes("64 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 64GB";
+            }
+        }
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
+            (!sessions[sessionId].product.toLowerCase().includes("128g") || !sessions[sessionId].product.toLowerCase().includes("128 g"))) {
+            if (customer_question.toLowerCase().includes("128g") || customer_question.toLowerCase().includes("128 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 128GB";
+            }
+        }
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
+            (!sessions[sessionId].product.toLowerCase().includes("256g") || !sessions[sessionId].product.toLowerCase().includes("256 g"))) {
+            if (customer_question.toLowerCase().includes("256g") || customer_question.toLowerCase().includes("256 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 256GB";
+            }
+        }
+
+        //th sản phẩm Iphone bị sai tên
+        if (sessions[sessionId].product && !sessions[sessionId].product.toLocaleLowerCase().includes("iphone")
+            && sessions[sessionId].product.toLocaleLowerCase().includes("ip")) {
+            sessions[sessionId].product = sessions[sessionId].product.replace("ip", "iphone ");
+        }
+
+        if (sessions[sessionId].product && !sessions[sessionId].product.toLocaleLowerCase().includes("plus")
+            && sessions[sessionId].product.toLocaleLowerCase().includes("pl")) {
+            sessions[sessionId].product = sessions[sessionId].product.replace("pl", "plus ");
+        }
+
+        sessions[sessionId].product = sessions[sessionId].product.replace("ss", "samsung  ");
+        sessions[sessionId].product = sessions[sessionId].product.replace("j2pro", "j2 pro  ");
+
+        if (sessions[sessionId].product && sessions[sessionId].product.toLocaleLowerCase().includes("pluss")) {
+            sessions[sessionId].product = sessions[sessionId].product.replace("pluss", "plus ");
+        }
+
+
 
         //trường hợp sản phẩm chung chung thì xem như chưa xác định
         if (sessions[sessionId].product && isGeneralProduct(sessions[sessionId].product)) {
@@ -2306,15 +2354,15 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                         APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
                                             resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
-
-                                            if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
+                                            console.log(result.GetProductResult.productErpPriceBOField.webStatusIdField);
+                                            if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
                                                 resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                     .catch(console.error);
                                             }
-                                            else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+                                            else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
+                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>CHƯA CÓ HÀNG</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                     .catch(console.error);
@@ -2503,6 +2551,27 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 });
 
                                                                 // }
+                                                            }
+                                                            else {
+                                                                console.log("======productname=======", productName);
+                                                                //TH samsung galaxy A7 2018 đặc beiejt (chưa có thông tin trả góp 0% trogn API)
+                                                                if (productName.trim() === "samsung galaxy a7") {
+                                                                    resultanswer += "Cần phải đặt cọc trước 500.000đ để được tham gia gói trả góp lãi suất 0%</br>";
+                                                                    resultanswer += "*Phần trăm trả trước: 30%</br>";
+                                                                    resultanswer += "*Số tháng góp: 4 tháng</br>";
+                                                                    resultanswer += "*Công ty tài chính: <span style='color:red'>Home Credit</span></br>";
+                                                                    resultanswer += "*Quà tặng:</br>";
+                                                                    resultanswer += "1. Phiếu mua hàng 1.000.000đ</br>\
+                                                                    2. 6 tháng bảo hiểm rơi vỡ</br>\
+                                                                    3. Trả góp 0% nhà tài chính</br>\
+                                                                    4. Quà tặng Galaxy Café Highland & Xem Phim Lotte trị giá 700.000đ</br>";
+
+
+                                                                    setTimeout(() => {
+                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                            .catch(console.error);
+                                                                    }, 500);
+                                                                }
                                                             }
                                                         }
                                                         else {
@@ -3041,14 +3110,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
                                             resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
 
-                                            if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
+                                            if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
                                                 resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                                     .catch(console.error);
                                             }
-                                            else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+                                            else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
+                                                resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>CHƯA CÓ HÀNG</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                                     .catch(console.error);
