@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://1b8ca5c2.ngrok.io/chatbot";
+var severResponse = "https://25dd8793.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -55,7 +55,8 @@ var lstAccessoryKeyword = [
 var lstCommonProduct = [
     "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei",
     "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung", "dell", "asus", "macbook", "hp",
-    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi"
+    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi",
+    "may tinh bang", "tablet", "máy tính bảng"
 ];
 
 var isGetExampleAnswer = false;
@@ -1421,7 +1422,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].prev_intent = intent;
                 try {
                     var percent = parseInt(button_payload_state);
+                    if (percent === 0)//gói 0đ
+                    {
+                        intent = ASK_INSTALMENT_PACKAGE0D;
+                        sessions[sessionId].prev_intent = intent;
+                    }
                     sessions[sessionId].percent_instalment = percent;
+
 
                 }
                 catch (error) {
@@ -2559,7 +2566,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             else {
                                                                 console.log("======productname=======", productName);
                                                                 //TH samsung galaxy A7 2018 đặc beiejt (chưa có thông tin trả góp 0% trogn API)
-                                                                if (productName.trim() === "samsung galaxy a7") {
+                                                                if (productName.trim().includes("a7") && !productName.trim().includes("oppo")) {
                                                                     resultanswer += "Cần phải đặt cọc trước 500.000đ để được tham gia gói trả góp lãi suất 0%</br>";
                                                                     resultanswer += "*Phần trăm trả trước: 30%</br>";
                                                                     resultanswer += "*Số tháng góp: 4 tháng</br>";
@@ -2794,7 +2801,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     }
                                                                 }
                                                                 else {
-                                                                    finalCTTC = -1;//default fe
+                                                                    if (categoryID === 522) {
+                                                                        finalCTTC = 3;//default fe, vi tablet lấy -1 sẽ lỗi
+                                                                    }
+                                                                    else {
+                                                                        finalCTTC = -1;
+                                                                    }
+
                                                                 }
 
 
@@ -4273,15 +4286,22 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
         console.log(percent);
         console.log(messagecontent);
         if (percent < 10 || percent > 90 || isNaN(percent) || percent % 10 != 0) {
-            if (percent === 0)//một số sp có hỗ trợ trả góp 0%
+            if (percent === 0 || messagecontent.toLocaleLowerCase().includes("0đ") ||
+                messagecontent.toLocaleLowerCase().includes("0 đ") ||
+                messagecontent.toLocaleLowerCase().includes("0 đồng") ||
+                messagecontent.toLocaleLowerCase().includes("0đồng") ||
+                messagecontent.toLocaleLowerCase().includes("0 dong") ||
+                messagecontent.toLocaleLowerCase().includes("0dong")
+            )//một số sp có hỗ trợ trả góp 0%
             {
-                console.log("tra gop 0đ", percent);
-                getJsonAndAnalyze(url, sender, sessionId, percent, replyobject, siteid);
+                console.log("====tra gop 0đ: =====", percent);
+                getJsonAndAnalyze(url, sender, sessionId, "0", replyobject, siteid);
             }
             else {
                 resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng chỉ nhập số TRÒN CHỤC và nằm trong khoảng từ 0% đến 80%."
                 SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
                     .catch(console.error);
+                sessions[sessionId].isLatestAskPercentInstalment = false;
 
                 return;
             }
