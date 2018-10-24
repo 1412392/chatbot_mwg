@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://25dd8793.ngrok.io/chatbot";
+var severResponse = "https://c72ab35d.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -53,10 +53,10 @@ var lstAccessoryKeyword = [
     "đồng hồ", "dong ho", "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
 ];
 var lstCommonProduct = [
-    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei",
-    "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung", "dell", "asus", "macbook", "hp",
-    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi",
-    "may tinh bang", "tablet", "máy tính bảng"
+    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei","note",
+    "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung","sam sung", "dell", "asus", "macbook", "hp",
+    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi","lenovo",
+    "may tinh bang", "tablet", "máy tính bảng", "miếng dán cường lực", "dán cường lực"
 ];
 
 var isGetExampleAnswer = false;
@@ -1777,6 +1777,33 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 sessions[sessionId].product = sessions[sessionId].product + " 256GB";
             }
         }
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
+            (!sessions[sessionId].product.toLowerCase().includes("3g") || !sessions[sessionId].product.toLowerCase().includes("3 g"))) {
+            if (customer_question.toLowerCase().includes("3g") || customer_question.toLowerCase().includes("3 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 3GB";
+            }
+        }
+
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
+            (!sessions[sessionId].product.toLowerCase().includes("4g") || !sessions[sessionId].product.toLowerCase().includes("4 g"))) {
+            if (customer_question.toLowerCase().includes("4g") || customer_question.toLowerCase().includes("4 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 4GB";
+            }
+        }
+
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
+            (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+            if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 6GB";
+            }
+        }
+
+        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
+            (!sessions[sessionId].product.toLowerCase().includes("8g") || !sessions[sessionId].product.toLowerCase().includes("8 g"))) {
+            if (customer_question.toLowerCase().includes("8g") || customer_question.toLowerCase().includes("8 g")) {
+                sessions[sessionId].product = sessions[sessionId].product + " 8GB";
+            }
+        }
 
         //th sản phẩm Iphone bị sai tên
 
@@ -2273,7 +2300,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     <span style='color:red;'>Tùy theo gói trả góp sẽ có thêm yêu cầu giấy tờ:</span>  </br>\
                     3. Bằng lái xe (còn thời hạn)</br>\
                     4. Sổ hộ khẩu (có tên người trả góp)</br>\
-                    5. Hóa đơn điện(cáp/nước/internet) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br></p>";
+                    5. Hóa đơn điện(cáp/nước/internet) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br>\
+                    <span style='color:red;font-style:italic'>LƯU Ý: THỜI GIAN DUYỆT HỒ SƠ TỪ 4-14 TIẾNG Ạ.</span></p>";
 
                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                         .catch(console.error);
@@ -3393,6 +3421,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         .catch(console.error);
                     return;
 
+                }
+                else if (subIntent === "information_oldproduct") {
+
+                    return;
                 }
 
 
@@ -4578,6 +4610,8 @@ var webhookController = {
                     messagecontent = messagecontent.replace("@", " ");
                 if (messagecontent.includes("+"))
                     messagecontent = messagecontent.replace("+", " plus ");
+                if (messagecontent.includes("+"))
+                    messagecontent = messagecontent.replace("-", " ");
                 messagecontent = messagecontent.replace(/\n/g, '');
                 var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
