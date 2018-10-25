@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://c72ab35d.ngrok.io/chatbot";
+var severResponse = "https://2534ae56.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -53,9 +53,9 @@ var lstAccessoryKeyword = [
     "đồng hồ", "dong ho", "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
 ];
 var lstCommonProduct = [
-    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei","note",
-    "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung","sam sung", "dell", "asus", "macbook", "hp",
-    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi","lenovo",
+    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei", "note",
+    "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung", "sam sung", "dell", "asus", "macbook", "hp",
+    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi", "lenovo",
     "may tinh bang", "tablet", "máy tính bảng", "miếng dán cường lực", "dán cường lực"
 ];
 
@@ -1446,7 +1446,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             try {
                                 sessions[sessionId].month_instalment = parseInt(entities[i].value.replace('_', ' '));
                                 //ishaveMonthInstalment = true;
-                                intent = ASK_INSTALMENT_INFORMATION;
+                                intent = ASK_INSTALMENT_PACKAGE0D;
                                 sessions[sessionId].prev_intent = intent;
 
                             }
@@ -1744,75 +1744,83 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         console.log("===product==", sessions[sessionId].product);
 
 
-        //xu ly rieng th oppo f9 6gb mà không nhận dc 6gb, chỉ nhận dc oppo f9 (4gb)
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("f9") &&
-            (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
-            if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 6GB";
-            }
-        }
-
-        //xu ly iphone 
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
-            (!sessions[sessionId].product.toLowerCase().includes("32g") || !sessions[sessionId].product.toLowerCase().includes("32 g"))) {
-            if (customer_question.toLowerCase().includes("32g") || customer_question.toLowerCase().includes("32 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 32GB";
-            }
-        }
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
-            (!sessions[sessionId].product.toLowerCase().includes("64g") || !sessions[sessionId].product.toLowerCase().includes("64 g"))) {
-            if (customer_question.toLowerCase().includes("64g") || customer_question.toLowerCase().includes("64 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 64GB";
-            }
-        }
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
-            (!sessions[sessionId].product.toLowerCase().includes("128g") || !sessions[sessionId].product.toLowerCase().includes("128 g"))) {
-            if (customer_question.toLowerCase().includes("128g") || customer_question.toLowerCase().includes("128 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 128GB";
-            }
-        }
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("iphone") &&
-            (!sessions[sessionId].product.toLowerCase().includes("256g") || !sessions[sessionId].product.toLowerCase().includes("256 g"))) {
-            if (customer_question.toLowerCase().includes("256g") || customer_question.toLowerCase().includes("256 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 256GB";
-            }
-        }
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
-            (!sessions[sessionId].product.toLowerCase().includes("3g") || !sessions[sessionId].product.toLowerCase().includes("3 g"))) {
-            if (customer_question.toLowerCase().includes("3g") || customer_question.toLowerCase().includes("3 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 3GB";
-            }
-        }
-
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
-            (!sessions[sessionId].product.toLowerCase().includes("4g") || !sessions[sessionId].product.toLowerCase().includes("4 g"))) {
-            if (customer_question.toLowerCase().includes("4g") || customer_question.toLowerCase().includes("4 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 4GB";
-            }
-        }
-
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
-            (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
-            if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 6GB";
-            }
-        }
-
-        if (sessions[sessionId].product && sessions[sessionId].product.toLowerCase().includes("realme") &&
-            (!sessions[sessionId].product.toLowerCase().includes("8g") || !sessions[sessionId].product.toLowerCase().includes("8 g"))) {
-            if (customer_question.toLowerCase().includes("8g") || customer_question.toLowerCase().includes("8 g")) {
-                sessions[sessionId].product = sessions[sessionId].product + " 8GB";
-            }
-        }
-
-        //th sản phẩm Iphone bị sai tên
+        //th sản phẩm bị sai tên
 
         if (sessions[sessionId].product) {
-            sessions[sessionId].product = sessions[sessionId].product.replace("ss", "samsung  ");
-            sessions[sessionId].product = sessions[sessionId].product.replace("j2pro", "j2 pro  ");
-            if (sessions[sessionId].product.toLocaleLowerCase().includes("pluss")) {
-                sessions[sessionId].product = sessions[sessionId].product.replace("pluss", "plus ");
+
+
+
+            //xu ly rieng th oppo f9 6gb mà không nhận dc 6gb, chỉ nhận dc oppo f9 (4gb)
+            if (sessions[sessionId].product.toLowerCase().includes("f9") &&
+                (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+                if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 6GB";
+                }
             }
+
+            //xử lý f9 tím
+            if (sessions[sessionId].product.toLowerCase().includes("f9") &&
+                (!sessions[sessionId].product.toLowerCase().includes("tím") || !sessions[sessionId].product.toLowerCase().includes("tim"))) {
+                if (customer_question.toLowerCase().includes("tím") || customer_question.toLowerCase().includes("tim")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " Tím Tinh Tú";
+                }
+            }
+
+            //xu ly iphone 
+            if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
+                (!sessions[sessionId].product.toLowerCase().includes("32g") || !sessions[sessionId].product.toLowerCase().includes("32 g"))) {
+                if (customer_question.toLowerCase().includes("32g") || customer_question.toLowerCase().includes("32 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 32GB";
+                }
+            }
+            if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
+                (!sessions[sessionId].product.toLowerCase().includes("64g") || !sessions[sessionId].product.toLowerCase().includes("64 g"))) {
+                if (customer_question.toLowerCase().includes("64g") || customer_question.toLowerCase().includes("64 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 64GB";
+                }
+            }
+            if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
+                (!sessions[sessionId].product.toLowerCase().includes("128g") || !sessions[sessionId].product.toLowerCase().includes("128 g"))) {
+                if (customer_question.toLowerCase().includes("128g") || customer_question.toLowerCase().includes("128 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 128GB";
+                }
+            }
+            if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
+                (!sessions[sessionId].product.toLowerCase().includes("256g") || !sessions[sessionId].product.toLowerCase().includes("256 g"))) {
+                if (customer_question.toLowerCase().includes("256g") || customer_question.toLowerCase().includes("256 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 256GB";
+                }
+            }
+
+            //xử lý realme
+            if (sessions[sessionId].product.toLowerCase().includes("realme") &&
+                (!sessions[sessionId].product.toLowerCase().includes("3g") || !sessions[sessionId].product.toLowerCase().includes("3 g"))) {
+                if (customer_question.toLowerCase().includes("3g") || customer_question.toLowerCase().includes("3 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 3GB";
+                }
+            }
+
+            if (sessions[sessionId].product.toLowerCase().includes("realme") &&
+                (!sessions[sessionId].product.toLowerCase().includes("4g") || !sessions[sessionId].product.toLowerCase().includes("4 g"))) {
+                if (customer_question.toLowerCase().includes("4g") || customer_question.toLowerCase().includes("4 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 4GB";
+                }
+            }
+
+            if (sessions[sessionId].product.toLowerCase().includes("realme") &&
+                (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+                if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 6GB";
+                }
+            }
+
+            if (sessions[sessionId].product.toLowerCase().includes("realme") &&
+                (!sessions[sessionId].product.toLowerCase().includes("8g") || !sessions[sessionId].product.toLowerCase().includes("8 g"))) {
+                if (customer_question.toLowerCase().includes("8g") || customer_question.toLowerCase().includes("8 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 8GB";
+                }
+            }
+
             if (!sessions[sessionId].product.toLocaleLowerCase().includes("iphone")
                 && sessions[sessionId].product.toLocaleLowerCase().includes("ip")) {
                 sessions[sessionId].product = sessions[sessionId].product.replace("ip", "iphone ");
@@ -1822,6 +1830,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 && sessions[sessionId].product.toLocaleLowerCase().includes("pl")) {
                 sessions[sessionId].product = sessions[sessionId].product.replace("pl", "plus ");
             }
+
+            //===============storage========================
+            sessions[sessionId].product = sessions[sessionId].product.replace("64 gb", "64GB");
+            sessions[sessionId].product = sessions[sessionId].product.replace("32 gb", "32GB");
+            sessions[sessionId].product = sessions[sessionId].product.replace("128 gb", "128GB");
+            sessions[sessionId].product = sessions[sessionId].product.replace("16 gb", "16GB");
+            sessions[sessionId].product = sessions[sessionId].product.replace("256 gb", "256GB");
+            //===============storage========================
 
         }
 
@@ -3301,36 +3317,36 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
 
 
-                                                                        setTimeout(() => {
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
-                                                                                .catch(console.error);
-                                                                        }, 800);
+                                                                        // setTimeout(() => {
+                                                                        //     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
+                                                                        //         .catch(console.error);
+                                                                        // }, 800);
 
                                                                         questionTitle = "Lựa chọn khác";
-                                                                        var anotheroptionbutton = AnotherOptionNormalInstalment0d(sender, siteid, replyobject, questionTitle);
+                                                                        var anotheroptionbutton = AnotherOptionNormalInstalment0d(sender, siteid, replyobject, resultanswer);
 
                                                                         setTimeout(() => {
                                                                             SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d")
                                                                                 .catch(console.error);
 
-                                                                        }, 1500);
+                                                                        }, 500);
                                                                     }
                                                                     else {
                                                                         resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả trước 0đ nào</span></br>";
 
-                                                                        setTimeout(() => {
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
-                                                                                .catch(console.error);
-                                                                        }, 400);
+                                                                        // setTimeout(() => {
+                                                                        //     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
+                                                                        //         .catch(console.error);
+                                                                        // }, 400);
 
                                                                         questionTitle = "Lựa chọn khác";
-                                                                        var anotheroptionbutton = AnotherOptionNormalInstalment0d(sender, siteid, replyobject, questionTitle);
+                                                                        var anotheroptionbutton = AnotherOptionNormalInstalment0d(sender, siteid, replyobject, resultanswer);
 
                                                                         setTimeout(() => {
                                                                             SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d")
                                                                                 .catch(console.error);
 
-                                                                        }, 800);
+                                                                        }, 500);
 
                                                                     }
                                                                 }
@@ -4606,12 +4622,20 @@ var webhookController = {
                     .catch(console.error);
             } else {
 
-                if (messagecontent.includes("@"))
-                    messagecontent = messagecontent.replace("@", " ");
-                if (messagecontent.includes("+"))
-                    messagecontent = messagecontent.replace("+", " plus ");
-                if (messagecontent.includes("+"))
-                    messagecontent = messagecontent.replace("-", " ");
+                messagecontent = messagecontent.replace("@", " ");
+                messagecontent = messagecontent.replace("+", " plus ");
+                messagecontent = messagecontent.replace("-", " ");
+                messagecontent = messagecontent.replace("o%", "0%");
+                messagecontent = messagecontent.replace("o %", "0%");
+                messagecontent = messagecontent.replace("sámung", "samsung");
+                messagecontent = messagecontent.replace("flush", "plus");
+                messagecontent = messagecontent.replace("pluss", "plus ");
+                messagecontent = messagecontent.replace("ss", "samsung  ");
+                messagecontent = messagecontent.replace("j2pro", "j2 pro  ");
+                messagecontent = messagecontent.replace("(", " ");
+                messagecontent = messagecontent.replace(")", " ");
+
+
                 messagecontent = messagecontent.replace(/\n/g, '');
                 var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
