@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://2534ae56.ngrok.io/chatbot";
+var severResponse = "https://4a465fae.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1755,6 +1755,12 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
                 if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 6GB";
+                }
+            }
+            if (sessions[sessionId].product.toLowerCase().includes("f7") &&
+                (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+                if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
+                    sessions[sessionId].product = sessions[sessionId].product + " 128GB"; //(ở đây là ram 6gb)
                 }
             }
 
@@ -4522,6 +4528,11 @@ var webhookController = {
 
     },
     postmessage: function (req, res) {
+        //thời gian từ 8h-18h hàng ngày
+        var hours = new Date().getHours();
+        console.log("==========Hour now==========",hours);
+        if (hours < 8 || hours > 18) return;
+
 
         //load data
         if (!isGetExampleAnswer) {
