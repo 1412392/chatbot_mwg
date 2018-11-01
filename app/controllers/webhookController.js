@@ -13,7 +13,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://4a465fae.ngrok.io/chatbot";
+var severResponse = "https://cbb23393.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -53,7 +53,7 @@ var lstAccessoryKeyword = [
     "đồng hồ", "dong ho", "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
 ];
 var lstCommonProduct = [
-    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei", "note",
+    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei", "note", "realme",
     "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung", "sam sung", "dell", "asus", "macbook", "hp",
     "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi", "lenovo",
     "may tinh bang", "tablet", "máy tính bảng", "miếng dán cường lực", "dán cường lực"
@@ -1451,9 +1451,24 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                             }
                             catch (errr) {
-                                console.log("err when parse Month_instalment=>isLatestAskMonth0dInstalment", err);
+                                console.log("err when parse Month_instalment => isLatestAskMonth0dInstalment", err);
 
                             }
+
+                        }
+                    }
+                }
+                else {
+                    if (customer_question.toLocaleLowerCase().includes("thang") || customer_question.toLocaleLowerCase().includes("tháng")) {
+                        try {
+                            sessions[sessionId].month_instalment = parseInt(customer_question);
+                            //ishaveMonthInstalment = true;
+                            intent = ASK_INSTALMENT_INFORMATION;
+                            sessions[sessionId].prev_intent = intent;
+
+                        }
+                        catch (errr) {
+                            console.log("err when parse Month_instalment => isLatestAskMonth0dInstalment", err);
 
                         }
                     }
@@ -1501,6 +1516,21 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                 console.log("err when parse Month_instalment => isLatestAskMonthInstalment", err);
 
                             }
+
+                        }
+                    }
+                }
+                else {//th nó nhận diện không đc 
+                    if (customer_question.toLocaleLowerCase().includes("thang") || customer_question.toLocaleLowerCase().includes("tháng")) {
+                        try {
+                            sessions[sessionId].month_instalment = parseInt(customer_question);
+                            //ishaveMonthInstalment = true;
+                            intent = ASK_INSTALMENT_INFORMATION;
+                            sessions[sessionId].prev_intent = intent;
+
+                        }
+                        catch (errr) {
+                            console.log("err when parse Month_instalment => isLatestAskMonthInstalment", err);
 
                         }
                     }
@@ -1828,6 +1858,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
 
             if (!sessions[sessionId].product.toLocaleLowerCase().includes("iphone")
+                && !sessions[sessionId].product.toLocaleLowerCase().includes("ipad")
                 && sessions[sessionId].product.toLocaleLowerCase().includes("ip")) {
                 sessions[sessionId].product = sessions[sessionId].product.replace("ip", "iphone ");
             }
@@ -2616,23 +2647,23 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                             else {
                                                                 console.log("======productname=======", productName);
                                                                 //TH samsung galaxy A7 2018 đặc beiejt (chưa có thông tin trả góp 0% trogn API)
-                                                                if (productName.trim().includes("a7") && !productName.trim().includes("oppo")) {
-                                                                    resultanswer += "Cần phải đặt cọc trước 500.000đ để được tham gia gói trả góp lãi suất 0%</br>";
-                                                                    resultanswer += "*Phần trăm trả trước: 30%</br>";
-                                                                    resultanswer += "*Số tháng góp: 4 tháng</br>";
-                                                                    resultanswer += "*Công ty tài chính: <span style='color:red'>Home Credit</span></br>";
-                                                                    resultanswer += "*Quà tặng:</br>";
-                                                                    resultanswer += "1. Phiếu mua hàng 1.000.000đ</br>\
-                                                                    2. 6 tháng bảo hiểm rơi vỡ</br>\
-                                                                    3. Trả góp 0% nhà tài chính</br>\
-                                                                    4. Quà tặng Galaxy Café Highland & Xem Phim Lotte trị giá 700.000đ</br>";
+                                                                // if (productName.trim().includes("a7") && !productName.trim().includes("oppo")) {
+                                                                //     resultanswer += "Cần phải đặt cọc trước 500.000đ để được tham gia gói trả góp lãi suất 0%</br>";
+                                                                //     resultanswer += "*Phần trăm trả trước: 30%</br>";
+                                                                //     resultanswer += "*Số tháng góp: 4 tháng</br>";
+                                                                //     resultanswer += "*Công ty tài chính: <span style='color:red'>Home Credit</span></br>";
+                                                                //     resultanswer += "*Quà tặng:</br>";
+                                                                //     resultanswer += "1. Phiếu mua hàng 1.000.000đ</br>\
+                                                                //     2. 6 tháng bảo hiểm rơi vỡ</br>\
+                                                                //     3. Trả góp 0% nhà tài chính</br>\
+                                                                //     4. Quà tặng Galaxy Café Highland & Xem Phim Lotte trị giá 700.000đ</br>";
 
 
-                                                                    setTimeout(() => {
-                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                            .catch(console.error);
-                                                                    }, 500);
-                                                                }
+                                                                //     setTimeout(() => {
+                                                                //         SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                //             .catch(console.error);
+                                                                //     }, 500);
+                                                                // }
                                                             }
                                                         }
                                                         else {
@@ -3413,7 +3444,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
                 else if (subIntent === "canbuymultiproduct") {
                     questionTitle = "Mua trả góp nhiều sản phẩm cùng lúc";
-                    resultanswer = "Dạ, hiện tại chỉ có công ty tài chính Home Credit hỗ trợ mua trả góp nhiều sản phẩm cùng lúc thôi ạ. ";
+                    resultanswer = "Dạ, hiện tại chỉ có công ty tài chính <span style='color:red'>Home Credit</span> hỗ trợ mua trả góp nhiều sản phẩm cùng lúc thôi ạ. ";
 
                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+canbuymultiproduct", replyobject, siteid)
                         .catch(console.error);
@@ -4336,6 +4367,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
     var url = encodeURI(sever);
     var resultanswer = "";
     try {
+
         var percent = parseInt(messagecontent);
         console.log(percent);
         console.log(messagecontent);
@@ -4352,12 +4384,41 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
                 getJsonAndAnalyze(url, sender, sessionId, "0", replyobject, siteid);
             }
             else {
-                resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng chỉ nhập số TRÒN CHỤC và nằm trong khoảng từ 0% đến 80%."
-                SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
-                    .catch(console.error);
-                sessions[sessionId].isLatestAskPercentInstalment = false;
+                request({
+                    url: encodeURI(severRasaQuery + messagecontent),
+                    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                    json: true
+                }, function (error, response, body) {
+                    var object = JSON.stringify(body);
+                    var json = JSON.parse(object);
+                    // console.log(json);
+                    var entities = json.entities;
+                    // console.log(entities);
+                    if (entities) {
+                        for (var i = 0; i < entities.length; i++) {
+                            if (entities[i].entity === "instalment_percent") {
+                                try {
+                                    percent = parseInt(entities[i].value.replace('_', ' '));
+                                    sessions[sessionId].percent_instalment = percent;
+                                    getJsonAndAnalyze(url, sender, sessionId, percent, replyobject, siteid);
+                                }
+                                catch (errr) {
+                                    console.log("err when parse Percent_instalment", err);
 
-                return;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng chỉ nhập số TRÒN CHỤC và nằm trong khoảng từ 0% đến 80%."
+                        SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
+                            .catch(console.error);
+                        sessions[sessionId].isLatestAskPercentInstalment = false;
+
+                        return;
+                    }
+
+                });
             }
 
         }
@@ -4530,8 +4591,8 @@ var webhookController = {
     postmessage: function (req, res) {
         //thời gian từ 8h-18h hàng ngày
         var hours = new Date().getHours();
-        console.log("==========Hour now==========",hours);
-        if (hours < 8 || hours > 18) return;
+        console.log("==========Hour now==========", hours);
+        if (hours < 8 || hours > 17) return;
 
 
         //load data
