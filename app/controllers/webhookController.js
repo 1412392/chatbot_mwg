@@ -1388,7 +1388,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             ishavePercentInstalment = false, ishaveProduct = false,
             ishaveMoneyPrepaidInstalment = false, isAsk0PTInstalment = false;
 
-       
+
         //==========================================================
         if (sessions[sessionId].isLatestAskBrief) {
             //kịch bản: đang trong luồng hỏi nhưng khách hàng lại push câu khác vào không liên quan
@@ -1436,11 +1436,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                     }
                     else {
-                       // console.log("===nhao vo ====",percent);
+                        // console.log("===nhao vo ====",percent);
                         if (percent === 0) {//0đ
                             intent = ASK_INSTALMENT_PACKAGE0D;
                             sessions[sessionId].prev_intent = intent;
-                            sessions[sessionId].isLatestAskPercentInstalment=false;
+                            sessions[sessionId].isLatestAskPercentInstalment = false;
                         }
                         else {
                             sessions[sessionId].percent_instalment = percent;
@@ -1919,6 +1919,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             sessions[sessionId].product = sessions[sessionId].product.replace("16 gb", "16GB");
             sessions[sessionId].product = sessions[sessionId].product.replace("256 gb", "256GB");
             //===============storage========================
+            //xu ly huawei 
+            sessions[sessionId].product = sessions[sessionId].product.replace("hawei", "huawei");
+            sessions[sessionId].product = sessions[sessionId].product.replace("hawai", "huawei");
+            sessions[sessionId].product = sessions[sessionId].product.replace("huwei", "huawei");
+            sessions[sessionId].product = sessions[sessionId].product.replace("huwai", "huawei");
+            sessions[sessionId].product = sessions[sessionId].product.replace("huawai", "huawei");
+            sessions[sessionId].product = sessions[sessionId].product.replace("hưawei", "huawei");
+            
 
         }
 
@@ -4610,7 +4618,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
                 messagecontent.toLocaleLowerCase().includes("0 %")) {//ý là trả góp 0đ
                 console.log("====tra gop 0đ: =====", percent);
                 getJsonAndAnalyze(url, sender, sessionId, "0", replyobject, siteid);
-               
+
             }
             else {
                 request({
@@ -4938,7 +4946,9 @@ var webhookController = {
             // We retrieve the message content
             var messagetype = data.messageobject.type;
             var messagecontent = data.messageobject.content.toLowerCase();
-
+            if (messagecontent.includes("https") || messagecontent.includes("http")) {
+                return;
+            }
             //console.log(event.message);
             if (messagetype == 2) {
                 // We received an attachment
@@ -4964,6 +4974,10 @@ var webhookController = {
                 messagecontent = messagecontent.replace(/\n/g, '');
                 var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
+                if (!messagecontent.includes("nokia") && !messagecontent.includes("inch")) {
+                    messagecontent = messagecontent.replace('.', " ");
+                    messagecontent = messagecontent.replace(',', " ");
+                }
 
                 var sever = severRasaQuery + messagecontent;
                 var url = encodeURI(sever);
