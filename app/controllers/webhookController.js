@@ -14,7 +14,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://8af66d42.ngrok.io/chatbot";
+var severResponse = "https://0c77b711.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1351,8 +1351,12 @@ function GetSystemPromotionDisCountValue(productBO, decPrice, isZeroInstallment)
     return decDisCountValue;
 }
 function IsSystemPromoNotApplyForCompany(productBO, ErpInstallProgramId) {
+   // console.log("====ErpInstallProgramId====", ErpInstallProgramId);
+
     if (productBO == null || ErpInstallProgramId == -1) return false;
     var lstPromotion = productBO.promotionField;
+    console.log("====lstPromotion====", lstPromotion);
+
     if (lstPromotion == null || lstPromotion.length == 0) return false;
 
     //region Lấy list khuyến mãi hệ thống
@@ -1368,6 +1372,19 @@ function IsSystemPromoNotApplyForCompany(productBO, ErpInstallProgramId) {
 
     if (lstNewPromotionFinal == null || lstNewPromotionFinal.length == 0) return false;
     //endregion
+
+    //Bổ sung: Chỉ lấy check những khuyến mãi giảm tiền "tặng"
+    //lstPromotionFinal = lstPromotionFinal.FindAll(p => p != null && p.groupIDField.ToLower() == "tặng");
+    var temptInstalmentLsit = [];
+    for (var i = 0; i < lstNewPromotionFinal.length; i++) {
+        if (lstNewPromotionFinal[i] && lstNewPromotionFinal[i].groupIDField.toLowerCase().trim() === "tặng") {
+            temptInstalmentLsit.push(lstNewPromotionFinal[i]);
+        }
+    }
+
+    lstNewPromotionFinal = temptInstalmentLsit;
+    if (lstNewPromotionFinal == null || lstNewPromotionFinal.length == 0) return false;
+
 
     //region Kiểm tra loại trừ khuyến mãi
 
@@ -3026,8 +3043,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var discountPrice = parseFloat(GetSystemPromotionDisCountValue(productDetail, parseFloat(productPrice), false));
                                                                         console.log("======GIA GIAM==========", discountPrice);
                                                                         productPrice = productPrice - discountPrice;
+                                                                        console.log("======GIA SAU GIAM==========", productPrice);
+
                                                                         var bIsNotApplyPromoHC = false;
                                                                         bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
+                                                                        console.log("========bIsNotApplyPromoHC====", bIsNotApplyPromoHC);
                                                                         if (bIsNotApplyPromoHC)
                                                                             productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
 
