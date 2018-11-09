@@ -14,7 +14,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "https://0c77b711.ngrok.io/chatbot";
+var severResponse = "https://137ce79e.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1873,8 +1873,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
         }
-        console.log("===product==", sessions[sessionId].product);
-
+       
 
         //th sản phẩm bị sai tên
 
@@ -1884,13 +1883,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             //xu ly rieng th oppo f9 6gb mà không nhận dc 6gb, chỉ nhận dc oppo f9 (4gb)
             if (sessions[sessionId].product.toLowerCase().includes("f9") &&
-                (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("6g") && !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
                 if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 6GB";
                 }
             }
             if (sessions[sessionId].product.toLowerCase().includes("f7") &&
-                (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("6g") && !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
                 if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 128GB"; //(ở đây là ram 6gb)
                 }
@@ -1898,7 +1897,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             //xử lý f9 tím
             if (sessions[sessionId].product.toLowerCase().includes("f9") &&
-                (!sessions[sessionId].product.toLowerCase().includes("tím") || !sessions[sessionId].product.toLowerCase().includes("tim"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("tím") && !sessions[sessionId].product.toLowerCase().includes("tim"))) {
                 if (customer_question.toLowerCase().includes("tím") || customer_question.toLowerCase().includes("tim")) {
                     sessions[sessionId].product = sessions[sessionId].product + " Tím Tinh Tú";
                 }
@@ -1906,25 +1905,25 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             //xu ly iphone 
             if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
-                (!sessions[sessionId].product.toLowerCase().includes("32g") || !sessions[sessionId].product.toLowerCase().includes("32 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("32g") && !sessions[sessionId].product.toLowerCase().includes("32 g"))) {
                 if (customer_question.toLowerCase().includes("32g") || customer_question.toLowerCase().includes("32 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 32GB";
                 }
             }
             if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
-                (!sessions[sessionId].product.toLowerCase().includes("64g") || !sessions[sessionId].product.toLowerCase().includes("64 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("64g") && !sessions[sessionId].product.toLowerCase().includes("64 g"))) {
                 if (customer_question.toLowerCase().includes("64g") || customer_question.toLowerCase().includes("64 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 64GB";
                 }
             }
             if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
-                (!sessions[sessionId].product.toLowerCase().includes("128g") || !sessions[sessionId].product.toLowerCase().includes("128 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("128g") && !sessions[sessionId].product.toLowerCase().includes("128 g"))) {
                 if (customer_question.toLowerCase().includes("128g") || customer_question.toLowerCase().includes("128 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 128GB";
                 }
             }
             if (sessions[sessionId].product.toLowerCase().includes("iphone") &&
-                (!sessions[sessionId].product.toLowerCase().includes("256g") || !sessions[sessionId].product.toLowerCase().includes("256 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("256g") && !sessions[sessionId].product.toLowerCase().includes("256 g"))) {
                 if (customer_question.toLowerCase().includes("256g") || customer_question.toLowerCase().includes("256 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 256GB";
                 }
@@ -1932,28 +1931,28 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             //xử lý realme
             if (sessions[sessionId].product.toLowerCase().includes("realme") &&
-                (!sessions[sessionId].product.toLowerCase().includes("3g") || !sessions[sessionId].product.toLowerCase().includes("3 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("3g") && !sessions[sessionId].product.toLowerCase().includes("3 g"))) {
                 if (customer_question.toLowerCase().includes("3g") || customer_question.toLowerCase().includes("3 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 3GB";
                 }
             }
 
             if (sessions[sessionId].product.toLowerCase().includes("realme") &&
-                (!sessions[sessionId].product.toLowerCase().includes("4g") || !sessions[sessionId].product.toLowerCase().includes("4 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("4g") && !sessions[sessionId].product.toLowerCase().includes("4 g"))) {
                 if (customer_question.toLowerCase().includes("4g") || customer_question.toLowerCase().includes("4 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 4GB";
                 }
             }
 
             if (sessions[sessionId].product.toLowerCase().includes("realme") &&
-                (!sessions[sessionId].product.toLowerCase().includes("6g") || !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("6g") && !sessions[sessionId].product.toLowerCase().includes("6 g"))) {
                 if (customer_question.toLowerCase().includes("6g") || customer_question.toLowerCase().includes("6 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 6GB";
                 }
             }
 
             if (sessions[sessionId].product.toLowerCase().includes("realme") &&
-                (!sessions[sessionId].product.toLowerCase().includes("8g") || !sessions[sessionId].product.toLowerCase().includes("8 g"))) {
+                (!sessions[sessionId].product.toLowerCase().includes("8g") && !sessions[sessionId].product.toLowerCase().includes("8 g"))) {
                 if (customer_question.toLowerCase().includes("8g") || customer_question.toLowerCase().includes("8 g")) {
                     sessions[sessionId].product = sessions[sessionId].product + " 8GB";
                 }
@@ -1990,6 +1989,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
 
+        console.log("===product==", sessions[sessionId].product);
 
 
         //trường hợp sản phẩm chung chung thì xem như chưa xác định
