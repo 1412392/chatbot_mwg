@@ -1468,6 +1468,9 @@ const getExactlyUrl = (currenturl) => {
         if (temptUrl.length > 2) {
             finalUrl = temptUrl[temptUrl.length - 2] + "/" + temptUrl[temptUrl.length - 1];
         }
+        if (finalUrl.includes("?")) {
+            finalUrl = finalUrl.split('?')[0];
+        }
         return finalUrl;
 
     }
