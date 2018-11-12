@@ -1414,7 +1414,7 @@ function IsSystemPromoNotApplyForCompany(productBO, ErpInstallProgramId) {
 
 const GetProductInfoByURL = (currenturl, sessionId) => {
     return new Promise((resolve, reject) => {
-        if (currenturl) {
+        if (currenturl && currenturl.length > 1) {
             var args = {
                 url: currenturl
             };
@@ -1460,6 +1460,20 @@ const GetProductInfoByURL = (currenturl, sessionId) => {
         }
     });
 
+}
+const getExactlyUrl = (currenturl) => {
+    if (currenturl) {
+        var finalUrl = "";
+        var temptUrl = currenturl.split("thegioididong").length > 1 ? currenturl.split("thegioididong")[1].split('/') : [];
+        if (temptUrl.length > 2) {
+            finalUrl = temptUrl[temptUrl.length - 2] + "/" + temptUrl[temptUrl.length - 1];
+        }
+        return finalUrl;
+
+    }
+    else {
+        return null;
+    }
 }
 
 
@@ -2043,10 +2057,15 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         //lấy thông tin sản phẩm từ currenturl khách hàng. Để dùng trong TH: nếu không nhận diện được sản phẩm 
         //thì dùng đến thằng này
         var currenturl = replyobject.currenturl;
-       // currenturl = "dtdd/oppo-f7";
-        GetProductInfoByURL(currenturl, sessionId).then((value) => {
+        //tách url chính xác
+        var finalUrl = getExactlyUrl(currenturl);
+
+        console.log("========finalURL========", finalUrl);
+
+        // currenturl = "dtdd/oppo-f7";
+        GetProductInfoByURL(finalUrl, sessionId).then((value) => {
             if (value) {
-                sessions[sessionId].product = value.replace("+"," plus ");
+                sessions[sessionId].product = value.replace("+", " plus ");
             }
 
             console.log("===productNameAfter==", sessions[sessionId].product);
@@ -2578,7 +2597,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                 if (result.SearchProductPhiResult != null) {
 
                                     var productID = result.SearchProductPhiResult.string[0];
-                                    console.log("=====ProductID from APIGetProductSearch=====",productID);
+                                    console.log("=====ProductID from APIGetProductSearch=====", productID);
 
 
                                     sessions[sessionId].productID = productID;
