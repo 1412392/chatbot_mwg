@@ -8,6 +8,19 @@ var path = require('path');
 var elasticsearch = require('elasticsearch');
 var soap = require('soap');
 var fs = require('fs');
+const line = require('@line/bot-sdk');
+const https = require('https');
+var fetchTimeout = require('fetch-timeout');
+
+// var LineAPI =require('line-api');
+// const lineconfig = {
+//     channelAccessToken: "OF/JLbPlLNPPK1z65/CYKHYcmxICRDPRZ/5mv+uf5nc8svIORfM/9fT/zH/f4h00SA2XA5+xXKNPgxep0dQlP8VIF3K2iBOgWcunGCzcWvkLeZhESgk8V/FMtIQS0RKaWZ0RcsSpkrhH0JbV3catwAdB04t89/1O/w1cDnyilFU=",
+//     channelSecret: "6a24678d4466e1ed662397ed64b3926b"
+// };
+const lineClient = new line.Client({
+    channelAccessToken: 'OF/JLbPlLNPPK1z65/CYKHYcmxICRDPRZ/5mv+uf5nc8svIORfM/9fT/zH/f4h00SA2XA5+xXKNPgxep0dQlP8VIF3K2iBOgWcunGCzcWvkLeZhESgk8V/FMtIQS0RKaWZ0RcsSpkrhH0JbV3catwAdB04t89/1O/w1cDnyilFU='
+});
+
 
 var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNwciAmicecV7IfX0rOfsFNUwZCMnZATJxWpkK0aFmj2XUuhacR8XA1sWsFiGasBtBcAOgon0BQqeP8RDCm6VQR9V9Ygxow0EvBwbhrHjwViGHDQ77dIkfkY3XDhzv';
 
@@ -2046,7 +2059,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             sessions[sessionId].product = sessions[sessionId].product.replace("huwai", "huawei");
             sessions[sessionId].product = sessions[sessionId].product.replace("huawai", "huawei");
             sessions[sessionId].product = sessions[sessionId].product.replace("hưawei", "huawei");
-
+            sessions[sessionId].product = sessions[sessionId].product.replace("huawia", "huawei")
+            sessions[sessionId].product = sessions[sessionId].product.replace("huawey", "huawei")
 
         }
         //trường hợp sản phẩm chung chung thì xem như chưa xác định
@@ -3980,6 +3994,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                         return;
                     }
+                    else if (subIntent === "agecondition") {
+
+                        return;
+                    }
+                    else if (subIntent === "cancontinuepayinstalment_whenloan") {
+
+                        return;
+                    }
+                    else if (subIntent === "timeapprove") {
+                        return;
+                    }
 
 
                 }
@@ -5105,9 +5130,219 @@ function readFiles(dirname, onFileContent) {
 
     });
 };
+function handleEvent(event) {
+    if (event.replyToken.match(/^(.)\1*$/)) {
+        return console.log("Test hook recieved: " + JSON.stringify(event.message));
+    }
+
+    switch (event.type) {
+        case 'message':
+            const message = event.message;
+            switch (message.type) {
+                case 'text':
+                    return handleText(message, event.replyToken, event.source);
+                case 'image':
+                    return handleImage(message, event.replyToken);
+                case 'sticker':
+                    return handleSticker(message, event.replyToken);
+                default:
+                    throw new Error(`Unknown message: ${JSON.stringify(message)}`);
+            }
+    }
+}
+const replyText = (token, texts) => {
+    texts = Array.isArray(texts) ? texts : [texts];
+    return lineClient.replyMessage(
+        token,
+        texts.map((text) => ({ type: 'text', text }))
+    );
+};
+
+function handleText(message, replyToken, source) {
+    const buttonsImageURL = "";
+
+    switch (message.text) {
+        case 'profile':
+            if (source.userId) {
+                return client.getProfile(source.userId)
+                    .then((profile) => replyText(
+                        replyToken,
+                        [
+                            `Display name: ${profile.displayName}`,
+                            `Status message: ${profile.statusMessage}`,
+                        ]
+                    ));
+            } else {
+                return replyText(replyToken, 'Bot can\'t use profile API without user ID');
+            }
+        case 'buttons':
+            return client.replyMessage(
+                replyToken,
+                {
+                    type: 'template',
+                    altText: 'Buttons alt text',
+                    template: {
+                        type: 'buttons',
+                        thumbnailImageUrl: buttonsImageURL,
+                        title: 'My button sample',
+                        text: 'Hello, my button',
+                        actions: [
+                            { label: 'Go to line.me', type: 'uri', uri: 'https://line.me' },
+                            { label: 'Say hello1', type: 'postback', data: 'hello こんにちは' },
+                            { label: '言 hello2', type: 'postback', data: 'hello こんにちは', text: 'hello こんにちは' },
+                            { label: 'Say message', type: 'message', text: 'Rice=米' },
+                        ],
+                    },
+                }
+            );
+        case 'confirm':
+            return client.replyMessage(
+                replyToken,
+                {
+                    type: 'template',
+                    altText: 'Confirm alt text',
+                    template: {
+                        type: 'confirm',
+                        text: 'Do it?',
+                        actions: [
+                            { label: 'Yes', type: 'message', text: 'Yes!' },
+                            { label: 'No', type: 'message', text: 'No!' },
+                        ],
+                    },
+                }
+            )
+        case 'carousel':
+            return client.replyMessage(
+                replyToken,
+                {
+                    type: 'template',
+                    altText: 'Carousel alt text',
+                    template: {
+                        type: 'carousel',
+                        columns: [
+                            {
+                                thumbnailImageUrl: buttonsImageURL,
+                                title: 'hoge',
+                                text: 'fuga',
+                                actions: [
+                                    { label: 'Go to line.me', type: 'uri', uri: 'https://line.me' },
+                                    { label: 'Say hello1', type: 'postback', data: 'hello こんにちは' },
+                                ],
+                            },
+                            {
+                                thumbnailImageUrl: buttonsImageURL,
+                                title: 'hoge',
+                                text: 'fuga',
+                                actions: [
+                                    { label: '言 hello2', type: 'postback', data: 'hello こんにちは', text: 'hello こんにちは' },
+                                    { label: 'Say message', type: 'message', text: 'Rice=米' },
+                                ],
+                            },
+                        ],
+                    },
+                }
+            );
+        case 'image carousel':
+            return client.replyMessage(
+                replyToken,
+                {
+                    type: 'template',
+                    altText: 'Image carousel alt text',
+                    template: {
+                        type: 'image_carousel',
+                        columns: [
+                            {
+                                imageUrl: buttonsImageURL,
+                                action: { label: 'Go to LINE', type: 'uri', uri: 'https://line.me' },
+                            },
+                            {
+                                imageUrl: buttonsImageURL,
+                                action: { label: 'Say hello1', type: 'postback', data: 'hello こんにちは' },
+                            },
+                            {
+                                imageUrl: buttonsImageURL,
+                                action: { label: 'Say message', type: 'message', text: 'Rice=米' },
+                            },
+                            {
+                                imageUrl: buttonsImageURL,
+                                action: {
+                                    label: 'datetime',
+                                    type: 'datetimepicker',
+                                    data: 'DATETIME',
+                                    mode: 'datetime',
+                                },
+                            },
+                        ]
+                    },
+                }
+            );
+        case 'datetime':
+            return client.replyMessage(
+                replyToken,
+                {
+                    type: 'template',
+                    altText: 'Datetime pickers alt text',
+                    template: {
+                        type: 'buttons',
+                        text: 'Select date / time !',
+                        actions: [
+                            { type: 'datetimepicker', label: 'date', data: 'DATE', mode: 'date' },
+                            { type: 'datetimepicker', label: 'time', data: 'TIME', mode: 'time' },
+                            { type: 'datetimepicker', label: 'datetime', data: 'DATETIME', mode: 'datetime' },
+                        ],
+                    },
+                }
+            );
+        case 'imagemap':
+            return client.replyMessage(
+                replyToken,
+                {
+                    type: 'imagemap',
+                    baseUrl: `${baseURL}/static/rich`,
+                    altText: 'Imagemap alt text',
+                    baseSize: { width: 1040, height: 1040 },
+                    actions: [
+                        { area: { x: 0, y: 0, width: 520, height: 520 }, type: 'uri', linkUri: 'https://store.line.me/family/manga/en' },
+                        { area: { x: 520, y: 0, width: 520, height: 520 }, type: 'uri', linkUri: 'https://store.line.me/family/music/en' },
+                        { area: { x: 0, y: 520, width: 520, height: 520 }, type: 'uri', linkUri: 'https://store.line.me/family/play/en' },
+                        { area: { x: 520, y: 520, width: 520, height: 520 }, type: 'message', text: 'URANAI!' },
+                    ],
+                    video: {
+                        originalContentUrl: `${baseURL}/static/imagemap/video.mp4`,
+                        previewImageUrl: `${baseURL}/static/imagemap/preview.jpg`,
+                        area: {
+                            x: 280,
+                            y: 385,
+                            width: 480,
+                            height: 270,
+                        },
+                        externalLink: {
+                            linkUri: 'https://line.me',
+                            label: 'LINE'
+                        }
+                    },
+                }
+            );
+        // case 'bye':
+        //     switch (source.type) {
+        //         case 'user':
+        //             return replyText(replyToken, 'Bot can\'t leave from 1:1 chat');
+        //         case 'group':
+        //             return replyText(replyToken, 'Leaving group')
+        //                 .then(() => client.leaveGroup(source.groupId));
+        //         case 'room':
+        //             return replyText(replyToken, 'Leaving room')
+        //                 .then(() => client.leaveRoom(source.roomId));
+        //     }
+        default:
+            console.log(`Echo message to ${replyToken}: ${message.text}`);
+            return replyText(replyToken, "Xin chào");
+    }
+}
 
 var webhookController = {
     index: function (req, res) {
+
 
         if (req.query['hub.mode'] === 'subscribe' &&
             req.query['hub.verify_token'] === 'rasa-bot') {
@@ -5227,27 +5462,34 @@ var webhookController = {
                     .catch(console.error);
             } else {
 
+                //tách module tiền xử lý dữ liệu : ký tự đặc biệt và chuẩn hóa từ viết sai
                 messagecontent = messagecontent.replace("@", " ");
+                messagecontent = messagecontent.replace("!", " ");
+                messagecontent = messagecontent.replace("#", " ");
+                messagecontent = messagecontent.replace("$", " ");
                 messagecontent = messagecontent.replace("+", " plus ");
                 messagecontent = messagecontent.replace("-", " ");
                 messagecontent = messagecontent.replace("o%", "0%");
                 messagecontent = messagecontent.replace("o %", "0%");
                 messagecontent = messagecontent.replace("sámung", "samsung");
                 messagecontent = messagecontent.replace("sam sung", "samsung");
+                messagecontent = messagecontent.replace("mobiistar", "mobistar");
                 messagecontent = messagecontent.replace("flush", "plus");
                 messagecontent = messagecontent.replace("pluss", "plus ");
                 messagecontent = messagecontent.replace("ss", "samsung  ");
                 messagecontent = messagecontent.replace("j2pro", "j2 pro  ");
                 messagecontent = messagecontent.replace("(", " ");
                 messagecontent = messagecontent.replace(")", " ");
+                messagecontent = messagecontent.replace("~", " ");
+                messagecontent = messagecontent.replace(":", " ");
 
 
                 messagecontent = messagecontent.replace(/\n/g, '');
                 var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
                 if (!messagecontent.includes("nokia") && !messagecontent.includes("inch")) {
-                    messagecontent = messagecontent.replace('.', " ");
-                    messagecontent = messagecontent.replace(',', " ");
+                    messagecontent = messagecontent.replace(".", " ");
+                    messagecontent = messagecontent.replace(",", " ");
                 }
 
                 var sever = severRasaQuery + messagecontent;
@@ -5410,6 +5652,109 @@ var webhookController = {
         }, 100);
 
 
+    },
+    notifyline: function (req, res) {
+
+        var testgroup = "R91dcfc0f3e755bf257bd0763cb5f75bc";
+        var CHATBOT_GROUP = "Cd9f30843307bd31c1a72424dc20d677e";
+        var linepost = "https://api.line.me/v2/bot/message/push";
+        // console.log(req.body);
+        // console.log("=======SOURCE==========");
+        // console.log(req.body.events[0].source);
+        // console.log("=======MESSAGE==========");
+        // console.log(req.body.events[0].message);
+
+        const body = {
+            to: testgroup,
+            messages: [
+                {
+                    type: "text",
+                    text: "Hi. I'm BOT. Sorry for bother you!"
+                }
+            ]
+        };
+
+        // return fetch(linepost, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Authorization': 'Bearer OF/JLbPlLNPPK1z65/CYKHYcmxICRDPRZ/5mv+uf5nc8svIORfM/9fT/zH/f4h00SA2XA5+xXKNPgxep0dQlP8VIF3K2iBOgWcunGCzcWvkLeZhESgk8V/FMtIQS0RKaWZ0RcsSpkrhH0JbV3catwAdB04t89/1O/w1cDnyilFU='
+        //     },
+        //     body: JSON.stringify(body),
+        //     json: true,
+        //     timeout: 0
+        // })
+        //     .then(rsp => rsp.json())
+        //     .then(json => {
+        //         if (json.error && json.error.message) {
+        //             console.log(json.error);
+        //         }
+
+        //         //return json;
+        //     }).catch(err => {
+        //         console.log(err);
+        //     });;
+
+
+        // lineClient.pushMessage(CHATBOT_GROUP, message)
+        //     .then(() => {
+
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //     });
+
+        // if (req.body.destination) {
+        //     console.log("Destination User ID: " + req.body.destination);
+        // }
+
+        // req.body.events should be an array of events
+        // if (!Array.isArray(req.body.events)) {
+        //     return res.status(500).end();
+        // }
+
+        // handle events separately
+        // Promise.all(req.body.events.map(handleEvent))
+        //     .then(() => res.end())
+        //     .catch((err) => {
+        //         console.error(err);
+        //         res.status(500).end();
+        //     });
+
+        // var data = req.body;
+        // try {
+
+        //     const client = new line.Client({
+        //         channelAccessToken: 'OF/JLbPlLNPPK1z65/CYKHYcmxICRDPRZ/5mv+uf5nc8svIORfM/9fT/zH/f4h00SA2XA5+xXKNPgxep0dQlP8VIF3K2iBOgWcunGCzcWvkLeZhESgk8V/FMtIQS0RKaWZ0RcsSpkrhH0JbV3catwAdB04t89/1O/w1cDnyilFU='
+        //     });
+        //     const message = {
+        //         type: 'text',
+        //         text: 'Hello World! This is BOT notifications'
+        //     };
+
+        //     client.pushMessage('<to>', message)
+        //         .then(() => {
+
+        //         })
+        //         .catch((err) => {
+        //             // error handling
+        //         });
+
+        // } catch (error) {
+        //     res.send(400);
+        // }
+    },
+    notifyline_error: function (req, res) {
+        const notify = new LineAPI.Notify({
+            token: "GIjUM2YuZohZGiqgsW2K93zp71sPUxbQSE0S5AcKkey"
+        });
+
+        notify.send({
+            message: "Hi. I'm BOT. Sorry for bother!",
+            sticker: 'smile' // shorthand
+            //image: 'test.jpg' // local file
+            // image: { fullsize: 'http://example.com/1024x1024.jpg', thumbnail: 'http://example.com/240x240.jpg' } // remote url
+        }).then(console.log)
     }
 };
 
