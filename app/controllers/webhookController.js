@@ -639,7 +639,7 @@ const getButtonBriefSupport = (sender, siteid, replyobject, questionTitle) => {
                         buttons: [
                             {
                                 type: "postback",
-                                title: "Xem hồ sơ yêu cầu",
+                                title: "Xem chi tiết hồ sơ yêu cầu",
                                 payload: "BRIEFSUPPORT"
                             }
                         ]
@@ -1474,7 +1474,7 @@ const GetProductInfoByURL = (currenturl, sessionId, ishaveProductEntity) => {
                                                 if (result.SearchProductPhiResult.string.length > 1) {//nhiều kết quả search
                                                     var productID = result.SearchProductPhiResult.string[0];
 
-                                                    var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };                                           
+                                                    var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
                                                     APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
                                                         var productDetail = result.GetProductResult;
                                                         if (result && result.GetProductResult.productErpPriceBOField) {
@@ -4051,14 +4051,31 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                     else if (subIntent === "agecondition") {
 
-                        return;
-                    }
-                    else if (subIntent === "cancontinuepayinstalment_whenloan") {
+                        questionTitle = "Tuổi trả góp";
+                        resultanswer = "Dạ, để tham gia trả góp thì bắt buộc tuổi phải từ <span style='color:red'>20 - 60</span> ạ (tính theo ngày sinh nhật). Nếu " + sessions[sessionId].gender + " nhỏ hơn 20 tuổi thì không thể tham gia trả góp được rồi ạ. </br>\
+                        Do vậy, "+ sessions[sessionId].gender + " có thể nhờ người thân hoặc bạn bè đủ từ 20 đến 60 tuổi đứng tên làm hồ sơ giúp " + sessions[sessionId].gender + " ạ";
+                        var jsonbuttonBrief = getButtonBriefSupport(sender, siteid, replyobject, resultanswer);
+                        setTimeout(() => {
+                            SentToClientButton(sender, jsonbuttonBrief, "ask_instalment+agecondition")
+                                .catch(console.error);
+
+                        }, 100);
 
                         return;
+
+                    }
+                    else if (subIntent === "cancontinuepayinstalment_whenloan") {
+                        questionTitle = "Vay có thể góp";
+                        resultanswer = "Dạ, hiện tại có 3 công ty tài chính hỗ trợ trả góp là <span style='color:green'>FECredit</span>, <span style='color:red'>HomeCredit</span> và <span style='color:yellow'>HD SaiGon</span>.\
+                         Nếu "+ sessions[sessionId].gender + " đang vay tiền bên ngân hàng này thì có thể tham gia trả góp ngân hàng kia để được duyệt hồ sơ ạ. </br>\
+                         Ví dụ, nếu "+ sessions[sessionId].gender + " đang vay tiền tại <span style='color:green'>FECredit</span> thì có thể làm hồ sơ mua trả góp tại công ty <span style='color:red'>HomeCredit</span> và <span style='color:yellow'>HD SaiGon</span></br>";
+
+
                     }
                     else if (subIntent === "timeapprove") {
-                        return;
+                        questionTitle = "Thời gian duyệt hồ sơ";
+                        resultanswer = "Dạ, thời gian duyệt hồ sơ online là trong vòng 24h ạ. Nếu làm trực tiếp tại siêu thị thì thời gian duyệt hồ sơ tối đa 4 tiếng ạ.</br>";
+
                     }
 
 
