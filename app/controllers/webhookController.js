@@ -27,7 +27,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "http://1864334a.ngrok.io/chatbot";
+var severResponse = "http://4aa95b8e.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -64,7 +64,7 @@ var listBriefID = [
 ];
 var lstAccessoryKeyword = [
     "ốp", "op lung", "bluetooth", "tai nghe", "tai phone", "pin", "sạc", "sac", "bàn phím", "ban phim", "loa", "thẻ nhớ", "the nho", "usb",
-    "đồng hồ", "dong ho", "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
+    "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
 ];
 var lstCommonProduct = [
     "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei", "note", "realme",
@@ -1425,7 +1425,7 @@ function IsSystemPromoNotApplyForCompany(productBO, ErpInstallProgramId) {
     //endregion
 }
 
-const GetProductInfoByURL = (currenturl, sessionId) => {
+const GetProductInfoByURL = (currenturl, sessionId, ishaveProductEntity) => {
     return new Promise((resolve, reject) => {
         if (currenturl && currenturl.length > 1) {
             var args = {
@@ -1448,15 +1448,64 @@ const GetProductInfoByURL = (currenturl, sessionId) => {
                             APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(productDetail) {
                                 if (productDetail && productDetail.GetProductResult) {
                                     var finalProductName = productDetail.GetProductResult.productNameField;
-                                    resolve(finalProductName);
+                                    if (ishaveProductEntity) {//nếu câu hỏi kh có product , kiểm tra?
+                                        //nếu product đó BOT detect mà search không ra, hoặc ra nhiều Model (như iphone 6=> ra 32gb,64gb..) thì lấy sản phẩm từ URL
+                                        var keyword = sessions[sessionId].product;
+                                        var argsSearchProduct = "";
+
+                                        if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
+                                        {
+                                            argsSearchProduct = {
+                                                q: keyword,
+                                                CateID: -3
+                                            };
+                                        }
+                                        else {
+
+                                            argsSearchProduct = {
+                                                q: keyword,
+                                                CateID: -4
+                                            };
+                                        }
+                                        APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+
+                                            if (result.SearchProductPhiResult != null) {
+
+                                                if (result.SearchProductPhiResult.string.length > 1) {//nhiều kết quả search
+                                                    var productID = result.SearchProductPhiResult.string[0];
+
+                                                    var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };                                           
+                                                    APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+                                                        var productDetail = result.GetProductResult;
+                                                        if (result && result.GetProductResult.productErpPriceBOField) {
+                                                            //console.log(result);     
+                                                            resolve(result.GetProductResult.productNameField);
+                                                        }
+                                                        else {
+                                                            resolve(finalProductName);
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    resolve(finalProductName);
+                                                }
+                                            }
+                                            else {
+                                                resolve(finalProductName);
+                                            }
+                                        });
+
+                                    }
+                                    else {
+                                        resolve(finalProductName);
+                                    }
+
 
                                 }
                                 else {
                                     resolve(null);
                                 }
                             });
-
-
                         }
                         else {
                             resolve(null);
@@ -2080,9 +2129,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         console.log("========finalURL========", finalUrl);
 
         // currenturl = "dtdd/oppo-f7";
-        GetProductInfoByURL(finalUrl, sessionId).then((value) => {
-            if (value) {
+        GetProductInfoByURL(finalUrl, sessionId, ishaveProductEntity).then((value) => {
+            if (value) {//nếu có sản phẩm từ URL
                 sessions[sessionId].product = value.replace("+", " plus ");
+
             }
 
             console.log("===productNameAfter==", sessions[sessionId].product);
@@ -2537,6 +2587,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             // =>vức đi)
                         }
                         else {
+                            //nếu pre_intent  mà how hoặc brierfsupport thì bỏ qua luôn
+                            if (sessions[sessionId].prev_intent.includes("how") || sessions[sessionId].prev_intent.includes("briefsupport")) {
+                                sessions[sessionId].prev_intent = intent;
+                                return;
+                            }
                             intent = sessions[sessionId].prev_intent ? sessions[sessionId].prev_intent : intent;
                             console.log("đổi intent", intent);
                         }
