@@ -11,6 +11,7 @@ var fs = require('fs');
 const line = require('@line/bot-sdk');
 const https = require('https');
 var fetchTimeout = require('fetch-timeout');
+var helpersentence = require('../helpers/helpersentence');
 
 // var LineAPI =require('line-api');
 // const lineconfig = {
@@ -27,7 +28,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "http://4aa95b8e.ngrok.io/chatbot";
+var severResponse = "http://3b59f762.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -5535,34 +5536,13 @@ var webhookController = {
             } else {
 
                 //tách module tiền xử lý dữ liệu : ký tự đặc biệt và chuẩn hóa từ viết sai
-                messagecontent = messagecontent.replace("@", " ");
-                messagecontent = messagecontent.replace("!", " ");
-                messagecontent = messagecontent.replace("#", " ");
-                messagecontent = messagecontent.replace("$", " ");
-                messagecontent = messagecontent.replace("+", " plus ");
-                messagecontent = messagecontent.replace("-", " ");
-                messagecontent = messagecontent.replace("o%", "0%");
-                messagecontent = messagecontent.replace("o %", "0%");
-                messagecontent = messagecontent.replace("sámung", "samsung");
-                messagecontent = messagecontent.replace("sam sung", "samsung");
-                messagecontent = messagecontent.replace("mobiistar", "mobistar");
-                messagecontent = messagecontent.replace("flush", "plus");
-                messagecontent = messagecontent.replace("pluss", "plus ");
-                messagecontent = messagecontent.replace("ss", "samsung  ");
-                messagecontent = messagecontent.replace("j2pro", "j2 pro  ");
-                messagecontent = messagecontent.replace("(", " ");
-                messagecontent = messagecontent.replace(")", " ");
-                messagecontent = messagecontent.replace("~", " ");
-                messagecontent = messagecontent.replace(":", " ");
+              
+                messagecontent = helpersentence.ReplaceNonsenWord(messagecontent);
+                console.log("===Customer question===",messagecontent);
 
-
-                messagecontent = messagecontent.replace(/\n/g, '');
                 var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
-                if (!messagecontent.includes("nokia") && !messagecontent.includes("inch")) {
-                    messagecontent = messagecontent.replace(".", " ");
-                    messagecontent = messagecontent.replace(",", " ");
-                }
+              
 
                 var sever = severRasaQuery + messagecontent;
                 var url = encodeURI(sever);
