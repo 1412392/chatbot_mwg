@@ -28,7 +28,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "http://3b59f762.ngrok.io/chatbot";
+var severResponse = "http://824f9992.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -2740,7 +2740,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     !sessions[sessionId].isLatestAskMonthInstalment && !sessions[sessionId].isLatestAskPercentInstalment
                                                                     && !sessions[sessionId].isLatestAskNormalInstallment && !sessions[sessionId].isLatestAskCompanyForNormalInstalment)) {//đéo có concat gi het thi ném gói 0% ra chứ làm me gì
                                                                 if (result) {
-                                                                    resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói <span style='color:green'>trả góp 0%</span>. (<span style='color:green'>trả góp 0%</span> là gói trả góp đặc biệt rất hấp dẫn, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br> ";
+                                                                    resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói trả góp đặc biệt (<span style='color:green'>0%</span> và <span style='color:red'>1%</span> lãi suất).</br>\
+                                                                    (<span style='color:green'>0% lãi suất: </span> Gói trả góp đặc biệt, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br>\
+                                                                    (<span style='color:red'>1% lãi suất: </span> Gói trả góp đặc biệt, trả trước 0đ và chỉ chịu <span style='color:red'>1%</span> lãi suất). </br> ";
                                                                     //send ds ctytc
                                                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                         .catch(console.error);
@@ -2788,7 +2790,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         if (packageInfo && packageInfo.length > 0) {
                                                                             packageInfo.forEach(function (packageDetail) {
                                                                                 if (!packageDetail || !packageDetail.GetFeatureInstallment2018Result) return;
-
+                                                                                //console.log("======packageDetail======",packageDetail);
                                                                                 //====================ÁP DỤNG KHUYẾN MÃI====================
                                                                                 var desPrice = GetSystemPromotionWithoutPrevent(productDetail, parseFloat(productPrice), true, packageDetail.GetFeatureInstallment2018Result.ErpInstallmentId);
                                                                                 console.log("======GIA GIAM==========", desPrice);
@@ -2813,13 +2815,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     SiteId: 1,
                                                                                     InventStatusId: 1
                                                                                 }
+                                                                                // console.log("=======THAM SO 0%==========",argsInstalmentResult);
+
                                                                                 APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
                                                                                     //console.log(InstallmentResult);
                                                                                     if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
-
+                                                                                        console.log("=======packageDetail======", packageDetail.GetFeatureInstallment2018Result);
                                                                                         //=====================================================
+                                                                                        console.log("=======InstallmentResult.GetInstallmentResult2018Result===========", InstallmentResult.GetInstallmentResult2018Result);
 
-                                                                                        resultanswer = "Thông tin gói trả góp 0% " + (parseInt(packageDetail.GetFeatureInstallment2018Result.CompanyID) === 1 ? "<span style='color:red;font-weight:bold'> Home Credit</span>" : parseInt(packageDetail.GetFeatureInstallment2018Result.CompanyID) === 3 ? "<span style='color:green;font-weight:bold'>FE Credit</span>" : "") + "</br>";
+                                                                                        resultanswer = "Thông tin gói trả góp " + (parseInt(packageDetail.GetFeatureInstallment2018Result.PercentInstallment) === 0 ? "<span style='color:purple'>0%</span> " : "<span style='color:purple'>1%</span> ") +
+                                                                                            (parseInt(packageDetail.GetFeatureInstallment2018Result.CompanyID) === 1 ? "<span style='color:red;font-weight:bold'> Home Credit</span>" : parseInt(packageDetail.GetFeatureInstallment2018Result.CompanyID) === 3 ? "<span style='color:green;font-weight:bold'>FE Credit</span>" : "") + "</br>";
                                                                                         var moneyPrepaid = (packageDetail.GetFeatureInstallment2018Result.PaymentPercentFrom / 100) * (parseFloat(productPrice) - desPrice);
                                                                                         resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency((productPrice - desPrice).toString()) + "đ</span></br>";
                                                                                         if (desPrice > 0) {
@@ -2830,10 +2836,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                                         //tinh so tien tra gop hàng tháng=(giá-sttt)/sothangtragop+tienphiht
 
-                                                                                        console.log(packageDetail.GetFeatureInstallment2018Result);
+
                                                                                         var m1 = parseFloat(productPrice) - parseFloat(desPrice) - moneyPrepaid;
-                                                                                        var m2 = m1 / packageDetail.GetFeatureInstallment2018Result.PaymentMonth;
-                                                                                        var CollectionFee = sessions[sessionId].financialCompany === 8 ? 11000 : 12000;
+                                                                                        //var m2 = m1 / packageDetail.GetFeatureInstallment2018Result.PaymentMonth;
+                                                                                        var m2 = parseFloat(InstallmentResult.GetInstallmentResult2018Result.MoneyPayPerMonth);
+                                                                                        var CollectionFee = packageDetail.GetFeatureInstallment2018Result.CompanyID === 1 ? 11000 : 12000;
                                                                                         var moneyPayInMonth = parseFloat(m2 + CollectionFee + parseFloat(InstallmentResult.GetInstallmentResult2018Result.InsuranceFee)).toFixed(0);
                                                                                         // console.log(m3);
 
@@ -5536,13 +5543,13 @@ var webhookController = {
             } else {
 
                 //tách module tiền xử lý dữ liệu : ký tự đặc biệt và chuẩn hóa từ viết sai
-              
+
                 messagecontent = helpersentence.ReplaceNonsenWord(messagecontent);
-                console.log("===Customer question===",messagecontent);
+                console.log("===Customer question===", messagecontent);
 
                 var button_payload_state = 0;//không có gì, 1: hoi sp, 2: hỏi giá, 3: hỏi km
 
-              
+
 
                 var sever = severRasaQuery + messagecontent;
                 var url = encodeURI(sever);
