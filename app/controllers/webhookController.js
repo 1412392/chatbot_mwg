@@ -28,7 +28,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "http://824f9992.ngrok.io/chatbot";
+var severResponse = "http://45d3a129.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -3171,42 +3171,122 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                     }
 
-
-
-                                                                    //lấy gói trả góp đưa ra
-                                                                    var argsInstalmentResult = {
-                                                                        CategoryId: categoryID,
-                                                                        Price: productPrice,
-                                                                        CompanyId: finalCTTC,
+                                                                    //check xem có trùng gói 0% hay không
+                                                                    var argGetZeroPackage = {
+                                                                        CompanyId: -1,
+                                                                        CategoryId: -1,
+                                                                        ProductId: parseInt(productID),
                                                                         Percent: parseInt(sessions[sessionId].percent_instalment),
                                                                         Month: parseInt(sessions[sessionId].month_instalment),
-                                                                        BriefId: sessions[sessionId].BriefID,
-                                                                        ListDealId: -1,
-                                                                        ProductId: -1,
-                                                                        CollectionFee: finalCTTC === 1 ? 11000 : 12000,
+                                                                        MoneyLoan: -1,
+                                                                        FeatureType: 1,
+                                                                        IsDefaultPackage: -1,
                                                                         SiteId: 1,
                                                                         InventStatusId: 1
-                                                                    }
-                                                                    //console.log("======thông số=======", argsInstalmentResult);
-                                                                    APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
-                                                                        //console.log(InstallmentResult);
+                                                                    };
+                                                                    APIGetInfoZeroInstalmentPackage(urlwcfProduct, argGetZeroPackage, function (packageInfo) {
+                                                                        // console.log(packageInfo.GetFeatureInstallment2018Result);
+                                                                        if (packageInfo && packageInfo.length > 0) {//có gói trả góp 0% trùng
+                                                                            //show gói 0%
+                                                                            packageInfo.forEach(function (packageDetail) {
+                                                                                if (!packageDetail || !packageDetail.GetFeatureInstallment2018Result) return;
+                                                                                //console.log("======packageDetail======",packageDetail);
+                                                                                //====================ÁP DỤNG KHUYẾN MÃI====================
+                                                                                var desPrice = GetSystemPromotionWithoutPrevent(productDetail, parseFloat(productPrice), true, packageDetail.GetFeatureInstallment2018Result.ErpInstallmentId);
+                                                                                console.log("======GIA GIAM==========", desPrice);
 
-                                                                        if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
-                                                                            //====================ÁP DỤNG KHUYẾN MÃI====================
-                                                                            var discountPrice = parseFloat(GetSystemPromotionDisCountValue(productDetail, parseFloat(productPrice), false));
-                                                                            console.log("======GIA GIAM==========", discountPrice);
-                                                                            productPrice = productPrice - discountPrice;
-                                                                            console.log("======GIA SAU GIAM==========", productPrice);
+                                                                                //tính lại % 
+                                                                                var newPercent = GetInstallPercentPrepaid(packageDetail.GetFeatureInstallment2018Result, parseFloat(productPrice) - desPrice);
+                                                                                console.log("======% trả trước==========", newPercent);
 
-                                                                            var bIsNotApplyPromoHC = false;
-                                                                            bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
-                                                                            console.log("========bIsNotApplyPromoHC====", bIsNotApplyPromoHC);
-                                                                            if (bIsNotApplyPromoHC)
-                                                                                productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
+                                                                                //lấy gói trả góp đưa ra
+                                                                                finalCompanySpecialInstalment = parseInt(packageDetail.GetFeatureInstallment2018Result.CompanyID);
+
+                                                                                var argsInstalmentResult = {
+                                                                                    CategoryId: -1,
+                                                                                    Price: parseFloat(productPrice - desPrice),
+                                                                                    CompanyId: finalCompanySpecialInstalment,
+                                                                                    Percent: newPercent,
+                                                                                    Month: parseInt(packageDetail.GetFeatureInstallment2018Result.PaymentMonth),
+                                                                                    BriefId: parseInt(packageDetail.GetFeatureInstallment2018Result.BriefId),
+                                                                                    ListDealId: -1,
+                                                                                    ProductId: parseInt(productID),
+                                                                                    CollectionFee: finalCompanySpecialInstalment === 1 ? 11000 : finalCompanySpecialInstalment === 3 ? 12000 : 11000,
+                                                                                    SiteId: 1,
+                                                                                    InventStatusId: 1
+                                                                                }
+                                                                                // console.log("=======THAM SO 0%==========",argsInstalmentResult);
+
+                                                                                APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
+                                                                                    //console.log(InstallmentResult);
+                                                                                    if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
+                                                                                        console.log("=======packageDetail======", packageDetail.GetFeatureInstallment2018Result);
+                                                                                        //=====================================================
+                                                                                        console.log("=======InstallmentResult.GetInstallmentResult2018Result===========", InstallmentResult.GetInstallmentResult2018Result);
+
+                                                                                        resultanswer = "Thông tin gói trả góp " + (parseInt(packageDetail.GetFeatureInstallment2018Result.PercentInstallment) === 0 ? "<span style='color:purple'>0%</span> " : "<span style='color:purple'>1%</span> ") +
+                                                                                            (parseInt(packageDetail.GetFeatureInstallment2018Result.CompanyID) === 1 ? "<span style='color:red;font-weight:bold'> Home Credit</span>" : parseInt(packageDetail.GetFeatureInstallment2018Result.CompanyID) === 3 ? "<span style='color:green;font-weight:bold'>FE Credit</span>" : "") + "</br>";
+                                                                                        var moneyPrepaid = (packageDetail.GetFeatureInstallment2018Result.PaymentPercentFrom / 100) * (parseFloat(productPrice) - desPrice);
+                                                                                        resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency((productPrice - desPrice).toString()) + "đ</span></br>";
+                                                                                        if (desPrice > 0) {
+                                                                                            resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(desPrice.toString()) + "đ</span>" + "</br>";
+
+                                                                                        }
+                                                                                        resultanswer += "*Số tiền trả trước: <span style='font-weight:bold'>" + format_currency(moneyPrepaid.toString()) + "đ</span>" + " (" + newPercent + "%)</br>";
+
+                                                                                        //tinh so tien tra gop hàng tháng=(giá-sttt)/sothangtragop+tienphiht
 
 
-                                                                            //=====================================================
-                                                                            var newargsInstalmentResult = {
+                                                                                        var m1 = parseFloat(productPrice) - parseFloat(desPrice) - moneyPrepaid;
+                                                                                        //var m2 = m1 / packageDetail.GetFeatureInstallment2018Result.PaymentMonth;
+                                                                                        var m2 = parseFloat(InstallmentResult.GetInstallmentResult2018Result.MoneyPayPerMonth);
+                                                                                        var CollectionFee = packageDetail.GetFeatureInstallment2018Result.CompanyID === 1 ? 11000 : 12000;
+                                                                                        var moneyPayInMonth = parseFloat(m2 + CollectionFee + parseFloat(InstallmentResult.GetInstallmentResult2018Result.InsuranceFee)).toFixed(0);
+                                                                                        // console.log(m3);
+
+                                                                                        resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + packageDetail.GetFeatureInstallment2018Result.PaymentMonth + " tháng</span>)" + "</br>";
+
+
+                                                                                        var moneyDiff = (moneyPrepaid + packageDetail.GetFeatureInstallment2018Result.PaymentMonth * moneyPayInMonth - (parseFloat(productPrice) - parseFloat(desPrice))).toFixed(0);
+                                                                                        resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
+
+
+                                                                                        var FromDate = (packageDetail.GetFeatureInstallment2018Result.FromDate.split('T')[0]).split('-');
+                                                                                        var ToDate = (packageDetail.GetFeatureInstallment2018Result.ToDate.split('T')[0]).split('-');
+                                                                                        var newFromDate = FromDate[2] + "/" + FromDate[1] + "/" + FromDate[0];
+                                                                                        var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
+                                                                                        resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[packageDetail.GetFeatureInstallment2018Result.BriefId - 1] + "</span>" + "</br>";
+
+                                                                                        resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                        resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
+
+                                                                                        resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
+
+
+                                                                                        // setTimeout(() => {
+                                                                                        //     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                                        //         .catch(console.error);
+                                                                                        // }, 800);
+
+                                                                                        questionTitle = "Lựa chọn khác";
+                                                                                        var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, resultanswer, productPrice);
+
+                                                                                        setTimeout(() => {
+                                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                .catch(console.error);
+
+                                                                                        }, 100);
+                                                                                    }
+
+
+                                                                                });
+                                                                            });
+
+
+                                                                        }
+                                                                        else {
+                                                                            //lấy gói trả góp đưa ra
+                                                                            var argsInstalmentResult = {
                                                                                 CategoryId: categoryID,
                                                                                 Price: productPrice,
                                                                                 CompanyId: finalCTTC,
@@ -3219,320 +3299,286 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                 SiteId: 1,
                                                                                 InventStatusId: 1
                                                                             }
-                                                                            APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
+                                                                            //console.log("======thông số=======", argsInstalmentResult);
+                                                                            APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
                                                                                 //console.log(InstallmentResult);
 
                                                                                 if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
-                                                                                    resultanswer += "</br>Thông tin gói trả góp của " + (InstallmentResult.GetInstallmentResult2018Result.CompanyID === 1 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + "</br>";
-                                                                                    var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
-                                                                                    resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
-                                                                                    if (discountPrice > 0) {
-                                                                                        resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(discountPrice.toString()) + "đ</span>" + "</br>";
+                                                                                    //====================ÁP DỤNG KHUYẾN MÃI====================
+                                                                                    var discountPrice = parseFloat(GetSystemPromotionDisCountValue(productDetail, parseFloat(productPrice), false));
+                                                                                    console.log("======GIA GIAM==========", discountPrice);
+                                                                                    productPrice = productPrice - discountPrice;
+                                                                                    console.log("======GIA SAU GIAM==========", productPrice);
 
+                                                                                    var bIsNotApplyPromoHC = false;
+                                                                                    bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
+                                                                                    console.log("========bIsNotApplyPromoHC====", bIsNotApplyPromoHC);
+                                                                                    if (bIsNotApplyPromoHC)
+                                                                                        productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
+
+
+                                                                                    //=====================================================
+                                                                                    var newargsInstalmentResult = {
+                                                                                        CategoryId: categoryID,
+                                                                                        Price: productPrice,
+                                                                                        CompanyId: finalCTTC,
+                                                                                        Percent: parseInt(sessions[sessionId].percent_instalment),
+                                                                                        Month: parseInt(sessions[sessionId].month_instalment),
+                                                                                        BriefId: sessions[sessionId].BriefID,
+                                                                                        ListDealId: -1,
+                                                                                        ProductId: -1,
+                                                                                        CollectionFee: finalCTTC === 1 ? 11000 : 12000,
+                                                                                        SiteId: 1,
+                                                                                        InventStatusId: 1
                                                                                     }
+                                                                                    APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
+                                                                                        //console.log(InstallmentResult);
 
-                                                                                    resultanswer += "*Số tiền trả trước: <span style='font-weight:bold'>" + format_currency(moneyPrepaid.toString()) + "đ</span>" + " (" + InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom + "%)</br>";
-
-                                                                                    //tinh so tien tra gop hàng tháng=(giá-sttt)/sothangtragop+tienphiht
-
-                                                                                    // var m1 = parseFloat(productPrice) - moneyPrepaid;
-                                                                                    // var m2 = m1 / InstallmentResult.GetInstallmentResultResult.PaymentMonth + 11000;
-                                                                                    // var moneyPayInMonth = m2.toFixed(0);
-                                                                                    var CollectionFee = finalCTTC === 1 ? 11000 : 12000;
-                                                                                    //console.log(InstallmentResult.GetInstallmentResult2018Result);
-                                                                                    var totlapaymonth = parseFloat(InstallmentResult.GetInstallmentResult2018Result.MoneyPayPerMonth) + parseFloat(InstallmentResult.GetInstallmentResult2018Result.InsuranceFee) + CollectionFee;
-
-                                                                                    var moneyPayInMonth = parseFloat(totlapaymonth).toFixed(0);
-                                                                                    console.log("===========moneyPayInMonth====: " + moneyPayInMonth);
-                                                                                    console.log("=======newargsInstalmentResult====:", newargsInstalmentResult);
-
-                                                                                    // console.log(m3);
-
-                                                                                    resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
-
-
-                                                                                    var moneyDiff = (parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay) - parseFloat(productPrice)).toFixed(0);
-                                                                                    resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
-
-
-                                                                                    var FromDate = (InstallmentResult.GetInstallmentResult2018Result.FromDate.split('T')[0]).split('-');
-                                                                                    var ToDate = (InstallmentResult.GetInstallmentResult2018Result.ToDate.split('T')[0]).split('-');
-                                                                                    var newFromDate = FromDate[2] + "/" + FromDate[1] + "/" + FromDate[0];
-                                                                                    var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
-                                                                                    resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[InstallmentResult.GetInstallmentResult2018Result.BriefId - 1] + "</span>" + "</br>";
-
-                                                                                    resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
-                                                                                    resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
-
-                                                                                    resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
-
-
-                                                                                    setTimeout(() => {
-                                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                                            .catch(console.error);
-                                                                                    }, 800);
-
-                                                                                    // questionTitle = "Lựa chọn khác";
-                                                                                    // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
-
-                                                                                    // setTimeout(() => {
-                                                                                    //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                                    //         .catch(console.error);
-
-                                                                                    // }, 1500);
-                                                                                }
-                                                                                else {
-                                                                                    resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp với công ty " + finalCTTC === 1 ? "<span style='color:red'>HomeCredit</span>" : finalCTTC === 3 ? "<span style='color:green'>FECredit</span>" : "CHƯA CHỌN" + "</span></br>";
-
-                                                                                    setTimeout(() => {
-                                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                                            .catch(console.error);
-                                                                                    }, 400);
-
-                                                                                    questionTitle = "Lựa chọn khác";
-                                                                                    return;
-                                                                                    // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
-
-                                                                                    // setTimeout(() => {
-                                                                                    //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                                    //         .catch(console.error);
-
-                                                                                    // }, 800);
-
-                                                                                }
-
-                                                                            });
-                                                                        }
-                                                                        else {
-                                                                            //if (categoryID === 522)//máy tính bảng lấy thêm company=1 xem sao
-                                                                            {
-                                                                                argsInstalmentResult.CompanyId = 1;
-                                                                                finalCTTC = 1;
-                                                                                APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
-                                                                                    if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
-                                                                                        //====================ÁP DỤNG KHUYẾN MÃI====================
-                                                                                        var discountPrice = parseFloat(GetSystemPromotionDisCountValue(productDetail, parseFloat(productPrice), false));
-                                                                                        console.log("======GIA GIAM==========", discountPrice);
-                                                                                        productPrice = productPrice - discountPrice;
-                                                                                        var bIsNotApplyPromoHC = false;
-                                                                                        bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
-                                                                                        if (bIsNotApplyPromoHC)
-                                                                                            productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
-
-
-                                                                                        //=====================================================
-                                                                                        var newargsInstalmentResult = {
-                                                                                            CategoryId: categoryID,
-                                                                                            Price: productPrice,
-                                                                                            CompanyId: finalCTTC,
-                                                                                            Percent: parseInt(sessions[sessionId].percent_instalment),
-                                                                                            Month: parseInt(sessions[sessionId].month_instalment),
-                                                                                            BriefId: sessions[sessionId].BriefID,
-                                                                                            ListDealId: -1,
-                                                                                            ProductId: -1,
-                                                                                            CollectionFee: finalCTTC === 1 ? 11000 : 12000,
-                                                                                            SiteId: 1,
-                                                                                            InventStatusId: 1
-                                                                                        }
-                                                                                        APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
-                                                                                            //console.log(InstallmentResult);
-
-                                                                                            if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
-                                                                                                resultanswer += "</br>Thông tin gói trả góp của " + (InstallmentResult.GetInstallmentResult2018Result.CompanyID === 1 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + "</br>";
-                                                                                                var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
-                                                                                                resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
-                                                                                                if (discountPrice > 0) {
-                                                                                                    resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(discountPrice.toString()) + "đ</span>" + "</br>";
-
-                                                                                                }
-
-                                                                                                resultanswer += "*Số tiền trả trước: <span style='font-weight:bold'>" + format_currency(moneyPrepaid.toString()) + "đ</span>" + " (" + InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom + "%)</br>";
-
-                                                                                                //tinh so tien tra gop hàng tháng=(giá-sttt)/sothangtragop+tienphiht
-
-                                                                                                // var m1 = parseFloat(productPrice) - moneyPrepaid;
-                                                                                                // var m2 = m1 / InstallmentResult.GetInstallmentResultResult.PaymentMonth + 11000;
-                                                                                                // var moneyPayInMonth = m2.toFixed(0);
-                                                                                                var CollectionFee = finalCTTC === 1 ? 11000 : 12000;
-                                                                                                //console.log(InstallmentResult.GetInstallmentResult2018Result);
-                                                                                                var totlapaymonth = parseFloat(InstallmentResult.GetInstallmentResult2018Result.MoneyPayPerMonth) + parseFloat(InstallmentResult.GetInstallmentResult2018Result.InsuranceFee) + CollectionFee;
-
-                                                                                                var moneyPayInMonth = parseFloat(totlapaymonth).toFixed(0);
-                                                                                                // console.log(m3);
-
-                                                                                                resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
-
-
-                                                                                                var moneyDiff = (parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay) - parseFloat(productPrice)).toFixed(0);
-                                                                                                resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
-
-
-                                                                                                var FromDate = (InstallmentResult.GetInstallmentResult2018Result.FromDate.split('T')[0]).split('-');
-                                                                                                var ToDate = (InstallmentResult.GetInstallmentResult2018Result.ToDate.split('T')[0]).split('-');
-                                                                                                var newFromDate = FromDate[2] + "/" + FromDate[1] + "/" + FromDate[0];
-                                                                                                var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
-                                                                                                resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[InstallmentResult.GetInstallmentResult2018Result.BriefId - 1] + "</span>" + "</br>";
-
-                                                                                                resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
-                                                                                                resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
-
-                                                                                                resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
-
-
-                                                                                                setTimeout(() => {
-                                                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                                                        .catch(console.error);
-                                                                                                }, 800);
-
-                                                                                                // questionTitle = "Lựa chọn khác";
-                                                                                                // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
-
-                                                                                                // setTimeout(() => {
-                                                                                                //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                                                //         .catch(console.error);
-
-                                                                                                // }, 1500);
-                                                                                            }
-                                                                                            else {
-                                                                                                resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp với công ty " + finalCTTC === 1 ? "<span style='color:red'>HomeCredit</span>" : finalCTTC === 3 ? "<span style='color:green'>FECredit</span>" : "CHƯA CHỌN" + "</span></br>";
-
-                                                                                                setTimeout(() => {
-                                                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                                                        .catch(console.error);
-                                                                                                }, 400);
-
-                                                                                                questionTitle = "Lựa chọn khác";
-                                                                                                return;
-                                                                                                // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
-
-                                                                                                // setTimeout(() => {
-                                                                                                //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                                                //         .catch(console.error);
-
-                                                                                                // }, 800);
+                                                                                        if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
+                                                                                            resultanswer += "</br>Thông tin gói trả góp của " + (InstallmentResult.GetInstallmentResult2018Result.CompanyID === 1 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + "</br>";
+                                                                                            var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
+                                                                                            resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
+                                                                                            if (discountPrice > 0) {
+                                                                                                resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(discountPrice.toString()) + "đ</span>" + "</br>";
 
                                                                                             }
 
-                                                                                        });
-                                                                                    }
-                                                                                    else {
-                                                                                        resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp nào với </span>" +
-                                                                                            "<span style='color:red'>số tháng là " + sessions[sessionId].month_instalment + "</span> và " +
-                                                                                            "<span style='color:green'>% trả trước là " + sessions[sessionId].percent_instalment + "%</span></br>";
-                                                                                        if (parseInt(sessions[sessionId].percent_instalment) === 0) {
-                                                                                            var jsonmessageAnother =
-                                                                                                {
-                                                                                                    username: sender,
-                                                                                                    siteid: siteid,
-                                                                                                    messagetype: "template",
-                                                                                                    replyobject: replyobject,
-                                                                                                    messagecontentobject: {
-                                                                                                        elements: [
-                                                                                                            {
-                                                                                                                title: resultanswer,
-                                                                                                                buttons: [
-                                                                                                                    {
-                                                                                                                        type: "postback",
-                                                                                                                        title: "Xem gói trả trước 0đ",
-                                                                                                                        payload: "INSTALMENT_PACKAGE0D"
-                                                                                                                    },
-                                                                                                                    {
-                                                                                                                        type: "postback",
-                                                                                                                        title: "Xem gói 0% lãi suất",
-                                                                                                                        payload: "INSTALMENT_0PTLS"
-                                                                                                                    }
+                                                                                            resultanswer += "*Số tiền trả trước: <span style='font-weight:bold'>" + format_currency(moneyPrepaid.toString()) + "đ</span>" + " (" + InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom + "%)</br>";
 
-                                                                                                                ]
-                                                                                                            }
-                                                                                                        ]
-                                                                                                    }
-                                                                                                };
+                                                                                            //tinh so tien tra gop hàng tháng=(giá-sttt)/sothangtragop+tienphiht
 
-                                                                                            var anotheroptionbutton = JSON.stringify(jsonmessageAnother);
+                                                                                            // var m1 = parseFloat(productPrice) - moneyPrepaid;
+                                                                                            // var m2 = m1 / InstallmentResult.GetInstallmentResultResult.PaymentMonth + 11000;
+                                                                                            // var moneyPayInMonth = m2.toFixed(0);
+                                                                                            var CollectionFee = finalCTTC === 1 ? 11000 : 12000;
+                                                                                            //console.log(InstallmentResult.GetInstallmentResult2018Result);
+                                                                                            var totlapaymonth = parseFloat(InstallmentResult.GetInstallmentResult2018Result.MoneyPayPerMonth) + parseFloat(InstallmentResult.GetInstallmentResult2018Result.InsuranceFee) + CollectionFee;
+
+                                                                                            var moneyPayInMonth = parseFloat(totlapaymonth).toFixed(0);
+                                                                                            console.log("===========moneyPayInMonth====: " + moneyPayInMonth);
+                                                                                            console.log("=======newargsInstalmentResult====:", newargsInstalmentResult);
+
+                                                                                            // console.log(m3);
+
+                                                                                            resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
+
+
+                                                                                            var moneyDiff = (parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay) - parseFloat(productPrice)).toFixed(0);
+                                                                                            resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
+
+
+                                                                                            var FromDate = (InstallmentResult.GetInstallmentResult2018Result.FromDate.split('T')[0]).split('-');
+                                                                                            var ToDate = (InstallmentResult.GetInstallmentResult2018Result.ToDate.split('T')[0]).split('-');
+                                                                                            var newFromDate = FromDate[2] + "/" + FromDate[1] + "/" + FromDate[0];
+                                                                                            var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
+                                                                                            resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[InstallmentResult.GetInstallmentResult2018Result.BriefId - 1] + "</span>" + "</br>";
+
+                                                                                            resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                            resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
+
+                                                                                            resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
 
 
                                                                                             setTimeout(() => {
-                                                                                                SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                                     .catch(console.error);
+                                                                                            }, 800);
 
-                                                                                            }, 400);
+                                                                                            // questionTitle = "Lựa chọn khác";
+                                                                                            // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+
+                                                                                            // setTimeout(() => {
+                                                                                            //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                            //         .catch(console.error);
+
+                                                                                            // }, 1500);
                                                                                         }
                                                                                         else {
+                                                                                            resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp với công ty " + finalCTTC === 1 ? "<span style='color:red'>HomeCredit</span>" : finalCTTC === 3 ? "<span style='color:green'>FECredit</span>" : "CHƯA CHỌN" + "</span></br>";
+
                                                                                             setTimeout(() => {
                                                                                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                                                     .catch(console.error);
                                                                                             }, 400);
+
+                                                                                            questionTitle = "Lựa chọn khác";
+                                                                                            return;
+                                                                                            // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+
+                                                                                            // setTimeout(() => {
+                                                                                            //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                            //         .catch(console.error);
+
+                                                                                            // }, 800);
+
                                                                                         }
-                                                                                        return;
-                                                                                    }
-                                                                                });
 
-                                                                            }
-                                                                            // else {
-                                                                            //     console.log("==========O DAY=================");
-                                                                            //     resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp nào với </span>" +
-                                                                            //         "<span style='color:red'>số tháng là " + sessions[sessionId].month_instalment + "</span> và " +
-                                                                            //         "<span style='color:green'>% trả trước là " + sessions[sessionId].percent_instalment + "%</span></br>";
-                                                                            //     if (parseInt(sessions[sessionId].percent_instalment) === 0) {
-                                                                            //         var jsonmessageAnother =
-                                                                            //             {
-                                                                            //                 username: sender,
-                                                                            //                 siteid: siteid,
-                                                                            //                 messagetype: "template",
-                                                                            //                 replyobject: replyobject,
-                                                                            //                 messagecontentobject: {
-                                                                            //                     elements: [
-                                                                            //                         {
-                                                                            //                             title: resultanswer,
-                                                                            //                             buttons: [
-                                                                            //                                 {
-                                                                            //                                     type: "postback",
-                                                                            //                                     title: "Xem gói trả trước 0đ",
-                                                                            //                                     payload: "INSTALMENT_PACKAGE0D"
-                                                                            //                                 },
-                                                                            //                                 {
-                                                                            //                                     type: "postback",
-                                                                            //                                     title: "Xem gói 0% lãi suất",
-                                                                            //                                     payload: "INSTALMENT_0PTLS"
-                                                                            //                                 }
-
-                                                                            //                             ]
-                                                                            //                         }
-                                                                            //                     ]
-                                                                            //                 }
-                                                                            //             };
-
-                                                                            //         var anotheroptionbutton = JSON.stringify(jsonmessageAnother);
+                                                                                    });
+                                                                                }
+                                                                                else {
+                                                                                    argsInstalmentResult.CompanyId = 1;
+                                                                                    finalCTTC = 1;
+                                                                                    APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
+                                                                                        if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
+                                                                                            //====================ÁP DỤNG KHUYẾN MÃI====================
+                                                                                            var discountPrice = parseFloat(GetSystemPromotionDisCountValue(productDetail, parseFloat(productPrice), false));
+                                                                                            console.log("======GIA GIAM==========", discountPrice);
+                                                                                            productPrice = productPrice - discountPrice;
+                                                                                            var bIsNotApplyPromoHC = false;
+                                                                                            bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
+                                                                                            if (bIsNotApplyPromoHC)
+                                                                                                productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
 
 
-                                                                            //         setTimeout(() => {
-                                                                            //             SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                            //                 .catch(console.error);
+                                                                                            //=====================================================
+                                                                                            var newargsInstalmentResult = {
+                                                                                                CategoryId: categoryID,
+                                                                                                Price: productPrice,
+                                                                                                CompanyId: finalCTTC,
+                                                                                                Percent: parseInt(sessions[sessionId].percent_instalment),
+                                                                                                Month: parseInt(sessions[sessionId].month_instalment),
+                                                                                                BriefId: sessions[sessionId].BriefID,
+                                                                                                ListDealId: -1,
+                                                                                                ProductId: -1,
+                                                                                                CollectionFee: finalCTTC === 1 ? 11000 : 12000,
+                                                                                                SiteId: 1,
+                                                                                                InventStatusId: 1
+                                                                                            }
+                                                                                            APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
+                                                                                                //console.log(InstallmentResult);
 
-                                                                            //         }, 400);
-                                                                            //     }
-                                                                            //     else {
-                                                                            //         setTimeout(() => {
-                                                                            //             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                            //                 .catch(console.error);
-                                                                            //         }, 400);
-                                                                            //     }
-                                                                            //     return;
-                                                                            // }
+                                                                                                if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
+                                                                                                    resultanswer += "</br>Thông tin gói trả góp của " + (InstallmentResult.GetInstallmentResult2018Result.CompanyID === 1 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + "</br>";
+                                                                                                    var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
+                                                                                                    resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
+                                                                                                    if (discountPrice > 0) {
+                                                                                                        resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(discountPrice.toString()) + "đ</span>" + "</br>";
 
-                                                                            // questionTitle = "Lựa chọn khác";
-                                                                            // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+                                                                                                    }
 
-                                                                            // setTimeout(() => {
-                                                                            //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
-                                                                            //         .catch(console.error);
+                                                                                                    resultanswer += "*Số tiền trả trước: <span style='font-weight:bold'>" + format_currency(moneyPrepaid.toString()) + "đ</span>" + " (" + InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom + "%)</br>";
 
-                                                                            // }, 800);
+                                                                                                    //tinh so tien tra gop hàng tháng=(giá-sttt)/sothangtragop+tienphiht
+
+                                                                                                    // var m1 = parseFloat(productPrice) - moneyPrepaid;
+                                                                                                    // var m2 = m1 / InstallmentResult.GetInstallmentResultResult.PaymentMonth + 11000;
+                                                                                                    // var moneyPayInMonth = m2.toFixed(0);
+                                                                                                    var CollectionFee = finalCTTC === 1 ? 11000 : 12000;
+                                                                                                    //console.log(InstallmentResult.GetInstallmentResult2018Result);
+                                                                                                    var totlapaymonth = parseFloat(InstallmentResult.GetInstallmentResult2018Result.MoneyPayPerMonth) + parseFloat(InstallmentResult.GetInstallmentResult2018Result.InsuranceFee) + CollectionFee;
+
+                                                                                                    var moneyPayInMonth = parseFloat(totlapaymonth).toFixed(0);
+                                                                                                    // console.log(m3);
+
+                                                                                                    resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
 
 
+                                                                                                    var moneyDiff = (parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay) - parseFloat(productPrice)).toFixed(0);
+                                                                                                    resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
+
+
+                                                                                                    var FromDate = (InstallmentResult.GetInstallmentResult2018Result.FromDate.split('T')[0]).split('-');
+                                                                                                    var ToDate = (InstallmentResult.GetInstallmentResult2018Result.ToDate.split('T')[0]).split('-');
+                                                                                                    var newFromDate = FromDate[2] + "/" + FromDate[1] + "/" + FromDate[0];
+                                                                                                    var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
+                                                                                                    resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[InstallmentResult.GetInstallmentResult2018Result.BriefId - 1] + "</span>" + "</br>";
+
+                                                                                                    resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                                    resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
+
+                                                                                                    resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
+
+
+                                                                                                    setTimeout(() => {
+                                                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                                                            .catch(console.error);
+                                                                                                    }, 800);
+
+                                                                                                    // questionTitle = "Lựa chọn khác";
+                                                                                                    // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+
+                                                                                                    // setTimeout(() => {
+                                                                                                    //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                    //         .catch(console.error);
+
+                                                                                                    // }, 1500);
+                                                                                                }
+                                                                                                else {
+                                                                                                    resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp phù hợp với công ty " + finalCTTC === 1 ? "<span style='color:red'>HomeCredit</span>" : finalCTTC === 3 ? "<span style='color:green'>FECredit</span>" : "CHƯA CHỌN" + "</span></br>";
+
+                                                                                                    setTimeout(() => {
+                                                                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                                                            .catch(console.error);
+                                                                                                    }, 400);
+
+                                                                                                    questionTitle = "Lựa chọn khác";
+                                                                                                    return;
+                                                                                                    // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
+
+                                                                                                    // setTimeout(() => {
+                                                                                                    //     SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                    //         .catch(console.error);
+
+                                                                                                    // }, 800);
+
+                                                                                                }
+
+                                                                                            });
+                                                                                        }
+                                                                                        else {
+                                                                                            resultanswer += "<br /><span style='font-style:italic;'>Rất tiếc không tìm thấy gói trả góp nào với </span>" +
+                                                                                                "<span style='color:red'>số tháng là " + sessions[sessionId].month_instalment + "</span> và " +
+                                                                                                "<span style='color:green'>% trả trước là " + sessions[sessionId].percent_instalment + "%</span></br>";
+                                                                                            if (parseInt(sessions[sessionId].percent_instalment) === 0) {
+                                                                                                var jsonmessageAnother =
+                                                                                                    {
+                                                                                                        username: sender,
+                                                                                                        siteid: siteid,
+                                                                                                        messagetype: "template",
+                                                                                                        replyobject: replyobject,
+                                                                                                        messagecontentobject: {
+                                                                                                            elements: [
+                                                                                                                {
+                                                                                                                    title: resultanswer,
+                                                                                                                    buttons: [
+                                                                                                                        {
+                                                                                                                            type: "postback",
+                                                                                                                            title: "Xem gói trả trước 0đ",
+                                                                                                                            payload: "INSTALMENT_PACKAGE0D"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            type: "postback",
+                                                                                                                            title: "Xem gói 0% lãi suất",
+                                                                                                                            payload: "INSTALMENT_0PTLS"
+                                                                                                                        }
+
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    };
+
+                                                                                                var anotheroptionbutton = JSON.stringify(jsonmessageAnother);
+
+
+                                                                                                setTimeout(() => {
+                                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                        .catch(console.error);
+
+                                                                                                }, 400);
+                                                                                            }
+                                                                                            else {
+                                                                                                setTimeout(() => {
+                                                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                                                        .catch(console.error);
+                                                                                                }, 400);
+                                                                                            }
+                                                                                            return;
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            });
                                                                         }
-
-
                                                                     });
                                                                 }
 
@@ -5553,7 +5599,7 @@ var webhookController = {
 
                 var sever = severRasaQuery + messagecontent;
                 var url = encodeURI(sever);
-
+                console.log("====url==========", url);
 
 
                 if (sessions[sessionId].isLatestAskPercentInstalment) {

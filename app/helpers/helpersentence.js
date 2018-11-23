@@ -32,15 +32,20 @@ module.exports = {
         messagecontent = messagecontent.replace("thág", "tháng");
         messagecontent = messagecontent.replace("thag", "tháng");
         messagecontent = messagecontent.replace("ạk", "ạ");
+
         messagecontent = messagecontent.replace("ak", "à");
         messagecontent = messagecontent.replace("ah", "à");
-
         messagecontent = messagecontent.replace("ah", "ạ");
         messagecontent = messagecontent.replace("ko", "không");
         messagecontent = messagecontent.replace("k0", "không");
         messagecontent = messagecontent.replace("hk", "không");
         messagecontent = messagecontent.replace("hok", "không");
         messagecontent = messagecontent.replace("kg", "không");
+        messagecontent = messagecontent.replace("trug", "trung");
+        messagecontent = messagecontent.replace("vâg", "vâng");
+        messagecontent = messagecontent.replace("xog", "xong");
+
+
         //nguy hiểm
         if (!messagecontent.includes("lg")) {//ddiejn thoai LG k10,..
             messagecontent = messagecontent.replace(" k ", " không ");
@@ -71,7 +76,7 @@ module.exports = {
         messagecontent = messagecontent.replace("fai", "phải");
         messagecontent = messagecontent.replace("hàg", "hàng");
         messagecontent = messagecontent.replace("nhiu", "nhiêu");
-        messagecontent = messagecontent.replace("lm", "làm");
+        //messagecontent = messagecontent.replace("lm", "làm");
         messagecontent = messagecontent.replace("hih", "hình");
         messagecontent = messagecontent.replace("jo", "giờ");
         messagecontent = messagecontent.replace("chả", "trả");
@@ -80,12 +85,15 @@ module.exports = {
         messagecontent = messagecontent.replace("km", "khuyễn mãi");
         messagecontent = messagecontent.replace("bnhiu", "bao nhiêu");
         messagecontent = messagecontent.replace("thasng", "tháng");
-        messagecontent = messagecontent.replace("bao nh", "bao nhiêu");
+       // messagecontent = messagecontent.replace("bao nh", "bao nhiêu");
         messagecontent = messagecontent.replace("bn", "bao nhiêu");
+        messagecontent = messagecontent.replace("bnhiu", "bao nhiêu");
 
         messagecontent = messagecontent.replace("od", "0đ");
         messagecontent = messagecontent.replace("0d", "0đ");
         messagecontent = messagecontent.replace("vs", "với");
+        messagecontent = messagecontent.replace("zay", "vậy");
+
 
         messagecontent = messagecontent.replace(/\n/g, '');
         if (!messagecontent.includes("nokia") && !messagecontent.includes("inch")) {
