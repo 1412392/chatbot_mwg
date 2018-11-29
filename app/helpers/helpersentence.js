@@ -25,8 +25,10 @@ module.exports = {
         messagecontent = messagecontent.replace("xioami", "xiaomi");
         messagecontent = messagecontent.replace("xieomi", "xiaomi");
         messagecontent = messagecontent.replace("xaomi", "xiaomi");
+        messagecontent = messagecontent.replace("láp top", "laptop");
+        messagecontent = messagecontent.replace("loptop", "laptop");
         
-
+        
         messagecontent = messagecontent.replace("appo", "oppo");
 
         messagecontent = messagecontent.replace("flush", "plus");
@@ -82,7 +84,7 @@ module.exports = {
         messagecontent = messagecontent.replace(" đt ", " điện thoại ");
         messagecontent = messagecontent.replace("fai", "phải");
         messagecontent = messagecontent.replace("hàg", "hàng");
-        messagecontent = messagecontent.replace("nhiu", "nhiêu");
+        messagecontent = messagecontent.replace(" nhiu ", " nhiêu ");
         //messagecontent = messagecontent.replace("lm", "làm");
         messagecontent = messagecontent.replace("hih", "hình");
         messagecontent = messagecontent.replace("jo", "giờ");

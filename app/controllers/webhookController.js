@@ -2742,7 +2742,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 if (result) {
                                                                     resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói trả góp đặc biệt (<span style='color:green'>0%</span> và <span style='color:red'>1%</span> lãi suất).</br>\
                                                                     (<span style='color:green'>0% lãi suất: </span> Gói trả góp đặc biệt, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br>\
-                                                                    (<span style='color:red'>1% lãi suất: </span> Gói trả góp đặc biệt, trả trước 0đ và chỉ chịu <span style='color:red'>1%</span> lãi suất). </br> ";
+                                                                    (<span style='color:red'>1% lãi suất: </span> Gói trả góp đặc biệt, trả trước 0đ và chỉ chịu <span style='color:red'>1%</span> lãi suất). </br>\
+                                                                     Lưu ý: <span style='color:purple'>Mã giảm giá không sử dụng cho gói trả góp 0%, 1%</span></br>";
                                                                     //send ds ctytc
                                                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                         .catch(console.error);
