@@ -28,7 +28,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 
-var severResponse = "http://45d3a129.ngrok.io/chatbot";
+var severResponse = "http://e6b58b98.ngrok.io/chatbot";
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -1542,6 +1542,14 @@ const getExactlyUrl = (currenturl) => {
     }
 }
 
+const Check1PTInstalment = (packageInfo) => {
+    for (var i = 0; i < packageInfo.length; i++) {
+        if (parseInt(packageInfo[i].GetFeatureInstallment2018Result.PercentInstallment) === 1) {
+            return true;
+        }
+    }
+    return false;
+}
 
 const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyobject, siteid) => {
     //console.log(url);
@@ -2608,10 +2616,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     if (subIntent === "briefsupport") {
                         resultanswer = "<p>Dạ, điều kiện giấy tờ trả góp của công ty tài chính là:</br>\
                     1. Đủ 20-60 tuổi</br>\
-                    2. Giấy tờ CMND không quá 15 năm, rõ hình, chữ</br>\
+                    2. Giấy tờ CMND bản gốc không quá 15 năm, rõ hình, chữ</br>\
                     <span style='color:red;'>Tùy theo gói trả góp sẽ có thêm yêu cầu giấy tờ:</span>  </br>\
                     3. Bằng lái xe (còn thời hạn)</br>\
-                    4. Sổ hộ khẩu (có tên người trả góp), chấp nhận bản photo có công chứng không quá 3 tháng (photo nguyên cuốn)</br>\
+                    4. Sổ hộ khẩu (có tên người trả góp), chấp nhận bản photo có công chứng không quá 3 tháng (photo nguyên cuốn) (vay trên 10 triệu mới cần sổ hộ khẩu)</br>\
                     5. Hóa đơn điện(cáp/nước/internet) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br>\
                     <span style='color:red;font-style:italic'>LƯU Ý: THỜI GIAN DUYỆT HỒ SƠ TỪ 4-14 TIẾNG Ạ.</span></p>";
                         SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -2620,7 +2628,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                     else if (subIntent === "how") {
                         resultanswer = "<p>Dạ, về thủ tục mua trả góp online: " + sessions[sessionId].gender + " chọn sản phẩm và gói trả góp phù hợp\
-                    ,sau đó đặt trên web và công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 4h-14h ạ. Sau đó, " + sessions[sessionId].gender + " mang giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
+                    ,sau đó đặt trên web, điền thông tin đầy đủ và chờ công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 4h-14h ạ. Sau đó, " + sessions[sessionId].gender + " mang giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
                     Hoặc "+ sessions[sessionId].gender + " có thể ra trực tiếp siêu thị TGDD để làm thủ tục trả góp luôn ạ.</p>";
                         // SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                         //     .catch(console.error);
@@ -2739,14 +2747,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                 (!ishavePercentInstalment && !ishaveMonthInstalment && !ishaveMoneyPrepaidInstalment && !sessions[sessionId].isLatestAskBrief &&
                                                                     !sessions[sessionId].isLatestAskMonthInstalment && !sessions[sessionId].isLatestAskPercentInstalment
                                                                     && !sessions[sessionId].isLatestAskNormalInstallment && !sessions[sessionId].isLatestAskCompanyForNormalInstalment)) {//đéo có concat gi het thi ném gói 0% ra chứ làm me gì
+                                                               // console.log("======result==========", result);
                                                                 if (result) {
-                                                                    resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói trả góp đặc biệt (<span style='color:green'>0%</span> và <span style='color:red'>1%</span> lãi suất).</br>\
-                                                                    (<span style='color:green'>0% lãi suất: </span> Gói trả góp đặc biệt, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br>\
-                                                                    (<span style='color:red'>1% lãi suất: </span> Gói trả góp đặc biệt, trả trước 0đ và chỉ chịu <span style='color:red'>1%</span> lãi suất). </br>\
-                                                                     Lưu ý: <span style='color:purple'>Mã giảm giá không sử dụng cho gói trả góp 0%, 1%</span></br>";
-                                                                    //send ds ctytc
-                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
-                                                                        .catch(console.error);
+
 
                                                                     // if (!sessions[sessionId].financialCompany) {
                                                                     //     questionTitle = "Mời " + sessions[sessionId].gender + " lựa chọn công ty tài chính cho vay để xem gói trả góp tương ứng!";
@@ -2785,10 +2788,34 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         SiteId: 1,
                                                                         InventStatusId: 1
                                                                     };
+
+
                                                                     APIGetInfoZeroInstalmentPackage(urlwcfProduct, argGetZeroPackage, function (packageInfo) {
                                                                         // console.log(packageInfo.GetFeatureInstallment2018Result);
 
                                                                         if (packageInfo && packageInfo.length > 0) {
+                                                                            console.log("=======packageInfo length======", packageInfo.length);
+
+                                                                            var resultCheck1PT = Check1PTInstalment(packageInfo);
+                                                                            console.log("=======resultCheck1PT======", resultCheck1PT);
+                                                                            if (resultCheck1PT) {
+                                                                                resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói trả góp đặc biệt (<span style='color:green'>0%</span> và <span style='color:red'>1%</span> lãi suất).</br>\
+                                                                                (<span style='color:green'>0% lãi suất: </span> Gói trả góp đặc biệt, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br>\
+                                                                                (<span style='color:red'>1% lãi suất: </span> Gói trả góp đặc biệt, trả trước 0đ và chỉ chịu <span style='color:red'>1%</span> lãi suất). </br>\
+                                                                                 Lưu ý: <span style='color:purple'>Mã giảm giá không sử dụng cho gói trả góp 0%, 1%</span></br>";
+                                                                                //send ds ctytc
+
+                                                                            }
+                                                                            else {
+                                                                                resultanswer += "<br />Sản phẩm " + productName + " hiện đang có gói trả góp đặc biệt (<span style='color:green'>0%</span> lãi suất).</br>\
+                                                                                (<span style='color:green'>0% lãi suất: </span> Gói trả góp đặc biệt, không phải chịu bất kỳ lãi suất nào từ công ty cho vay). </br>\
+                                                                                 Lưu ý: <span style='color:purple'>Mã giảm giá không sử dụng cho gói trả góp 0%</span></br>";
+                                                                                //send ds ctytc
+
+                                                                            }
+                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                                .catch(console.error);
+
                                                                             packageInfo.forEach(function (packageDetail) {
                                                                                 if (!packageDetail || !packageDetail.GetFeatureInstallment2018Result) return;
                                                                                 //console.log("======packageDetail======",packageDetail);
@@ -2816,10 +2843,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     SiteId: 1,
                                                                                     InventStatusId: 1
                                                                                 }
-                                                                                // console.log("=======THAM SO 0%==========",argsInstalmentResult);
+                                                                                 //console.log("=======THAM SO 0%==========",argsInstalmentResult);
 
                                                                                 APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
-                                                                                    //console.log(InstallmentResult);
+                                                                                    //console.log("===============InstallmentResult==================",InstallmentResult);
+
                                                                                     if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
                                                                                         console.log("=======packageDetail======", packageDetail.GetFeatureInstallment2018Result);
                                                                                         //=====================================================
@@ -4060,7 +4088,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                     else if (subIntent === "needdobrief_again") {
                         questionTitle = "Làm lại hồ sơ";
-                        resultanswer = "Dạ, trong trường hợp " + sessions[sessionId].gender + " đã mua trả góp rồi và giờ muốn mua trả góp nữa thì bắt buộc phải làm lại hồ sơ ạ. Xin thông tin đến " + sessions[sessionId].gender + ".";
+                        resultanswer = "Dạ, trong trường hợp " + sessions[sessionId].gender + " đã mua trả góp rồi và giờ muốn mua trả góp nữa thì bắt buộc phải làm lại hồ sơ , không sử dụng được hồ sơ cũ ạ. Xin thông tin đến " + sessions[sessionId].gender + ".";
 
                         SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+needdobrief_again", replyobject, siteid)
                             .catch(console.error);
@@ -4079,7 +4107,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     else if (subIntent === "briefphoto") {
                         questionTitle = "Giấy tờ photo công chứng";
                         resultanswer = "Dạ theo quy định trả góp thì: </br>\
-                     1. CMND cần phải là bản gốc, <span style='color:red'>không chấp nhận bản photo công chứng</span></br>\
+                     1. CMND bắt buộc phải là bản gốc, <span style='color:red'>không chấp nhận bản photo công chứng</span></br>\
                      2. Sổ hộ khẩu chấp nhận bản photo có công chứng không quá 3 tháng và phải đủ 16 trang (nguyên cuốn) ạ</br>";
 
 
