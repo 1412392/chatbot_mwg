@@ -21,14 +21,14 @@ module.exports = {
         messagecontent = messagecontent.replace("sámung", "samsung");
         messagecontent = messagecontent.replace("sam sung", "samsung");
         messagecontent = messagecontent.replace("mobistar", "mobiistar");
-        
+
         messagecontent = messagecontent.replace("xioami", "xiaomi");
         messagecontent = messagecontent.replace("xieomi", "xiaomi");
         messagecontent = messagecontent.replace("xaomi", "xiaomi");
         messagecontent = messagecontent.replace("láp top", "laptop");
         messagecontent = messagecontent.replace("loptop", "laptop");
-        
-        
+
+
         messagecontent = messagecontent.replace("appo", "oppo");
 
         messagecontent = messagecontent.replace("flush", "plus");
@@ -104,6 +104,8 @@ module.exports = {
         messagecontent = messagecontent.replace("zay", "vậy");
 
         messagecontent = messagecontent.replace(" ipat ", " ipad ");
+
+        messagecontent = messagecontent.replace(" duog", " duong");
 
         messagecontent = messagecontent.replace(/\n/g, '');
         if (!messagecontent.includes("nokia") && !messagecontent.includes("inch")) {

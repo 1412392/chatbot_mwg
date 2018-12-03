@@ -101,37 +101,37 @@ module.exports = {
 
         });
 
-        //================================================
-        //check file exist
-        checkFileExist(sessionID + ".txt", PATH).then(function (result) {
-            if (!result) {//file chưa tồn tại
-                writeFile(filename, message.fullname + "<br />" + "\n");
+        // //================================================
+        // //check file exist
+        // checkFileExist(sessionID + ".txt", PATH).then(function (result) {
+        //     if (!result) {//file chưa tồn tại
+        //         writeFile(filename, message.fullname + "<br />" + "\n");
 
-            }
+        //     }
 
-            setTimeout(function () {
+        //     setTimeout(function () {
 
-                if (who === 1) {
-                    if (!message.postbackobject.title) {
-                        writeFile(filename, "CUSTOMER-" + message.messageobject.content.replace(/\n/g, '') + "<br />" + "\n");
-                    }
-                    else {//postback
-                        writeFile(filename, "CUSTOMER-" + message.postbackobject.title + "<br />" + "\n");
-                    }
-                }
-                else {
-                    if (message && message.length < 2) return; //rác
-                    if (isAdminChat) {
-                        writeFile(filename, "ADMIN-" + message.messageobject.content.replace(/\n/g, '') + "<br />" + "\n");
-                    }
-                    else {
-                        writeFile(filename, "BOT-" + message + "<br />" + "\n");
-                    }
-                }
+        //         if (who === 1) {
+        //             if (!message.postbackobject.title) {
+        //                 writeFile(filename, "CUSTOMER-" + message.messageobject.content.replace(/\n/g, '') + "<br />" + "\n");
+        //             }
+        //             else {//postback
+        //                 writeFile(filename, "CUSTOMER-" + message.postbackobject.title + "<br />" + "\n");
+        //             }
+        //         }
+        //         else {
+        //             if (message && message.length < 2) return; //rác
+        //             if (isAdminChat) {
+        //                 writeFile(filename, "ADMIN-" + message.messageobject.content.replace(/\n/g, '') + "<br />" + "\n");
+        //             }
+        //             else {
+        //                 writeFile(filename, "BOT-" + message + "<br />" + "\n");
+        //             }
+        //         }
 
-            }, 1000);
+        //     }, 1000);
 
-        });
+        // });
 
 
         var status = true;
