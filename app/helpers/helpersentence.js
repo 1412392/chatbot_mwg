@@ -21,13 +21,18 @@ module.exports = {
         messagecontent = messagecontent.replace("sámung", "samsung");
         messagecontent = messagecontent.replace("sam sung", "samsung");
         messagecontent = messagecontent.replace("mobistar", "mobiistar");
+        messagecontent = messagecontent.replace(" realmi", " realme");
+        messagecontent = messagecontent.replace(" reamed", " realme");
+        messagecontent = messagecontent.replace(" relmi", " realme");
+
+        messagecontent = messagecontent.replace(" ịhone", " iphone");
 
         messagecontent = messagecontent.replace("xioami", "xiaomi");
         messagecontent = messagecontent.replace("xieomi", "xiaomi");
         messagecontent = messagecontent.replace("xaomi", "xiaomi");
         messagecontent = messagecontent.replace("láp top", "laptop");
         messagecontent = messagecontent.replace("loptop", "laptop");
-
+        messagecontent = messagecontent.replace("lap top", "laptop");
 
         messagecontent = messagecontent.replace("appo", "oppo");
 
@@ -106,6 +111,11 @@ module.exports = {
         messagecontent = messagecontent.replace(" ipat ", " ipad ");
 
         messagecontent = messagecontent.replace(" duog", " duong");
+        messagecontent = messagecontent.replace(" máy tính bản", " máy tính bảng");
+        messagecontent = messagecontent.replace(" homerit", "home credit");
+        messagecontent = messagecontent.replace(" 0₫", "0đ");
+        messagecontent = messagecontent.replace("coire", "core");
+
 
         messagecontent = messagecontent.replace(/\n/g, '');
         if (!messagecontent.includes("nokia") && !messagecontent.includes("inch")) {
