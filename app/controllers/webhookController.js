@@ -31,7 +31,7 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
-var serverChatwithBot = "http://172.16.3.123:3000/";
+var serverChatwithBot = "http://a9d77722.ngrok.io/";
 
 var severResponse = "http://32544617.ngrok.io/chatbot";
 
