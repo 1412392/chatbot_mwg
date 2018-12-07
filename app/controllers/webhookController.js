@@ -15,6 +15,8 @@ var fetchTimeout = require('fetch-timeout');
 var helpersentence = require('../helpers/helpersentence');
 
 const ERRORFILE_PATH = "/home/tgdd/error_logs_chatmodule/errorlogs.txt";
+
+const MODULE_CHATWITHBOT = "CHATWITHBOT";
 // var LineAPI =require('line-api');
 // const lineconfig = {
 //     channelAccessToken: "OF/JLbPlLNPPK1z65/CYKHYcmxICRDPRZ/5mv+uf5nc8svIORfM/9fT/zH/f4h00SA2XA5+xXKNPgxep0dQlP8VIF3K2iBOgWcunGCzcWvkLeZhESgk8V/FMtIQS0RKaWZ0RcsSpkrhH0JbV3catwAdB04t89/1O/w1cDnyilFU=",
@@ -29,8 +31,10 @@ var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNw
 
 var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
+var serverChatwithBot = "http://172.16.3.123:3000/";
 
-var severResponse = "http://e6b58b98.ngrok.io/chatbot";
+var severResponse = "http://32544617.ngrok.io/chatbot";
+
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
 
@@ -139,7 +143,7 @@ const findOrCreateSession = (fbid) => {
 };
 
 
-const SentToClientButton = (id, text, intent) => {
+const SentToClientButton = (id, text, intent, replyobject) => {
     //console.log("============SentToClientButton===============");
     if (!intent.includes("ask_instalment")) {
         return new Promise((resolve, reject) => {
@@ -169,24 +173,44 @@ const SentToClientButton = (id, text, intent) => {
 
     jsonparse.messageID = messageID;
 
-    //console.log(text);
-    return fetch(severResponse, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(jsonparse),
-        json: true
-    })
-        .then(rsp => rsp.json())
-        .then(json => {
-            if (json.error && json.error.message) {
-                //throw new Error(json.error.message);
-            }
 
-            //return json;
-        });
+    //sendtochatwithbot
+    if (replyobject.chatmodule && replyobject.chatmodule === MODULE_CHATWITHBOT) {
+        return fetch(serverChatwithBot, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonparse),
+            json: true
+        })
+            .then(rsp => rsp.json())
+            .then(json => {
+                if (json.error && json.error.message) {
+                    //throw new Error(json.error.message);
+                }
 
+                return json;
+            });
+    }
+    else {
+        return fetch(severResponse, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonparse),
+            json: true
+        })
+            .then(rsp => rsp.json())
+            .then(json => {
+                if (json.error && json.error.message) {
+                    //throw new Error(json.error.message);
+                }
+
+                return json;
+            });
+    }
 
 };
 
@@ -354,22 +378,42 @@ const SentToClient = (id, text, questionTitle, state, intent, replyobject, sitei
     //console.log("================================");
     //console.log(body);
 
-    return fetch(severResponse, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: body,
-        json: true
-    })
-        .then(rsp => rsp.json())
-        .then(json => {
-            if (json.error && json.error.message) {
-                //throw new Error(json.error.message);
-            }
+    if (replyobject.chatmodule && replyobject.chatmodule === MODULE_CHATWITHBOT) {
+        return fetch(serverChatwithBot, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: body,
+            json: true
+        }).then(rsp => rsp.json())
+            .then(json => {
+                if (json.error && json.error.message) {
+                    //throw new Error(json.error.message);
+                }
 
-            //return json;
-        });
+                return json;
+            });
+    }
+    else {
+        return fetch(severResponse, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: body,
+            json: true
+        }).then(rsp => rsp.json())
+            .then(json => {
+                if (json.error && json.error.message) {
+                    //throw new Error(json.error.message);
+                }
+
+                return json;
+            });
+    }
+
+
 
 
 };
@@ -433,7 +477,7 @@ function SendToUserListColor(productID, productName, sender, siteid, replyobject
             sessions[sessionId].colorname = null;
 
             setTimeout(() => {
-                SentToClientButton(sender, bodyjson, intent)
+                SentToClientButton(sender, bodyjson, intent, replyobject)
                     .catch(console.error);
             }, 1500);
 
@@ -518,7 +562,7 @@ function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobje
                     console.log(bodyjson);
 
 
-                    SentToClientButton(sender, bodyjson, intent)
+                    SentToClientButton(sender, bodyjson, intent, replyobject)
                         .catch(console.error);
                 }
 
@@ -573,9 +617,19 @@ const fbEvaluate = (id, replyobject, siteid) => {
 
     tracechat.logChatHistory(id, contentlogs, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
 
+    fetch(serverChatwithBot, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: body,
+        json: true
+    })
+        .then((rsp) => {
 
+        });
     //
-    return fetch(severResponse, {
+    fetch(severResponse, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -591,6 +645,7 @@ const fbEvaluate = (id, replyobject, siteid) => {
 
             return json;
         });
+
 
 
 };
@@ -2641,7 +2696,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                 //send button briefsupport
                                 var jsonbuttonBrief = getButtonBriefSupport(sender, siteid, replyobject, resultanswer);
                                 setTimeout(() => {
-                                    SentToClientButton(sender, jsonbuttonBrief, "ask_instalment+how")
+                                    SentToClientButton(sender, jsonbuttonBrief, "ask_instalment+how", replyobject)
                                         .catch(console.error);
 
                                 }, 100);
@@ -2752,7 +2807,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         (!ishavePercentInstalment && !ishaveMonthInstalment && !ishaveMoneyPrepaidInstalment && !sessions[sessionId].isLatestAskBrief &&
                                                                             !sessions[sessionId].isLatestAskMonthInstalment && !sessions[sessionId].isLatestAskPercentInstalment
                                                                             && !sessions[sessionId].isLatestAskNormalInstallment && !sessions[sessionId].isLatestAskCompanyForNormalInstalment)) {//đéo có concat gi het thi ném gói 0% ra chứ làm me gì
-                                                                        // console.log("======result==========", result);
+                                                                         console.log("======result==========", result);
                                                                         if (result) {
 
 
@@ -2906,7 +2961,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                 var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, resultanswer, productPrice);
 
                                                                                                 setTimeout(() => {
-                                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment", replyobject)
                                                                                                         .catch(console.error);
 
                                                                                                 }, 100);
@@ -2933,7 +2988,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, questionTitle);
 
                                                                                     setTimeout(() => {
-                                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment", replyobject)
                                                                                             .catch(console.error);
 
                                                                                     }, 700);
@@ -3034,7 +3089,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             //     .catch(console.error);
 
                                                                             setTimeout(() => {
-                                                                                SentToClientButton(sender, jsonbuttonBrief, intent)
+                                                                                SentToClientButton(sender, jsonbuttonBrief, intent, replyobject)
                                                                                     .catch(console.error);
                                                                             }, 600)
 
@@ -3042,7 +3097,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             return;
 
                                                                         }
-                                                                        else if ((sessions[sessionId].percent_instalment === null || typeof sessions[sessionId].percent_instalment === "undefined") || sessions[sessionId].isLatestAskPercentInstalment) {
+                                                                        else if ((sessions[sessionId].percent_instalment === null ||isNaN(sessions[sessionId].percent_instalment)|| typeof sessions[sessionId].percent_instalment === "undefined") || sessions[sessionId].isLatestAskPercentInstalment) {
 
                                                                             resultanswer = "<br/><span style='font-style:italic;'>" + sessions[sessionId].gender + "  muốn trả trước bao nhiêu %? </span></br>";
                                                                             sessions[sessionId].isLatestAskPercentInstalment = true;
@@ -3140,7 +3195,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                         sessions[sessionId].isBeforeAskeMonthInstalment = false;
 
                                                                                         setTimeout(() => {
-                                                                                            SentToClientButton(sender, jsonbuttonMI, "ask_instalment")
+                                                                                            SentToClientButton(sender, jsonbuttonMI, "ask_instalment", replyobject)
                                                                                                 .catch(console.error);
                                                                                         }, 600)
 
@@ -3306,7 +3361,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                 var anotheroptionbutton = AnotherOptionInstalment(sender, siteid, replyobject, resultanswer, productPrice);
 
                                                                                                 setTimeout(() => {
-                                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment", replyobject)
                                                                                                         .catch(console.error);
 
                                                                                                 }, 100);
@@ -3596,7 +3651,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                                                                                                         setTimeout(() => {
-                                                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment")
+                                                                                                            SentToClientButton(sender, anotheroptionbutton, "ask_instalment", replyobject)
                                                                                                                 .catch(console.error);
 
                                                                                                         }, 400);
@@ -3749,7 +3804,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                     }
                                                                     setTimeout(() => {
-                                                                        SentToClientButton(sender, jsonbuttonInstalment, "ask_instalment+issupportinstalment")
+                                                                        SentToClientButton(sender, jsonbuttonInstalment, "ask_instalment+issupportinstalment", replyobject)
                                                                             .catch(console.error);
 
                                                                     }, 100);
@@ -3913,7 +3968,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                                                                 setTimeout(() => {
-                                                                    SentToClientButton(sender, jsonbuttonMI, "ask_instalment")
+                                                                    SentToClientButton(sender, jsonbuttonMI, "ask_instalment", replyobject)
                                                                         .catch(console.error);
                                                                 }, 600)
 
@@ -4021,7 +4076,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     var anotheroptionbutton = AnotherOptionNormalInstalment0d(sender, siteid, replyobject, resultanswer);
 
                                                                                     setTimeout(() => {
-                                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d")
+                                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d", replyobject)
                                                                                             .catch(console.error);
 
                                                                                     }, 500);
@@ -4038,7 +4093,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     var anotheroptionbutton = AnotherOptionNormalInstalment0d(sender, siteid, replyobject, resultanswer);
 
                                                                                     setTimeout(() => {
-                                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d")
+                                                                                        SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d", replyobject)
                                                                                             .catch(console.error);
 
                                                                                     }, 500);
@@ -4057,7 +4112,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                 var anotheroptionbutton = AnotherOptionNormalInstalment0d(sender, siteid, replyobject, questionTitle);
 
                                                                                 setTimeout(() => {
-                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d")
+                                                                                    SentToClientButton(sender, anotheroptionbutton, "ask_instalment+package0d", replyobject)
                                                                                         .catch(console.error);
 
                                                                                 }, 800);
@@ -4144,7 +4199,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         Do vậy, "+ sessions[sessionId].gender + " có thể nhờ người thân hoặc bạn bè đủ từ 20 đến 60 tuổi đứng tên làm hồ sơ giúp " + sessions[sessionId].gender + " ạ";
                                 var jsonbuttonBrief = getButtonBriefSupport(sender, siteid, replyobject, resultanswer);
                                 setTimeout(() => {
-                                    SentToClientButton(sender, jsonbuttonBrief, "ask_instalment+agecondition")
+                                    SentToClientButton(sender, jsonbuttonBrief, "ask_instalment+agecondition", replyobject)
                                         .catch(console.error);
 
                                 }, 100);
@@ -4402,7 +4457,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             //console.log(bodyjson);
 
 
-                                                                            SentToClientButton(sender, bodyjson, intent)
+                                                                            SentToClientButton(sender, bodyjson, intent, replyobject)
                                                                                 .catch(console.error);
 
 
@@ -4545,7 +4600,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
 
-                                                                                SentToClientButton(sender, bodyjson, intent)
+                                                                                SentToClientButton(sender, bodyjson, intent, replyobject)
                                                                                     .catch(console.error);
 
                                                                                 //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -4665,7 +4720,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         var bodyjson = JSON.stringify(jsonmessageDistrict);
 
                                                                         //console.log(bodyjson);
-                                                                        SentToClientButton(sender, bodyjson, intent)
+                                                                        SentToClientButton(sender, bodyjson, intent, replyobject)
                                                                             .catch(console.error);
                                                                     }
 
@@ -4720,7 +4775,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             var bodyjson = JSON.stringify(jsonmessageDistrict);
 
                                                                             //console.log(bodyjson);
-                                                                            SentToClientButton(sender, bodyjson, intent)
+                                                                            SentToClientButton(sender, bodyjson, intent, replyobject)
                                                                                 .catch(console.error);
                                                                         }
 
@@ -4885,7 +4940,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
         }
         catch (err) {
             logerror.WriteLogToFile(ERRORFILE_PATH, "Error at 4887: " + err);
-            
+
         }
     });
 
@@ -5001,7 +5056,7 @@ const responseRepeatChooseFinancialCompany = (sender, sessionId, button_payload_
         //console.log(jsonbuttonFinancialCompany);
         sessions[sessionId].isLatestAskCompanyForNormalInstalment = false;
 
-        SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment")
+        SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment", replyobject)
             .catch(console.error);
     }
     else {
@@ -5029,7 +5084,7 @@ const responseRepeatChooseFinancialCompany_NormalInstalment = (sender, sessionId
         //session phân biệt đang chọn company cho gói trả góp thường
         sessions[sessionId].isLatestAskCompanyForNormalInstalment = true;
 
-        SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment")
+        SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment", replyobject)
             .catch(console.error);
     }
     else {
