@@ -33,7 +33,7 @@ var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 var serverChatwithBot = "http://172.16.3.123:3000/";
 
-var severResponse = "http://32544617.ngrok.io/chatbot";
+var severResponse = "http://6202338b.ngrok.io/chatbot";
 
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
@@ -1039,6 +1039,38 @@ function APIGetSeoURLProduct(url, args, fn) {
 }
 
 
+const GetShockPriceByProductID = (productID) => {
+    var args = {
+        ProductID: productID
+    }
+    return new Promise((resolve, reject) => {
+        soap.createClient(urlApiProduct, function (err, client) {
+            client.GetShockPrice(args, function (err, result) {
+                if (err) reject(err);
+                // console.log("==========shock price========");
+                // console.log(result);
+
+                if (result && result.GetShockPriceResult) {
+                    if (Date.parse(result.GetShockPriceResult.showWebFromDateField) <= new Date().getTime() &&
+                        Date.parse(result.GetShockPriceResult.showWebToDateField) >= new Date().getTime()) {
+                        var priceDiscount = parseFloat(result.GetShockPriceResult.discountValueField);
+                        // console.log(priceDiscount);
+                        resolve(priceDiscount);
+                    }
+                    else {
+                        resolve(0);
+                    }
+
+                }
+                else {
+                    resolve(0);
+                }
+
+            });
+        });
+    })
+
+}
 
 function APIGetProductDetail(url, args, fn) {
     soap.createClient(url, function (err, client) {
@@ -1051,8 +1083,19 @@ function APIGetProductDetail(url, args, fn) {
             // console.log(productDetail);
 
             //resultanswer=ChangeResultAnswer(productDetail);
+            //lay giá sốc
+            var shockPrice = GetShockPriceByProductID(args.intProductID).then((shockprice) => {
+                console.log("shockprice", shockprice);
+                if (productDetail) {
+                    productDetail.shockPriceByProductID = shockprice;
+                }
 
-            fn(productDetail);
+                fn(productDetail);
+            }).catch(err => {
+                fn(null);
+            });
+
+
             // self.resultanswer+="Sản phẩm: "+productDetail.GetProductDetailBySiteIDResult.ProductName+"<br />"+
             // "Giá: "+productDetail.GetProductDetailBySiteIDResult.ExpectedPrice;
 
@@ -2370,7 +2413,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                 resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
 
                                                 if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                                    resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                                    resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh/span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -2433,7 +2476,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                         }
 
                                         else {
-                                            resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>NGỪNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                            resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>ngừng kinh doanh/span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                 .catch(console.error);
                                         }
@@ -2679,7 +2722,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     2. Giấy tờ CMND bản gốc không quá 15 năm, rõ hình, chữ</br>\
                     <span style='color:red;'>Tùy theo gói trả góp sẽ có thêm yêu cầu giấy tờ:</span>  </br>\
                     3. Bằng lái xe (còn thời hạn)</br>\
-                    4. Sổ hộ khẩu (có tên người trả góp), chấp nhận bản photo có công chứng không quá 3 tháng (photo nguyên cuốn) (vay trên 10 triệu mới cần sổ hộ khẩu)</br>\
+                    4. Sổ hộ khẩu (có tên người trả góp), chấp nhận bản photo có công chứng không quá 3 tháng (photo nguyên cuốn) (trả góp 0đ và vay trên 10 triệu mới cần sổ hộ khẩu)</br>\
                     5. Hóa đơn điện(cáp/nước/internet) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br>\
                     <span style='color:red;font-style:italic'>LƯU Ý: THỜI GIAN DUYỆT HỒ SƠ TỪ 4-14 TIẾNG Ạ.</span></p>";
                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -2765,10 +2808,22 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                     //console.log(result);
                                                     var categoryID = parseInt(result.GetProductResult.categoryIDField);
+                                                    var discountShockPrice = result.shockPriceByProductID;
 
-                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
-                                                        + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>Không xác định</span>") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
-                                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+
+                                                    productName = result.GetProductResult.productNameField;
+                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />";
+                                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/></br>";
+
+                                                    resultanswer += (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>*Không xác định được giá</span>") :
+                                                        ("*Giá gốc: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
+
+                                                    if (result.shockPriceByProductID > 0) {
+                                                        resultanswer += "</br><span style='color:#ec750f'>*Giá sốc Online (không áp dụng kèm Khuyến mãi khác và trả góp 0%-1.29%)</span>: " + "<span style='font-weight:bold'>" + (parseFloat(result.GetProductResult.productErpPriceBOField.priceField) - parseFloat(result.shockPriceByProductID)).toLocaleString() + " đ" + "</span>";
+
+                                                    }
+
+
                                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                                     //  console.log(resultanswer);
 
@@ -2776,13 +2831,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
                                                         console.log(result.GetProductResult.productErpPriceBOField.webStatusIdField);
                                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                 .catch(console.error);
                                                         }
                                                         else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>CHƯA CÓ HÀNG</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                 .catch(console.error);
@@ -2807,7 +2862,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         (!ishavePercentInstalment && !ishaveMonthInstalment && !ishaveMoneyPrepaidInstalment && !sessions[sessionId].isLatestAskBrief &&
                                                                             !sessions[sessionId].isLatestAskMonthInstalment && !sessions[sessionId].isLatestAskPercentInstalment
                                                                             && !sessions[sessionId].isLatestAskNormalInstallment && !sessions[sessionId].isLatestAskCompanyForNormalInstalment)) {//đéo có concat gi het thi ném gói 0% ra chứ làm me gì
-                                                                         console.log("======result==========", result);
+                                                                        console.log("======result==========", result);
                                                                         if (result) {
 
 
@@ -2946,7 +3001,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                 var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
                                                                                                 resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[packageDetail.GetFeatureInstallment2018Result.BriefId - 1] + "</span>" + "</br>";
 
-                                                                                                resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                                //resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
                                                                                                 resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
 
                                                                                                 resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
@@ -3097,7 +3152,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             return;
 
                                                                         }
-                                                                        else if ((sessions[sessionId].percent_instalment === null ||isNaN(sessions[sessionId].percent_instalment)|| typeof sessions[sessionId].percent_instalment === "undefined") || sessions[sessionId].isLatestAskPercentInstalment) {
+                                                                        else if ((sessions[sessionId].percent_instalment === null || isNaN(sessions[sessionId].percent_instalment) || typeof sessions[sessionId].percent_instalment === "undefined") || sessions[sessionId].isLatestAskPercentInstalment) {
 
                                                                             resultanswer = "<br/><span style='font-style:italic;'>" + sessions[sessionId].gender + "  muốn trả trước bao nhiêu %? </span></br>";
                                                                             sessions[sessionId].isLatestAskPercentInstalment = true;
@@ -3346,7 +3401,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                 var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
                                                                                                 resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[packageDetail.GetFeatureInstallment2018Result.BriefId - 1] + "</span>" + "</br>";
 
-                                                                                                resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                                //resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
                                                                                                 resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
 
                                                                                                 resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
@@ -3402,8 +3457,15 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                             var bIsNotApplyPromoHC = false;
                                                                                             bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
                                                                                             console.log("========bIsNotApplyPromoHC====", bIsNotApplyPromoHC);
-                                                                                            if (bIsNotApplyPromoHC)
+                                                                                            if (discountShockPrice === 0 && bIsNotApplyPromoHC)
                                                                                                 productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
+
+                                                                                            //nếu sản phẩm có giá sốc=> ưu tiên trả góp giá sốc online (giá sốc sẽ không lấy bất kỳ km nào khác cả)
+                                                                                            if (discountShockPrice > 0) {
+                                                                                                productPrice = productPrice + discountPrice;//trả về km cho gói không phải gs (nếu có)
+                                                                                                productPrice = productPrice - discountShockPrice;//trừ giá sốc
+
+                                                                                            }
 
 
                                                                                             //=====================================================
@@ -3426,11 +3488,16 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                 if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
                                                                                                     resultanswer += "</br>Thông tin gói trả góp của " + (InstallmentResult.GetInstallmentResult2018Result.CompanyID === 1 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + "</br>";
                                                                                                     var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
-                                                                                                    resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
-                                                                                                    if (discountPrice > 0) {
+                                                                                                    resultanswer += "*Giá trả góp (sau khi trừ KM nếu có, ưu tiên giá sốc nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
+                                                                                                    if (discountShockPrice === 0 && discountPrice > 0 && !bIsNotApplyPromoHC) {
                                                                                                         resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(discountPrice.toString()) + "đ</span>" + "</br>";
 
                                                                                                     }
+                                                                                                    if (discountShockPrice > 0) {
+                                                                                                        resultanswer += "*Được hưởng giảm giá sốc: <span style='font-weight:bold'>" + format_currency(discountShockPrice.toString()) + "đ</span>" + "</br>";
+
+                                                                                                    }
+
 
                                                                                                     resultanswer += "*Số tiền trả trước: <span style='font-weight:bold'>" + format_currency(moneyPrepaid.toString()) + "đ</span>" + " (" + InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom + "%)</br>";
 
@@ -3462,7 +3529,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                     var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
                                                                                                     resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[InstallmentResult.GetInstallmentResult2018Result.BriefId - 1] + "</span>" + "</br>";
 
-                                                                                                    resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                                    // resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
                                                                                                     resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
 
                                                                                                     resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
@@ -3515,10 +3582,15 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                     productPrice = productPrice - discountPrice;
                                                                                                     var bIsNotApplyPromoHC = false;
                                                                                                     bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
-                                                                                                    if (bIsNotApplyPromoHC)
+                                                                                                    if (discountShockPrice === 0 && bIsNotApplyPromoHC)
                                                                                                         productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
 
+                                                                                                    //nếu sản phẩm có giá sốc=> ưu tiên trả góp giá sốc online (giá sốc sẽ không lấy bất kỳ km nào khác cả)
+                                                                                                    if (discountShockPrice > 0) {
+                                                                                                        productPrice = productPrice + discountPrice;//trả về km cho gói không phải gs (nếu có)
+                                                                                                        productPrice = productPrice - discountShockPrice;//trừ giá sốc
 
+                                                                                                    }
                                                                                                     //=====================================================
                                                                                                     var newargsInstalmentResult = {
                                                                                                         CategoryId: categoryID,
@@ -3539,9 +3611,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                         if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
                                                                                                             resultanswer += "</br>Thông tin gói trả góp của " + (InstallmentResult.GetInstallmentResult2018Result.CompanyID === 1 ? "<span style='color:red;font-weight:bold'>Home Credit</span>" : "<span style='color:green;font-weight:bold'>FE Credit</span>") + "</br>";
                                                                                                             var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
-                                                                                                            resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
-                                                                                                            if (discountPrice > 0) {
+                                                                                                            resultanswer += "*Giá trả góp (sau khi trừ KM nếu có, ưu tiên giá sốc online nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
+                                                                                                            if (discountShockPrice === 0 && discountPrice > 0 && !bIsNotApplyPromoHC) {
                                                                                                                 resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(discountPrice.toString()) + "đ</span>" + "</br>";
+
+                                                                                                            }
+                                                                                                            if (discountShockPrice > 0) {
+                                                                                                                resultanswer += "*Được hưởng giảm giá sốc: <span style='font-weight:bold'>" + format_currency(discountShockPrice.toString()) + "đ</span>" + "</br>";
 
                                                                                                             }
 
@@ -3572,7 +3648,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                             var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
                                                                                                             resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[InstallmentResult.GetInstallmentResult2018Result.BriefId - 1] + "</span>" + "</br>";
 
-                                                                                                            resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                                            // resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
                                                                                                             resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
 
                                                                                                             resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
@@ -3693,7 +3769,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                 }
 
                                                 else {
-                                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG CÓ HÀNG</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>không có hàng</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
                                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                         .catch(console.error);
                                                 }
@@ -3766,21 +3842,28 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     //console.log(result);
                                                     var categoryID = parseInt(result.GetProductResult.categoryIDField);
 
-                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
-                                                        + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>Không xác định</span>") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
-                                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />";
+                                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/></br>";
+
+                                                    resultanswer += (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>*Không xác định được giá</span>") :
+                                                        ("*Giá gốc: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
+
+                                                    if (result.shockPriceByProductID > 0) {
+                                                        resultanswer += "</br><span style='color:#ec750f'>*Giá sốc Online (không áp dụng kèm Khuyến mãi khác và trả góp 0%-1.29%)</span>: " + "<span style='font-weight:bold'>" + (parseFloat(result.GetProductResult.productErpPriceBOField.priceField) - parseFloat(result.shockPriceByProductID)).toLocaleString() + " đ" + "</span>";
+
+                                                    }
 
                                                     APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
                                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
                                                         console.log(result.GetProductResult.productErpPriceBOField.webStatusIdField);
                                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                 .catch(console.error);
                                                         }
                                                         else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>CHƯA CÓ HÀNG</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                                 .catch(console.error);
@@ -3819,7 +3902,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     });
                                                 }
                                                 else {
-                                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG CÓ HÀNG</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>không có hàng</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
                                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                         .catch(console.error);
                                                 }
@@ -3849,7 +3932,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             else if (subIntent === "package0d") {
                                 questionTitle = "Trả trước 0đ";
                                 if (!sessions[sessionId].product) {
-                                    resultanswer = "Dạ, mua trả trước 0đ cần <span style='color:red'>Hộ Khẩu + CMND</span> và các sản phẩm tầm giá từ 2 triệu - 25 triệu đều hỗ trợ trả trước 0đ qua công ty <span style='color:green'>FE Credit</span> nha " + sessions[sessionId].gender + ", nhưng lãi suất sẽ tương đối cao ạ. Không biết " + sessions[sessionId].gender + " quan tâm đến\
+                                    resultanswer = "Dạ, mua trả trước 0đ (nghĩa là không có tiền vẫn mua máy được) cần <span style='color:red'>Hộ Khẩu + CMND</span> và các sản phẩm tầm giá từ 2 triệu - 25 triệu đều hỗ trợ trả trước 0đ qua công ty <span style='color:green'>FE Credit</span> nha " + sessions[sessionId].gender + ", nhưng lãi suất sẽ tương đối cao ạ. Không biết " + sessions[sessionId].gender + " quan tâm đến\
                      trả trước 0đ cho sản phẩm nào ạ? Em sẽ tính giúp "+ sessions[sessionId].gender + " thông tin trả góp";
                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                         .catch(console.error);
@@ -3912,9 +3995,18 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     var productPrice = parseFloat(result.GetProductResult.productErpPriceBOField.priceField);
                                                     var productNameField = result.GetProductResult.productNameField;
                                                     var productOriginPrice = parseFloat(result.GetProductResult.productErpPriceBOField.priceField);
-                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
-                                                        + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>Không xác định</span>") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
-                                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
+                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />";
+                                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/></br>";
+
+                                                    resultanswer += (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>*Không xác định được giá</span>") :
+                                                        ("*Giá gốc: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
+
+                                                    if (result.shockPriceByProductID > 0) {
+                                                        resultanswer += "</br><span style='color:#ec750f'>*Giá sốc Online (không áp dụng kèm Khuyến mãi khác và trả góp 0%-1.29%)</span>: " + "<span style='font-weight:bold'>" + (parseFloat(result.GetProductResult.productErpPriceBOField.priceField) - parseFloat(result.shockPriceByProductID)).toLocaleString() + " đ" + "</span>";
+
+                                                    }
+                                                    var discountShockPrice = result.shockPriceByProductID;
+
                                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                                     //  console.log(resultanswer);
 
@@ -3922,13 +4014,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
 
                                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                                                 .catch(console.error);
                                                         }
                                                         else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>CHƯA CÓ HÀNG</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                                             SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                                                 .catch(console.error);
@@ -4001,9 +4093,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                         productPrice = productPrice - discountPrice;
                                                                         var bIsNotApplyPromoHC = false;
                                                                         bIsNotApplyPromoHC = IsSystemPromoNotApplyForCompany(productDetail, InstallmentResult.GetInstallmentResult2018Result.ErpInstallmentId);
-                                                                        if (bIsNotApplyPromoHC)
+                                                                        if (discountShockPrice === 0 && bIsNotApplyPromoHC)
                                                                             productPrice = productPrice + discountPrice; //trả lại giá trị trước khuyến mãi
+                                                                        //nếu sản phẩm có giá sốc=> ưu tiên trả góp giá sốc online (giá sốc sẽ không lấy bất kỳ km nào khác cả)
+                                                                        if (discountShockPrice > 0) {
+                                                                            productPrice = productPrice + discountPrice;//trả về km cho gói không phải gs (nếu có)
+                                                                            productPrice = productPrice - discountShockPrice;//trừ giá sốc
 
+                                                                        }
 
                                                                         //=====================================================
                                                                         var newargsInstalmentResult = {
@@ -4028,12 +4125,15 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     resultanswer += "Giá gốc: <span style='font-weight:bold'>" + format_currency(productOriginPrice.toString()) + "đ</span></br>";
 
                                                                                     var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
-                                                                                    resultanswer += "*Giá trả góp (sau khi trừ KM nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
-                                                                                    if (discountPrice > 0) {
+                                                                                    resultanswer += "*Giá trả góp (sau khi trừ KM nếu có, ưu tiên giá sốc nếu có): <span style='font-weight:bold;color:red'>" + format_currency(productPrice.toString()) + "đ</span></br>";
+                                                                                    if (discountShockPrice === 0 && discountPrice > 0 && !bIsNotApplyPromoHC) {
                                                                                         resultanswer += "*Được áp dụng khuyễn mãi giảm tiền: <span style='font-weight:bold'>" + format_currency(discountPrice.toString()) + "đ</span>" + "</br>";
 
                                                                                     }
+                                                                                    if (discountShockPrice > 0) {
+                                                                                        resultanswer += "*Được hưởng giảm giá sốc: <span style='font-weight:bold'>" + format_currency(discountShockPrice.toString()) + "đ</span>" + "</br>";
 
+                                                                                    }
                                                                                     resultanswer += "*Số tiền trả trước: <span style='font-weight:bold'>" + format_currency(moneyPrepaid.toString()) + "đ</span>" + " (" + InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom + "%)</br>";
 
                                                                                     //tinh so tien tra gop hàng tháng=(giá-sttt)/sothangtragop+tienphiht
@@ -4061,7 +4161,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     var newToDate = ToDate[2] + "/" + ToDate[1] + "/" + ToDate[0];
                                                                                     resultanswer += "*Yêu cầu giấy tờ: <span style='font-weight:bold'>" + listBriefID[InstallmentResult.GetInstallmentResult2018Result.BriefId - 1] + "</span>" + "</br>";
 
-                                                                                    resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
+                                                                                    //resultanswer += "*Thời gian áp dụng: <span style='font-weight:bold'> Từ " + newFromDate + " Đến " + newToDate + "</br>";
                                                                                     resultanswer += "*Lưu ý: NỘP TRỄ</br>" + "<span style='font-style:italic;color:#09892d'" + "Phí phạt góp trễ:</br>#1 - 4 ngày: Không phạt.</br>#5 - 29 ngày: 150.000đ.</br>#Phí thanh lý sớm hợp đồng: 15% tính trên số tiền gốc còn lại.</br>#Số tiền góp mỗi tháng đã bao gồm phí giao dịch ngân hàng 13.000đ và phí bảo hiểm khoản vay" + "</span>" + "</br>";
 
                                                                                     resultanswer += "<span style='color:red;font-style:italic;font-size:12px;'>Lưu ý: Số tiền thực tế có thể chênh lệch đến 10.000đ.</span>";
@@ -4127,7 +4227,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     });
                                                 }
                                                 else {
-                                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG CÓ HÀNG</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>không có hàng</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
                                                     SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                                         .catch(console.error);
                                                     return;
@@ -4353,7 +4453,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                     if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
                                                         (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
-                                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>NGỪNG KINH DOANH</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                                         SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)

@@ -5,6 +5,13 @@ const MatchPattern_J = (messagecontent) => {
     return patt.test(messagecontent);
 
 }
+const MatchPattern_PT = (messagecontent) => {//match với pattern xx%
+    var pattern = "\\b\\s+\\d*\\s*%\\b";
+    var patt = new RegExp(pattern);
+    return patt.test(messagecontent);
+
+}
+
 
 module.exports = {
     ReplaceNonsenWord: function (messagecontent) {
@@ -75,6 +82,23 @@ module.exports = {
             //kiểm tra pattern j 8plus...
             if (!MatchPattern_J(messagecontent)) {
                 messagecontent = messagecontent.replace(" j ", " gì ");
+            }
+        }
+
+        if (messagecontent.includes("%")) {
+            if (MatchPattern_PT(messagecontent)) {
+                try {
+                    var value = messagecontent.match("\\b\\s+\\d*\\s*%\\b")
+                    if (value && value.length > 0) {
+                        var match = value[0];
+                        if (match) {
+                            messagecontent = messagecontent.replace(match, " " + match + " ");
+                        }
+                    }
+
+                } catch (error) {
+
+                }
             }
         }
 
