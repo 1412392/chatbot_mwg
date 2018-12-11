@@ -2081,6 +2081,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                     if (entities[i].entity === "instalment_percent") {
                         try {
+                            if (entities[i].value === "o%")//bị lỗi trong mẫu câu
+                            {
+                                entities[i].value = "0%";
+                            }
                             sessions[sessionId].percent_instalment = parseInt(entities[i].value.replace('_', ' '));
                             ishavePercentInstalment = true;
                         }
