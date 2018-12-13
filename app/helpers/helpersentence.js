@@ -27,6 +27,8 @@ module.exports = {
         messagecontent = messagecontent.replace("o %", "0%");
         messagecontent = messagecontent.replace("sámung", "samsung");
         messagecontent = messagecontent.replace("sam sung", "samsung");
+        messagecontent = messagecontent.replace("samsum", "samsung");
+        messagecontent = messagecontent.replace("sam xung", "samsung");
         messagecontent = messagecontent.replace("mobistar", "mobiistar");
         messagecontent = messagecontent.replace(" realmi", " realme");
         messagecontent = messagecontent.replace(" reamed", " realme");
@@ -42,6 +44,8 @@ module.exports = {
         messagecontent = messagecontent.replace("lap top", "laptop");
 
         messagecontent = messagecontent.replace("appo", "oppo");
+        messagecontent = messagecontent.replace("garaxy", "garaxy");
+
 
         messagecontent = messagecontent.replace("flush", "plus");
         messagecontent = messagecontent.replace("pluss", "plus ");
@@ -142,10 +146,30 @@ module.exports = {
 
 
         messagecontent = messagecontent.replace(/\n/g, '');
-        if (!messagecontent.includes("nokia") && !messagecontent.includes("inch")) {
+        if (!messagecontent.includes("nokia") && !messagecontent.includes("inch") &&
+            !messagecontent.includes("tr"))//ví dụ 3.5tr 
+        {
             messagecontent = messagecontent.replace(".", " ");
             messagecontent = messagecontent.replace(",", " ");
         }
+
+        //===============storage========================
+        messagecontent = messagecontent.replace("64 gb", "64GB");
+        messagecontent = messagecontent.replace("32 gb", "32GB");
+        messagecontent = messagecontent.replace("128 gb", "128GB");
+        messagecontent = messagecontent.replace("16 gb", "16GB");
+        messagecontent = messagecontent.replace("256 gb", "256GB");
+        //===============storage========================
+        //xu ly huawei 
+        messagecontent = messagecontent.replace("hawei", "huawei");
+        messagecontent = messagecontent.replace("hawai", "huawei");
+        messagecontent = messagecontent.replace("huwei", "huawei");
+        messagecontent = messagecontent.replace("huwai", "huawei");
+        messagecontent = messagecontent.replace("huawai", "huawei");
+        messagecontent = messagecontent.replace("hưawei", "huawei");
+        messagecontent = messagecontent.replace("huawia", "huawei")
+        messagecontent = messagecontent.replace("huawey", "huawei")
+        messagecontent = messagecontent.replace("hưawei", "huawei")
 
         messagecontent = messagecontent.trim();
         return messagecontent;

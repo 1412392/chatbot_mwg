@@ -736,7 +736,7 @@ const getButtonInstalment = (sender, siteid, replyobject, questionTitle, product
     if (is0ptpercent) {
         jsonmessageFiC.messagecontentobject.elements[0].buttons.push({
             type: "postback",
-            title: "Xem gói trả góp 0% & 1% lãi suất",
+            title: "Xem trả góp 0% & 1% lãi suất (Không áp dụng giảm giá)",
             payload: "INSTALMENT_0PTLS"
         });
     }
@@ -2208,22 +2208,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].product = sessions[sessionId].product.replace("pl", "plus ");
                 }
 
-                //===============storage========================
-                sessions[sessionId].product = sessions[sessionId].product.replace("64 gb", "64GB");
-                sessions[sessionId].product = sessions[sessionId].product.replace("32 gb", "32GB");
-                sessions[sessionId].product = sessions[sessionId].product.replace("128 gb", "128GB");
-                sessions[sessionId].product = sessions[sessionId].product.replace("16 gb", "16GB");
-                sessions[sessionId].product = sessions[sessionId].product.replace("256 gb", "256GB");
-                //===============storage========================
-                //xu ly huawei 
-                sessions[sessionId].product = sessions[sessionId].product.replace("hawei", "huawei");
-                sessions[sessionId].product = sessions[sessionId].product.replace("hawai", "huawei");
-                sessions[sessionId].product = sessions[sessionId].product.replace("huwei", "huawei");
-                sessions[sessionId].product = sessions[sessionId].product.replace("huwai", "huawei");
-                sessions[sessionId].product = sessions[sessionId].product.replace("huawai", "huawei");
-                sessions[sessionId].product = sessions[sessionId].product.replace("hưawei", "huawei");
-                sessions[sessionId].product = sessions[sessionId].product.replace("huawia", "huawei")
-                sessions[sessionId].product = sessions[sessionId].product.replace("huawey", "huawei")
+            
 
             }
             //trường hợp sản phẩm chung chung thì xem như chưa xác định
@@ -2723,11 +2708,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             if (subIntent === "briefsupport") {
                                 resultanswer = "<p>Dạ, điều kiện giấy tờ trả góp của công ty tài chính là:</br>\
                     1. Đủ 20-60 tuổi</br>\
-                    2. Giấy tờ CMND bản gốc không quá 15 năm, rõ hình, chữ</br>\
+                    2. Giấy tờ CMND bản gốc không quá 15 năm, rõ hình, chữ (có thể thay thế bằng thẻ căn cước)</br>\
                     <span style='color:red;'>Tùy theo gói trả góp sẽ có thêm yêu cầu giấy tờ:</span>  </br>\
-                    3. Bằng lái xe (còn thời hạn)</br>\
-                    4. Sổ hộ khẩu (có tên người trả góp), chấp nhận bản photo có công chứng không quá 3 tháng (photo nguyên cuốn) (trả góp 0đ và vay trên 10 triệu mới cần sổ hộ khẩu)</br>\
-                    5. Hóa đơn điện(cáp/nước/internet) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br>\
+                    3. Bằng lái xe (xe máy, ô tô, xe tải...) (còn thời hạn)</br>\
+                    4. Sổ hộ khẩu (phải có tên người trả góp), chấp nhận bản photo có công chứng không quá 3 tháng (photo nguyên cuốn) (trả góp 0đ và vay trên 10 triệu mới cần sổ hộ khẩu)</br>\
+                    5. Hóa đơn điện(cáp/nước/internet- không bắt buộc) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br>\
                     <span style='color:red;font-style:italic'>LƯU Ý: THỜI GIAN DUYỆT HỒ SƠ TỪ 4-14 TIẾNG Ạ.</span></p>";
                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                     .catch(console.error);
