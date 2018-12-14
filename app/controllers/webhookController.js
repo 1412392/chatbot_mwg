@@ -33,7 +33,7 @@ var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 var serverChatwithBot = "http://172.16.3.123:3000/";
 
-var severResponse = "http://6202338b.ngrok.io/chatbot";
+var severResponse = "http://de2f230c.ngrok.io/chatbot";
 
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
@@ -1470,7 +1470,7 @@ function IsSystemPromoNotApplyForCompany(productBO, ErpInstallProgramId) {
 
     if (productBO == null || ErpInstallProgramId == -1) return false;
     var lstPromotion = productBO.promotionField;
-    console.log("====lstPromotion====", lstPromotion);
+    //console.log("====lstPromotion====", lstPromotion);
 
     if (lstPromotion == null || lstPromotion.length == 0) return false;
 
@@ -2208,7 +2208,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     sessions[sessionId].product = sessions[sessionId].product.replace("pl", "plus ");
                 }
 
-            
+
 
             }
             //trường hợp sản phẩm chung chung thì xem như chưa xác định
@@ -2794,14 +2794,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         uRLField: result.GetProductResult.uRLField
                                                     };
 
-
+                                                    var productCapacity = "";
+                                                    if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                                        productCapacity = productDetail.capacityField;
+                                                    }
                                                     //console.log(result);
                                                     var categoryID = parseInt(result.GetProductResult.categoryIDField);
                                                     var discountShockPrice = result.shockPriceByProductID;
 
 
-                                                    productName = result.GetProductResult.productNameField;
-                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />";
+                                                    productName = result.GetProductResult.productNameField + (productCapacity ? "<span style='color:red'> bản " + productCapacity + "</span>" : "");
+                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + (productCapacity ? "<span style='color:red'> bản " + productCapacity + "</span>" : "") + "<br />";
                                                     resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/></br>";
 
                                                     resultanswer += (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>*Không xác định được giá</span>") :
@@ -3813,6 +3816,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                             var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
                                             APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
                                                 var productDetail = result.GetProductResult;
+                                                console.log("============capacityField==================", productDetail.capacityField);
+                                                var productCapacity = "";
+                                                if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                                    productCapacity = productDetail.capacityField;
+                                                }
                                                 if (result && result.GetProductResult.productErpPriceBOField) {
                                                     //lấy link sp
                                                     var argsProductDetailGetSeoURL = {
@@ -3831,7 +3839,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                     //console.log(result);
                                                     var categoryID = parseInt(result.GetProductResult.categoryIDField);
 
-                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />";
+                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + (productCapacity ? "<span style='color:red'> bản " + productCapacity + "</span>" : "") + "<br />";
                                                     resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/></br>";
 
                                                     resultanswer += (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>*Không xác định được giá</span>") :
@@ -3865,7 +3873,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                     SiteId: 1
                                                                 };
                                                                 APICheckZeroInstalment(urlwcfProduct, argCheckZeroInstalment, function callback(result) {
-                                                                    resultanswer += "Hiện tại, <span style='color:green'>" + productName + "</span> đang hỗ trợ các gói trả góp sau đây ạ";
+                                                                    resultanswer += "Hiện tại, <span style='color:green'>" + productName + (productCapacity ? "<span style='color:green'> (bản " + productCapacity + ")</span>" : "") + "</span> đang hỗ trợ các gói trả góp sau đây ạ";
                                                                     var jsonbuttonInstalment = "";
                                                                     if (result) {//co tra gop 0%                                                                                                               
                                                                         jsonbuttonInstalment = getButtonInstalment(sender, siteid, replyobject, resultanswer, productPrice, true);
@@ -3978,13 +3986,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                         uRLField: result.GetProductResult.uRLField
                                                     };
 
-
+                                                    var productCapacity = "";
+                                                    if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                                        productCapacity = productDetail.capacityField;
+                                                    }
                                                     //console.log(result);
                                                     var categoryID = parseInt(result.GetProductResult.categoryIDField);
                                                     var productPrice = parseFloat(result.GetProductResult.productErpPriceBOField.priceField);
                                                     var productNameField = result.GetProductResult.productNameField;
                                                     var productOriginPrice = parseFloat(result.GetProductResult.productErpPriceBOField.priceField);
-                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />";
+                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + (productCapacity ? "<span style='color:red'> bản " + productCapacity + "</span>" : "") + "<br />";
+
                                                     resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/></br>";
 
                                                     resultanswer += (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>*Không xác định được giá</span>") :
@@ -4110,7 +4122,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                                                                 if (InstallmentResult.GetInstallmentResult2018Result) {
                                                                                     resultanswer = "Thông tin gói trả trước 0đ của <span style='color:green;font-weight:bold'>FE Credit</span></br>";
-                                                                                    resultanswer += "Tên sản phẩm: <span style='font-weight:bold'>" + productNameField + "</span></br>";
+                                                                                    resultanswer += "Tên sản phẩm: <span style='font-weight:bold'>" + productNameField + (productCapacity ? "<span style='color:red'> bản " + productCapacity + "</span>" : "") + "</span></br>";
                                                                                     resultanswer += "Giá gốc: <span style='font-weight:bold'>" + format_currency(productOriginPrice.toString()) + "đ</span></br>";
 
                                                                                     var moneyPrepaid = (InstallmentResult.GetInstallmentResult2018Result.PaymentPercentFrom / 100) * parseFloat(productPrice);
