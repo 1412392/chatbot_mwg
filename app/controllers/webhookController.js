@@ -4310,9 +4310,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             }
                             else if (subIntent === "cancontinuepayinstalment_whenloan") {
                                 questionTitle = "Vay có thể góp";
-                                resultanswer = "Dạ, hiện tại có 3 công ty tài chính hỗ trợ trả góp là <span style='color:green'>FECredit</span>, <span style='color:red'>HomeCredit</span> và <span style='color:yellow'>HD SaiGon</span>.\
+                                resultanswer = "Dạ, hiện tại có 2 công ty tài chính hỗ trợ trả góp online là <span style='color:green'>FECredit</span> và <span style='color:red'>HomeCredit</span>.\
                          Nếu "+ sessions[sessionId].gender + " đang vay tiền bên ngân hàng này thì có thể tham gia trả góp ngân hàng kia để được duyệt hồ sơ ạ. </br>\
-                         Ví dụ, nếu "+ sessions[sessionId].gender + " đang vay tiền tại <span style='color:green'>FECredit</span> thì có thể làm hồ sơ mua trả góp tại công ty <span style='color:red'>HomeCredit</span> và <span style='color:yellow'>HD SaiGon</span></br>";
+                         Ví dụ, nếu "+ sessions[sessionId].gender + " đang vay tiền tại <span style='color:green'>FECredit</span> thì có thể làm hồ sơ mua trả góp tại công ty <span style='color:red'>HomeCredit</span> ạ</br>";
 
 
                             }
