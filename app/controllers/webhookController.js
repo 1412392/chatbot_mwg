@@ -33,7 +33,7 @@ var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 var serverChatwithBot = "http://172.16.3.123:3000/";
 
-var severResponse = "http://de2f230c.ngrok.io/chatbot";
+var severResponse = "http://181d77c5.ngrok.io/chatbot";
 
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
@@ -1234,6 +1234,7 @@ function APIGetNormalInstallment(url, args, fn) {
 }
 
 function APIGetInstallmentResult(url, args, fn) {
+    console.log("========args==========",args)
     soap.createClient(url, function (err, client) {
         //console.log(args);
         client.GetInstallmentResult(args, function (err, result) {
@@ -3511,7 +3512,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                     resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
 
 
-                                                                                                    var moneyDiff = (parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay) - parseFloat(productPrice)).toFixed(0);
+                                                                                                    var TotalPay=moneyPayInMonth*InstallmentResult.GetInstallmentResult2018Result.PaymentMonth+moneyPrepaid;
+                                                                                                    var moneyDiff = (parseFloat(TotalPay) - parseFloat(productPrice)).toFixed(0);
+                                                                                                    
                                                                                                     resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
 
 
@@ -3583,6 +3586,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                         productPrice = productPrice - discountShockPrice;//trừ giá sốc
 
                                                                                                     }
+                                                                                                   // console.log("=====================productPrice=============",productPrice);
                                                                                                     //=====================================================
                                                                                                     var newargsInstalmentResult = {
                                                                                                         CategoryId: categoryID,
@@ -3628,9 +3632,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                             // console.log(m3);
 
                                                                                                             resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
+                                                                                                           // console.log("=======totalpay==============",parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay))
 
-
-                                                                                                            var moneyDiff = (parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay) - parseFloat(productPrice)).toFixed(0);
+                                                                                                            var TotalPay=moneyPayInMonth*InstallmentResult.GetInstallmentResult2018Result.PaymentMonth+moneyPrepaid;
+                                                                                                            var moneyDiff = (parseFloat(TotalPay) - parseFloat(productPrice)).toFixed(0);
                                                                                                             resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
 
 
@@ -4152,7 +4157,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
 
 
-                                                                                    var moneyDiff = (parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay) - parseFloat(productPrice)).toFixed(0);
+                                                                                    var TotalPay=moneyPayInMonth*InstallmentResult.GetInstallmentResult2018Result.PaymentMonth+moneyPrepaid;
+                                                                                    var moneyDiff = (parseFloat(TotalPay) - parseFloat(productPrice)).toFixed(0);
+
                                                                                     resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
 
 

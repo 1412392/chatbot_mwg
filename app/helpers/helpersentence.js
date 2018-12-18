@@ -45,7 +45,8 @@ module.exports = {
 
         messagecontent = messagecontent.replace("appo", "oppo");
         messagecontent = messagecontent.replace("garaxy", "garaxy");
-
+        messagecontent = messagecontent.replace("vinsmart", "vsmart");
+        
 
         messagecontent = messagecontent.replace("flush", "plus");
         messagecontent = messagecontent.replace("pluss", "plus ");
