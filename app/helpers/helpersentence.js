@@ -46,6 +46,7 @@ module.exports = {
         messagecontent = messagecontent.replace("appo", "oppo");
         messagecontent = messagecontent.replace("garaxy", "garaxy");
         messagecontent = messagecontent.replace("vinsmart", "vsmart");
+        messagecontent = messagecontent.replace("vsmat", "vsmart");
         
 
         messagecontent = messagecontent.replace("flush", "plus");
@@ -134,7 +135,7 @@ module.exports = {
 
         messagecontent = messagecontent.replace("od", "0đ");
         messagecontent = messagecontent.replace("0d", "0đ");
-        messagecontent = messagecontent.replace("vs", "với");
+        messagecontent = messagecontent.replace(" vs ", "với");
         messagecontent = messagecontent.replace("zay", "vậy");
 
         messagecontent = messagecontent.replace(" ipat ", " ipad ");
