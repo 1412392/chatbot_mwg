@@ -33,7 +33,7 @@ var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
 var severRasaQuery = "http://localhost:5000/parse?q=";
 var serverChatwithBot = "http://172.16.3.123:3000/";
 
-var severResponse = "http://181d77c5.ngrok.io/chatbot";
+var severResponse = "http://3e9daa83.ngrok.io/chatbot";
 
 
 // var severResponse = "http://rtm.thegioididong.com/chatbot";
@@ -1234,7 +1234,7 @@ function APIGetNormalInstallment(url, args, fn) {
 }
 
 function APIGetInstallmentResult(url, args, fn) {
-    console.log("========args==========",args)
+    console.log("========args==========", args)
     soap.createClient(url, function (err, client) {
         //console.log(args);
         client.GetInstallmentResult(args, function (err, result) {
@@ -2721,8 +2721,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             }
                             else if (subIntent === "how") {
                                 resultanswer = "<p>Dạ, về thủ tục mua trả góp online: " + sessions[sessionId].gender + " chọn sản phẩm và gói trả góp phù hợp\
-                    ,sau đó đặt trên web, điền thông tin đầy đủ và chờ công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 4h-14h ạ. Sau đó, " + sessions[sessionId].gender + " mang giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
-                    Hoặc "+ sessions[sessionId].gender + " có thể ra trực tiếp siêu thị TGDD để làm thủ tục trả góp luôn ạ.</p>";
+                    ,sau đó đặt trên web, điền thông tin đầy đủ và chờ công ty tài chính sẽ gọi là cho "+ sessions[sessionId].gender + " để xác nhận ạ. Hồ sơ sẽ được thông báo kết quả trong vòng 4h-14h ạ. Sau khi duyệt xong, " + sessions[sessionId].gender + " mang đầy đủ giấy tờ và tiền trả trước ra siêu thị đối chứng và làm hợp đồng nhận máy ạ.</br>\
+                    Hoặc cách khác là "+ sessions[sessionId].gender + " có thể ra trực tiếp siêu thị TGDD để làm thủ tục trả góp luôn ạ. Lưu ý: cần mang đầy đủ giấy tờ và tiền trả trước ra siêu thị để được duyệt hồ sơ và nhận máy nhanh nhất</p>";
                                 // SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                 //     .catch(console.error);
 
@@ -3512,9 +3512,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                     resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
 
 
-                                                                                                    var TotalPay=moneyPayInMonth*InstallmentResult.GetInstallmentResult2018Result.PaymentMonth+moneyPrepaid;
+                                                                                                    var TotalPay = moneyPayInMonth * InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + moneyPrepaid;
                                                                                                     var moneyDiff = (parseFloat(TotalPay) - parseFloat(productPrice)).toFixed(0);
-                                                                                                    
+
                                                                                                     resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
 
 
@@ -3586,7 +3586,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                         productPrice = productPrice - discountShockPrice;//trừ giá sốc
 
                                                                                                     }
-                                                                                                   // console.log("=====================productPrice=============",productPrice);
+                                                                                                    // console.log("=====================productPrice=============",productPrice);
                                                                                                     //=====================================================
                                                                                                     var newargsInstalmentResult = {
                                                                                                         CategoryId: categoryID,
@@ -3632,9 +3632,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                             // console.log(m3);
 
                                                                                                             resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
-                                                                                                           // console.log("=======totalpay==============",parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay))
+                                                                                                            // console.log("=======totalpay==============",parseFloat(InstallmentResult.GetInstallmentResult2018Result.TotalPay))
 
-                                                                                                            var TotalPay=moneyPayInMonth*InstallmentResult.GetInstallmentResult2018Result.PaymentMonth+moneyPrepaid;
+                                                                                                            var TotalPay = moneyPayInMonth * InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + moneyPrepaid;
                                                                                                             var moneyDiff = (parseFloat(TotalPay) - parseFloat(productPrice)).toFixed(0);
                                                                                                             resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
 
@@ -4157,7 +4157,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                     resultanswer += "*Số tiền góp hàng tháng: <span style='font-weight:bold'>" + format_currency(moneyPayInMonth.toString()) + "đ</span>" + " (<span style='font-weight:bold'>" + InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + " tháng</span>)</br>";
 
 
-                                                                                    var TotalPay=moneyPayInMonth*InstallmentResult.GetInstallmentResult2018Result.PaymentMonth+moneyPrepaid;
+                                                                                    var TotalPay = moneyPayInMonth * InstallmentResult.GetInstallmentResult2018Result.PaymentMonth + moneyPrepaid;
                                                                                     var moneyDiff = (parseFloat(TotalPay) - parseFloat(productPrice)).toFixed(0);
 
                                                                                     resultanswer += "*Số tiền chênh lệch so với trả thẳng: <span style='font-weight:bold'>" + format_currency(moneyDiff) + "đ</span>" + "</br>";
@@ -4276,7 +4276,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                 questionTitle = "Giấy tờ photo công chứng";
                                 resultanswer = "Dạ theo quy định trả góp thì: </br>\
                      1. CMND bắt buộc phải là bản gốc, <span style='color:red'>không chấp nhận bản photo công chứng</span></br>\
-                     2. Sổ hộ khẩu chấp nhận bản photo có công chứng không quá 3 tháng và phải đủ 16 trang (nguyên cuốn) ạ</br>";
+                     2. Sổ hộ khẩu, nếu không có bản gốc thì chấp nhận bản photo có công chứng không quá 3 tháng và phải đủ 16 trang (nguyên cuốn) ạ</br>";
 
 
                                 SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+briefphoto", replyobject, siteid)
@@ -4325,9 +4325,202 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             }
                             else if (subIntent === "timeapprove") {
                                 questionTitle = "Thời gian duyệt hồ sơ";
-                                resultanswer = "Dạ, thời gian duyệt hồ sơ online là trong vòng 24h ạ. Nếu làm trực tiếp tại siêu thị thì thời gian duyệt hồ sơ tối đa 4 tiếng ạ.</br>";
+                                resultanswer = "Dạ, thời gian duyệt hồ sơ online là trong vòng 24h ạ. Nếu làm trực tiếp tại siêu thị thì thời gian duyệt hồ sơ tối đa 4 tiếng ạ.\
+                                Nếu trường hợp "+ sessions[sessionId].gender + " làm hồ sơ online thì sau khi duyệt xong, chị mang đầy đủ giấy tờ yêu cầu và tiền trả trước ra siêu thị đối chứng lần 2, sau đó thanh toán và nhận máy ạ.</br>";
 
                             }
+                            else if (subIntent === "general_infomation") {
+                                questionTitle = "Thông tin chung";
+                                resultanswer = "Dạ, mời " + sessions[sessionId].gender + " tham khảo một số thông tin sau ạ: </br>\
+                                1. Đóng tiền trả góp hàng tháng: "+ sessions[sessionId].gender + " có thể đóng tiền tại bất kỳ siêu thị thế giới di động, điện máy xanh nào gần nhà nhất. Khi đi, nhớ mang theo số hợp đồng trả góp. Ngoài ra " + sessions[sessionId].gender + " có \
+                                thể thanh toán qua MoMo, ViettelPay, tại ngân hàng...Xem thêm <a href='https://www.thegioididong.com/tien-ich/thanh-toan-tra-gop' target='_blank'>tại đây</a></br>\
+                                2. Trong quá trình trả góp, "+ sessions[sessionId].gender + " có thể thanh toán trước hợp đồng (tức là thanh toán hết hợp đồng 1 lần). Lúc này sẽ chịu thêm phí thanh lý hợp đồng từ công ty tài chính. <span style='font-weight:bold'>Chi tiết hơn về phí và thủ tục thanh lý hợp đồng, " + sessions[sessionId].gender + " vui lòng đến siêu thị \
+                                để được tư vấn</span></br>\
+                                3. Lưu ý về việc đóng trễ và phạt: <span style='color:green'>Trễ 1 - 4 ngày: Không phạt. Trễ 5 - 29 ngày: phạt 150.000đ</span></br>\
+                                4. Thời gian làm việc của công ty trả góp (Home và FE Credit): Làm việc từ 9h - 21h (<span style='font-weight:bold'>kể cả ngày lễ và chủ nhật</span>)</br>\
+                                5. Chú ý: Khi LÀM HỢP ĐỒNG TRẢ GÓP, phải dùng giấy tờ chính chủ (CMND, BLX chính chủ và SHK phải có tên mình trên đó). Trường hợp dùng giấy tờ của người khác để tham gia trả góp, bắt buộc phải có \
+                                người đó có mặt, nếu không sẽ không thể làm thủ tục được.</br>"
+
+
+                            }
+                            else if (subIntent === "needphonefamily") {
+                                questionTitle = "Số điện thoại người thân";
+                                resultanswer = "Dạ, khi tham gia trả góp, công ty tài chính sẽ yêu cầu cung cấp 2 hoặc 3 số điện thoại của người thân để họ gọi xác nhận ạ. <span style='font-style:italic'>Có thể thay thế bằng số điện thoại của anh chị em họ, bạn bè...</span> nhưng tốt nhất là nên \
+                                cung cấp số điện thoại người thân để tỷ lệ duyệt hồ sơ được cao nhất ạ.</br>";
+                            }
+                            else if (subIntent === "listcompanyinstalment") {
+                                questionTitle = "Danh sách công ty trả góp ở thegioididong.com";
+                                resultanswer = "Hiện tại, ở Thế Giới Di Động có 2 công ty hỗ trợ trả góp online là <span style='color:red;font-weight:bold'> Home Credit</span> và <span style='color:green;font-weight:bold'> FE Credit</span>.\
+                                Về công ty <span style='color:#8529ad;font-weight:bold'>ACS</span> chỉ có ở Điện Máy Xanh, công ty <span style='color:blue;font-weight:bold'>HD Sai Gon</span> chỉ hỗ trợ tại một số siêu thị của Thế giới di động ạ. Xin thông tin đến "+ sessions[sessionId].gender + "</br>";
+                            }
+                            else if (subIntent === "minpayinstalment") {
+                                questionTitle = "Mức trả góp";
+                                resultanswer = "1. Đối với gói trả góp thường: Mức trả trước từ 10% đến 80%, và trả trong vòng 6, 9 hoặc 12 tháng (một số sản phẩm có hỗ trợ 4 tháng, 8 tháng)</br>\
+                                2. Đối với gói lãi suất đặc biệt 0% và 1%: Thì mức trả trước và số tháng trả góp phải theo quy định của công ty đặt ra cho từng sản phẩm ạ. </br>";
+
+                            }
+                            else if (subIntent === "additionalbil_instalment") {
+                                questionTitle = "Bổ sung hóa đơn điện nước";
+                                resultanswer = "Nếu " + sessions[sessionId].gender + " có hóa đơn điện/nước/internet (trong vòng 3 tháng gần nhất), sẽ được hưởng lãi suất tốt hơn ạ.</br> Ví dụ: \
+                                Nếu sản phẩm có lãi suất là 3%, thì khi có hóa đơn điện/nước/internet, "+ sessions[sessionId].gender + " sẽ được giảm lãi suất còn 2% chẳng hạn (đây chỉ là ví dụ). Xin thông tin đến " + sessions[sessionId].gender + " ạ.</br>";
+                            }
+                            else if (subIntent === "promotion") {
+                                questionTitle = "Khuyễn mãi khi trả góp";
+                                resultanswer = "";
+                                if (sessions[sessionId].product) {
+                                    var productName = sessions[sessionId].product;
+                                    console.log(productName);
+                                    var keyword = productName;
+                                    var argsSearchProduct = "";
+
+                                    if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
+                                    {
+                                        argsSearchProduct = {
+                                            q: keyword,
+                                            CateID: -3
+                                        };
+                                    }
+                                    else {
+
+                                        argsSearchProduct = {
+                                            q: keyword,
+                                            CateID: -4
+                                        };
+                                    }
+                                    APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+
+                                        if (result.SearchProductPhiResult != null) {
+                                            var productID = result.SearchProductPhiResult.string[0];
+                                            sessions[sessionId].productID = productID;
+
+                                            var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
+                                            APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+                                                var productDetail = result.GetProductResult;
+                                                console.log("============capacityField==================", productDetail.capacityField);
+                                                var productCapacity = "";
+                                                if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                                    productCapacity = productDetail.capacityField;
+                                                }
+                                                if (result && result.GetProductResult.productErpPriceBOField) {
+                                                    //lấy link sp
+                                                    var argsProductDetailGetSeoURL = {
+                                                        productCategoryLangBOField_uRLField: result.GetProductResult.productCategoryLangBOField.uRLField,
+                                                        productCategoryLangBOField_categoryNameField: result.GetProductResult.productCategoryLangBOField.categoryNameField,
+                                                        productCategoryBOField_uRLField: result.GetProductResult.productCategoryBOField.uRLField,
+                                                        productCategoryBOField_categoryNameField: result.GetProductResult.productCategoryBOField.categoryNameField,
+                                                        categoryNameField: result.GetProductResult.categoryNameField,
+                                                        productLanguageBOField_productNameField: result.GetProductResult.productLanguageBOField.productNameField,
+                                                        productLanguageBOField_uRLField: result.GetProductResult.productLanguageBOField.uRLField,
+                                                        productNameField: result.GetProductResult.productNameField,
+                                                        uRLField: result.GetProductResult.uRLField
+                                                    };
+
+                                                    productName = result.GetProductResult.productNameField;
+                                                    //console.log(result);
+                                                    var categoryID = parseInt(result.GetProductResult.categoryIDField);
+
+                                                    resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + (productCapacity ? "<span style='color:red'> bản " + productCapacity + "</span>" : "") + "<br />";
+                                                    resultanswer += "<img width='120' height='120'  src='" + result.GetProductResult.mimageUrlField + "'" + "/></br>";
+
+                                                    resultanswer += (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("<span style='font-weight:bold'>*Không xác định được giá</span>") :
+                                                        ("*Giá gốc: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
+
+                                                    if (result.shockPriceByProductID > 0) {
+                                                        resultanswer += "</br><span style='color:#ec750f'>*Giá sốc Online (không áp dụng kèm Khuyến mãi khác và trả góp 0%-1.29%)</span>: " + "<span style='font-weight:bold'>" + (parseFloat(result.GetProductResult.productErpPriceBOField.priceField) - parseFloat(result.shockPriceByProductID)).toLocaleString() + " đ" + "</span>";
+
+                                                    }
+
+                                                    APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
+                                                        resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
+                                                        console.log(result.GetProductResult.productErpPriceBOField.webStatusIdField);
+                                                        if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
+
+                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                .catch(console.error);
+                                                        }
+                                                        else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
+                                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+
+                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
+                                                                .catch(console.error);
+                                                        }
+                                                        else {
+                                                            var productPrice = result.GetProductResult.productErpPriceBOField.priceField === "0" ? 0 : parseFloat(result.GetProductResult.productErpPriceBOField.priceField);
+                                                            if (productPrice >= 1200000) {
+                                                                console.log("======Danh sách khuyễn mãi=============");
+                                                                if (productDetail.promotionField && productDetail.promotionField.Promotion.length > 0) {
+                                                                    resultanswer += "<br /><p>Thông tin khuyến mãi khi mua trả góp:</p> ";
+                                                                    var km_count = 0;
+                                                                    var lstGroupNamePromotion = [];
+                                                                    for (var i = 0; i < productDetail.promotionField.Promotion.length; i++) {
+
+                                                                        var currentPromotion = productDetail.promotionField.Promotion[i];
+
+
+                                                                        console.log("======================" + (i + 1) + "=========================");
+                                                                        console.log(currentPromotion);
+                                                                        console.log("===============================================");
+                                                                        // if (!currentPromotion.homePageDescriptionField || currentPromotion.homePageDescriptionField === "undefined") {
+
+                                                                        // }
+                                                                        if (currentPromotion.promotionListGroupNameField && !lstGroupNamePromotion.includes(currentPromotion.promotionListGroupNameField.toLowerCase())) {
+
+                                                                            // resultanswer += "<p style='color:red'>" + currentPromotion.homePageDescriptionField + "</p>";
+                                                                            var fromDate = currentPromotion.beginDateField.split('T')[0];
+                                                                            var endDate = currentPromotion.endDateField.split('T')[0];
+                                                                            var fromDateSplit = fromDate.split("-");
+                                                                            var toDateSplit = endDate.split("-");
+
+                                                                            if (currentPromotion.groupIDField.toLowerCase() !== "bankem") {
+
+                                                                                resultanswer += (++km_count) + ". <span style='font-style:italic'>" + currentPromotion.promotionListGroupNameField + " ( <span style='color:green'> Từ " + fromDateSplit[2] + "/" + fromDateSplit[1] + " - " + toDateSplit[2] + "/" + toDateSplit[1] + "</span> )" + "</span></br>";
+                                                                            }
+
+                                                                        }
+
+                                                                        lstGroupNamePromotion.push(currentPromotion.promotionListGroupNameField.toLowerCase());
+
+
+                                                                    }
+                                                                    resultanswer += "<span style='color:red;font-style:italic'>*Lưu ý: Không áp dụng mã giảm giá, copule, phiếu mua hàng vào hình thức trả góp 0% và 1%</span></br<";
+                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+promotion", replyobject, siteid)
+                                                                        .catch(console.error);
+                                                                }
+                                                                else {
+                                                                    resultanswer += "<p style='color:red'>Hiện tại không có chương trình khuyến mãi nào dành cho sản phẩm này!</p>";
+                                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+promotion", replyobject, siteid)
+                                                                        .catch(console.error);
+                                                                }
+
+                                                            }
+                                                            else {
+                                                                resultanswer += "<br />Sản phẩm này hiện tại không hỗ trợ bất kỳ hình thức trả góp nào. " + sessions[sessionId].gender + "  có thể hỏi sản phẩm khác hoặc " + sessions[sessionId].gender + "  có thể cung cấp cho mình số điện thoại để bên mình có thể liên lạc tư vấn cho " + sessions[sessionId].gender + "  tốt hơn. ";
+                                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+promotion", replyobject, siteid)
+                                                                    .catch(console.error);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>không có hàng</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                                    SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+promotion", replyobject, siteid)
+                                                        .catch(console.error);
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            resultanswer = "Dạ không tìm thấy sản phẩm <span style='color:red'>" + productName + "</span>. " + sessions[sessionId].gender + " có thể nõi rõ và đúng tên sản phẩm để phục vụ tốt hơn ạ. Em cảm ơn " + sessions[sessionId].gender + "</br>";
+                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                .catch(console.error);
+
+                                        }
+                                    });
+                                }
+
+                                return;
+                            }
+
 
                         }
                         catch (err) {
@@ -5240,8 +5433,8 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
                 messagecontent.toLocaleLowerCase().includes("0đồng") ||
                 messagecontent.toLocaleLowerCase().includes("0 dong") ||
                 messagecontent.toLocaleLowerCase().includes("0dong") ||
-                messagecontent.toLocaleLowerCase().includes("0%") ||
-                messagecontent.toLocaleLowerCase().includes("0 %")) {//ý là trả góp 0đ
+                messagecontent.toLocaleLowerCase().includes(" 0%") ||
+                messagecontent.toLocaleLowerCase().includes(" 0 %")) {//ý là trả góp 0đ
                 console.log("====tra gop 0đ: =====", percent);
                 getJsonAndAnalyze(url, sender, sessionId, "0", replyobject, siteid);
 
@@ -5374,13 +5567,13 @@ const getMonthInstalment = (sender, sessionId, button_payload_state, replyobject
 }
 const sendBriefSupport = (sender, sessionId, button_payload_state, replyobject, siteid) => {
     var resultanswer = "<p>Dạ, điều kiện giấy tờ trả góp của công ty tài chính là:</br>\
-    1. Đủ 20-60 tuổi</br>\
-    2. Giấy tờ CMND không quá 15 năm, rõ hình, chữ</br>\
-    <span style='color:red;'>Tùy theo gói trả góp sẽ có thêm yêu cầu giấy tờ:</span>  </br>\
-    3. Bằng lái xe (còn thời hạn)</br>\
-    4. Sổ hộ khẩu (có tên người trả góp)</br>\
-    5. Hóa đơn điện(cáp/nước/internet) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br></p>";
-
+                    1. Đủ 20-60 tuổi</br>\
+                    2. Giấy tờ CMND bản gốc không quá 15 năm, rõ hình, chữ (có thể thay thế bằng thẻ căn cước)</br>\
+                    <span style='color:red;'>Tùy theo gói trả góp sẽ có thêm yêu cầu giấy tờ:</span>  </br>\
+                    3. Bằng lái xe (xe máy, ô tô, xe tải...) (còn thời hạn)</br>\
+                    4. Sổ hộ khẩu (phải có tên người trả góp), chấp nhận bản photo có công chứng không quá 3 tháng (photo nguyên cuốn) (trả góp 0đ và vay trên 10 triệu mới cần sổ hộ khẩu)</br>\
+                    5. Hóa đơn điện(cáp/nước/internet- không bắt buộc) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br>\
+                    <span style='color:red;font-style:italic'>LƯU Ý: THỜI GIAN DUYỆT HỒ SƠ TỪ 4-14 TIẾNG Ạ.</span></p>";
 
     SentToClient(sender, resultanswer, "", button_payload_state, "ask_instalment+briefsupport", replyobject, siteid)
         .catch(console.error);

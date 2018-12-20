@@ -47,7 +47,7 @@ module.exports = {
         messagecontent = messagecontent.replace("garaxy", "garaxy");
         messagecontent = messagecontent.replace("vinsmart", "vsmart");
         messagecontent = messagecontent.replace("vsmat", "vsmart");
-        
+
 
         messagecontent = messagecontent.replace("flush", "plus");
         messagecontent = messagecontent.replace("pluss", "plus ");
@@ -135,7 +135,10 @@ module.exports = {
 
         messagecontent = messagecontent.replace("od", "0đ");
         messagecontent = messagecontent.replace("0d", "0đ");
-        messagecontent = messagecontent.replace(" vs ", "với");
+        if (!messagecontent.includes("mart")) {
+            messagecontent = messagecontent.replace(" vs ", " với ");
+        }
+
         messagecontent = messagecontent.replace("zay", "vậy");
 
         messagecontent = messagecontent.replace(" ipat ", " ipad ");
@@ -143,13 +146,13 @@ module.exports = {
         messagecontent = messagecontent.replace(" duog", " duong");
         messagecontent = messagecontent.replace(" máy tính bản", " máy tính bảng");
         messagecontent = messagecontent.replace(" homerit", "home credit");
-        messagecontent = messagecontent.replace(" 0₫", "0đ");
+        messagecontent = messagecontent.replace(" 0₫", " 0đ");
         messagecontent = messagecontent.replace("coire", "core");
 
 
         messagecontent = messagecontent.replace(/\n/g, '');
         if (!messagecontent.includes("nokia") && !messagecontent.includes("inch") &&
-            !messagecontent.includes("tr"))//ví dụ 3.5tr 
+            !messagecontent.includes("tr") || messagecontent.includes("a6"))//ví dụ 3.5tr 
         {
             messagecontent = messagecontent.replace(".", " ");
             messagecontent = messagecontent.replace(",", " ");
@@ -172,6 +175,9 @@ module.exports = {
         messagecontent = messagecontent.replace("huawia", "huawei")
         messagecontent = messagecontent.replace("huawey", "huawei")
         messagecontent = messagecontent.replace("hưawei", "huawei")
+        messagecontent = messagecontent.replace("hưaei", "huawei");
+
+        messagecontent=messagecontent.replace("wifj","wifi");
 
         messagecontent = messagecontent.trim();
         return messagecontent;
