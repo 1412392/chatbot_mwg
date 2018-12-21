@@ -4326,7 +4326,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             else if (subIntent === "timeapprove") {
                                 questionTitle = "Thời gian duyệt hồ sơ";
                                 resultanswer = "Dạ, thời gian duyệt hồ sơ online là trong vòng 24h ạ. Nếu làm trực tiếp tại siêu thị thì thời gian duyệt hồ sơ tối đa 4 tiếng ạ.\
-                                Nếu trường hợp "+ sessions[sessionId].gender + " làm hồ sơ online thì sau khi duyệt xong, chị mang đầy đủ giấy tờ yêu cầu và tiền trả trước ra siêu thị đối chứng lần 2, sau đó thanh toán và nhận máy ạ.</br>";
+                                Nếu trường hợp "+ sessions[sessionId].gender + " làm hồ sơ online thì sau khi duyệt xong, " + sessions[sessionId].gender + " mang đầy đủ giấy tờ yêu cầu và tiền trả trước ra siêu thị đối chứng lần 2, sau đó thanh toán và nhận máy ạ.</br>";
 
                             }
                             else if (subIntent === "general_infomation") {
