@@ -3300,7 +3300,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                             }
                                                                             else {
                                                                                 //if (categoryID === 522) {
-                                                                                finalCTTC = 3;//default fe,
+                                                                                finalCTTC = 1;//ưu tiên home trước,
                                                                                 //}
                                                                                 // else {
                                                                                 //     finalCTTC = -1;
@@ -3535,6 +3535,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                                             .catch(console.error);
                                                                                                     }, 800);
 
+
+
+
+
                                                                                                     // questionTitle = "Lựa chọn khác";
                                                                                                     // var anotheroptionbutton = AnotherOptionNormalInstalment(sender, siteid, replyobject, questionTitle);
 
@@ -3567,8 +3571,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                                                                             });
                                                                                         }
                                                                                         else {
-                                                                                            argsInstalmentResult.CompanyId = 1;
-                                                                                            finalCTTC = 1;
+                                                                                            argsInstalmentResult.CompanyId = 3;
+                                                                                            finalCTTC = 3;
                                                                                             APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
                                                                                                 if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
                                                                                                     //====================ÁP DỤNG KHUYẾN MÃI====================
