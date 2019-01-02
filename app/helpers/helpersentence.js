@@ -133,7 +133,7 @@ module.exports = {
         messagecontent = messagecontent.replace("bn", "bao nhiêu");
         messagecontent = messagecontent.replace("bnhiu", "bao nhiêu");
 
-        messagecontent = messagecontent.replace("od", "0đ");
+        messagecontent = messagecontent.replace(" od ", "0đ");
         messagecontent = messagecontent.replace("0d", "0đ");
         if (!messagecontent.includes("mart")) {
             messagecontent = messagecontent.replace(" vs ", " với ");
