@@ -63,11 +63,11 @@ module.exports = {
 
         messagecontent = messagecontent.replace(" ak ", " à ");
         messagecontent = messagecontent.replace(" ah ", " à ");
-        messagecontent = messagecontent.replace("ko", "không");
-        messagecontent = messagecontent.replace("k0", "không");
+        messagecontent = messagecontent.replace(" ko ", " không ");
+        messagecontent = messagecontent.replace(" k0 ", " không ");
         messagecontent = messagecontent.replace(" hk ", " không ");
-        messagecontent = messagecontent.replace("hok", "không");
-        messagecontent = messagecontent.replace("kg", "không");
+        messagecontent = messagecontent.replace(" hok ", " không ");
+        messagecontent = messagecontent.replace(" kg ", " không ");
         messagecontent = messagecontent.replace("trug", "trung");
         messagecontent = messagecontent.replace("vâg", "vâng");
         messagecontent = messagecontent.replace("xog", "xong");
