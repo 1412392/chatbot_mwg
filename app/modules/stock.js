@@ -663,7 +663,7 @@ module.exports = {
                     }
 
                     else {
-                        var rn = randomNumber(productnotfound.length);
+                        var rn = CommonHelper.randomNumber(productnotfound.length);
                         resultanswer = productnotfound[rn];
 
                         SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
