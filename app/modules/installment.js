@@ -7,11 +7,7 @@ var ProductAPI = require('../services/ProductAPI');
 var InstallmentAPI = require('../services/InstallmentAPI');
 var helpernumber = require('../helpers/helpernumber');
 var logerror = require('../helpers/loghelper');
-
-var urlApiProduct = "http://api.thegioididong.com/ProductSvc.svc?singleWsdl";
-var urlApiCategory = "http://api.thegioididong.com/CategorySvc.svc?singleWsdl";
-var urlwcfProduct = "http://webservice.thegioididong.com/ProductSvc.asmx?wsdl";
-const ERRORFILE_PATH = "/home/tgdd/error_logs_chatmodule/errorlogs.txt";
+var ConstConfig = require('../const/config');
 
 var listBriefID = [
     "CMND + Hộ khẩu",//1
@@ -597,7 +593,7 @@ module.exports = {
                             CateID: -4
                         };
                     }
-                    ProductAPI.APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+                    ProductAPI.APIGetProductSearch(ConstConfig.URLAPI_PRODUCT, argsSearchProduct, function getResult(result) {
 
                         if (result.SearchProductPhiResult != null) {
 
@@ -610,7 +606,7 @@ module.exports = {
                             var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
                             var lstproduct = result;
 
-                            ProductAPI.APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+                            ProductAPI.APIGetProductDetail(ConstConfig.URLAPI_PRODUCT, argsProductDetail, function getResult(result) {
                                 var productDetail = result.GetProductResult;
                                 if (result && result.GetProductResult.productErpPriceBOField) {
                                     //lấy link sp
@@ -651,7 +647,7 @@ module.exports = {
                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                     //  console.log(resultanswer);
 
-                                    ProductAPI.APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
+                                    ProductAPI.APIGetSeoURLProduct(ConstConfig.URLAPI_CATEGORY, argsProductDetailGetSeoURL, function callback(seoURL) {
                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
                                         if (CommonHelper.IsPreoder(result.GetProductResult)) {
                                             resultanswer += "<p style='color:#bc9816;font-style:italic'>Sản phẩm hiện tại đang trong quá trình đặt trước và chưa có sẵn hàng</p>";
@@ -680,7 +676,7 @@ module.exports = {
                                                     ProductId: productID,
                                                     SiteId: 1
                                                 };
-                                                InstallmentAPI.APICheckZeroInstalment(urlwcfProduct, argCheckZeroInstalment, function callback(result) {
+                                                InstallmentAPI.APICheckZeroInstalment(ConstConfig.URLWCF_PRODUCT, argCheckZeroInstalment, function callback(result) {
 
                                                     //console.log("=====CHECK=======", result);
                                                     // sessions[sessionId].isHasZeroInstallment = result;
@@ -732,7 +728,7 @@ module.exports = {
                                                             };
 
 
-                                                            InstallmentAPI.APIGetInfoZeroInstalmentPackage(urlwcfProduct, argGetZeroPackage, function (packageInfo) {
+                                                            InstallmentAPI.APIGetInfoZeroInstalmentPackage(ConstConfig.URLWCF_PRODUCT, argGetZeroPackage, function (packageInfo) {
                                                                 // console.log(packageInfo.GetFeatureInstallment2018Result);
 
                                                                 if (packageInfo && packageInfo.length > 0) {
@@ -787,7 +783,7 @@ module.exports = {
                                                                         }
                                                                         //console.log("=======THAM SO 0%==========",argsInstalmentResult);
 
-                                                                        InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
+                                                                        InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, argsInstalmentResult, function (InstallmentResult) {
                                                                             //console.log("===============InstallmentResult==================",InstallmentResult);
 
                                                                             if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
@@ -1024,7 +1020,7 @@ module.exports = {
                                                                     InvenStatusId: 1
                                                                 }
                                                                 sessions[sessionId].isBeforeAskeMonthInstalment = true;
-                                                                InstallmentAPI.APIGetNormalInstallment(urlwcfProduct, argsGetListMonth, function (allpackages) {
+                                                                InstallmentAPI.APIGetNormalInstallment(ConstConfig.URLWCF_PRODUCT, argsGetListMonth, function (allpackages) {
                                                                     //console.log(allpackages);
                                                                     //console.log(argsGetListMonth);
                                                                     if (allpackages.GetListNormalInstallment2018Result) {
@@ -1155,7 +1151,7 @@ module.exports = {
                                                                 SiteId: 1,
                                                                 InventStatusId: 1
                                                             };
-                                                            InstallmentAPI.APIGetInfoZeroInstalmentPackage(urlwcfProduct, argGetZeroPackage, function (packageInfo) {
+                                                            InstallmentAPI.APIGetInfoZeroInstalmentPackage(ConstConfig.URLWCF_PRODUCT, argGetZeroPackage, function (packageInfo) {
                                                                 // console.log(packageInfo.GetFeatureInstallment2018Result);
                                                                 if (packageInfo && packageInfo.length > 0) {//có gói trả góp 0% trùng
                                                                     //show gói 0%
@@ -1188,7 +1184,7 @@ module.exports = {
                                                                         }
                                                                         // console.log("=======THAM SO 0%==========",argsInstalmentResult);
 
-                                                                        InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
+                                                                        InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, argsInstalmentResult, function (InstallmentResult) {
                                                                             //console.log(InstallmentResult);
                                                                             if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
                                                                                 //console.log("=======packageDetail======", packageDetail.GetFeatureInstallment2018Result);
@@ -1271,7 +1267,7 @@ module.exports = {
                                                                         InventStatusId: 1
                                                                     }
                                                                     //console.log("======thông số=======", argsInstalmentResult);
-                                                                    InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
+                                                                    InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, argsInstalmentResult, function (InstallmentResult) {
                                                                         //console.log(InstallmentResult);
 
                                                                         if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
@@ -1309,7 +1305,7 @@ module.exports = {
                                                                                 SiteId: 1,
                                                                                 InventStatusId: 1
                                                                             }
-                                                                            InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
+                                                                            InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, newargsInstalmentResult, function (InstallmentResult) {
                                                                                 //console.log(InstallmentResult);
 
                                                                                 if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
@@ -1407,7 +1403,7 @@ module.exports = {
                                                                         else {
                                                                             argsInstalmentResult.CompanyId = 3;
                                                                             finalCTTC = 3;
-                                                                            InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
+                                                                            InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, argsInstalmentResult, function (InstallmentResult) {
                                                                                 if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
                                                                                     //====================ÁP DỤNG KHUYẾN MÃI====================
                                                                                     var discountPrice = parseFloat(GetSystemPromotionDisCountValue(productDetail, parseFloat(productPrice), false));
@@ -1439,7 +1435,7 @@ module.exports = {
                                                                                         SiteId: 1,
                                                                                         InventStatusId: 1
                                                                                     }
-                                                                                    InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
+                                                                                    InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, newargsInstalmentResult, function (InstallmentResult) {
                                                                                         //console.log(InstallmentResult);
 
                                                                                         if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
@@ -1650,14 +1646,14 @@ module.exports = {
                             CateID: -4
                         };
                     }
-                    ProductAPI.APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+                    ProductAPI.APIGetProductSearch(ConstConfig.URLAPI_PRODUCT, argsSearchProduct, function getResult(result) {
 
                         if (result.SearchProductPhiResult != null) {
                             var productID = result.SearchProductPhiResult.string[0];
                             sessions[sessionId].productID = productID;
 
                             var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
-                            ProductAPI.APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+                            ProductAPI.APIGetProductDetail(ConstConfig.URLAPI_PRODUCT, argsProductDetail, function getResult(result) {
                                 var productDetail = result.GetProductResult;
                                 console.log("============capacityField==================", productDetail.capacityField);
                                 var productCapacity = "";
@@ -1693,7 +1689,7 @@ module.exports = {
 
                                     }
 
-                                    ProductAPI.APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
+                                    ProductAPI.APIGetSeoURLProduct(ConstConfig.URLAPI_CATEGORY, argsProductDetailGetSeoURL, function callback(seoURL) {
                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
                                         //console.log(result.GetProductResult.productErpPriceBOField.webStatusIdField);
                                         if (CommonHelper.IsPreoder(result.GetProductResult)) {
@@ -1719,7 +1715,7 @@ module.exports = {
                                                     ProductId: productID,
                                                     SiteId: 1
                                                 };
-                                                InstallmentAPI.APICheckZeroInstalment(urlwcfProduct, argCheckZeroInstalment, function callback(result) {
+                                                InstallmentAPI.APICheckZeroInstalment(ConstConfig.URLWCF_PRODUCT, argCheckZeroInstalment, function callback(result) {
                                                     resultanswer += "Hiện tại, <span style='color:green'>" + productName + (productCapacity ? "<span style='color:green'> (bản " + productCapacity + ")</span>" : "") + "</span> đang hỗ trợ các gói trả góp sau đây ạ";
                                                     var jsonbuttonInstalment = "";
                                                     if (result) {//co tra gop 0%                                                                                                               
@@ -1796,7 +1792,7 @@ module.exports = {
                             CateID: -4
                         };
                     }
-                    ProductAPI.APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+                    ProductAPI.APIGetProductSearch(ConstConfig.URLAPI_PRODUCT, argsSearchProduct, function getResult(result) {
 
                         if (result.SearchProductPhiResult != null) {
 
@@ -1806,7 +1802,7 @@ module.exports = {
                             var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
                             var lstproduct = result;
 
-                            ProductAPI.APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+                            ProductAPI.APIGetProductDetail(ConstConfig.URLAPI_PRODUCT, argsProductDetail, function getResult(result) {
                                 var productDetail = result.GetProductResult;
                                 if (result && result.GetProductResult.productErpPriceBOField) {
                                     //lấy link sp
@@ -1847,7 +1843,7 @@ module.exports = {
                                     //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                     //  console.log(resultanswer);
 
-                                    ProductAPI.APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
+                                    ProductAPI.APIGetSeoURLProduct(ConstConfig.URLAPI_CATEGORY, argsProductDetailGetSeoURL, function callback(seoURL) {
                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
                                         if (CommonHelper.IsPreoder(result.GetProductResult)) {
                                             resultanswer += "<p style='color:#bc9816;font-style:italic'>Sản phẩm hiện tại đang trong quá trình đặt trước và chưa có sẵn hàng</p>";
@@ -1922,7 +1918,7 @@ module.exports = {
                                                 SiteId: 1,
                                                 InventStatusId: 1
                                             }
-                                            InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, argsInstalmentResult, function (InstallmentResult) {
+                                            InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, argsInstalmentResult, function (InstallmentResult) {
                                                 //console.log(InstallmentResult);    
                                                 if (InstallmentResult && InstallmentResult.GetInstallmentResult2018Result) {
                                                     //====================ÁP DỤNG KHUYẾN MÃI====================
@@ -1954,7 +1950,7 @@ module.exports = {
                                                         SiteId: 1,
                                                         InventStatusId: 1
                                                     }
-                                                    InstallmentAPI.APIGetInstallmentResult(urlwcfProduct, newargsInstalmentResult, function (InstallmentResult) {
+                                                    InstallmentAPI.APIGetInstallmentResult(ConstConfig.URLWCF_PRODUCT, newargsInstalmentResult, function (InstallmentResult) {
                                                         if (InstallmentResult) {
 
                                                             if (InstallmentResult.GetInstallmentResult2018Result) {
@@ -2241,14 +2237,14 @@ module.exports = {
                             CateID: -4
                         };
                     }
-                    ProductAPI.APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
+                    ProductAPI.APIGetProductSearch(ConstConfig.URLAPI_PRODUCT, argsSearchProduct, function getResult(result) {
 
                         if (result.SearchProductPhiResult != null) {
                             var productID = result.SearchProductPhiResult.string[0];
                             sessions[sessionId].productID = productID;
 
                             var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
-                            ProductAPI.APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
+                            ProductAPI.APIGetProductDetail(ConstConfig.URLAPI_PRODUCT, argsProductDetail, function getResult(result) {
                                 var productDetail = result.GetProductResult;
                                 console.log("============capacityField==================", productDetail.capacityField);
                                 var productCapacity = "";
@@ -2284,7 +2280,7 @@ module.exports = {
 
                                     }
 
-                                    ProductAPI.APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
+                                    ProductAPI.APIGetSeoURLProduct(ConstConfig.URLAPI_CATEGORY, argsProductDetailGetSeoURL, function callback(seoURL) {
                                         resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
 
                                         if (CommonHelper.IsPreoder(result.GetProductResult)) {
@@ -2381,7 +2377,7 @@ module.exports = {
 
         }
         catch (err) {
-            logerror.WriteLogToFile(ERRORFILE_PATH, "Error at 2377: " + err);
+            logerror.WriteLogToFile(ConstConfig.ERRORFILE_PATH, "Error at installment module 2377: " + err);
         }
     }
 }

@@ -2,7 +2,7 @@
 var soap = require('soap');
 var CommonHelper = require('../helpers/commonhelper');
 
-const GetShockPriceByProductID = (urlApiProduct,productID) => {
+const GetShockPriceByProductID = (urlApiProduct, productID) => {
     var args = {
         ProductID: productID
     }
@@ -61,7 +61,7 @@ module.exports = {
 
                 //resultanswer=ChangeResultAnswer(productDetail);
                 //lay giá sốc
-                var shockPrice = GetShockPriceByProductID(url,args.intProductID).then((shockprice) => {
+                var shockPrice = GetShockPriceByProductID(url, args.intProductID).then((shockprice) => {
                     console.log("======shockprice=====", shockprice);
                     if (productDetail) {
                         productDetail.shockPriceByProductID = shockprice;
@@ -69,7 +69,7 @@ module.exports = {
 
                     fn(productDetail);
                 }).catch(err => {
-                    console.log("===error at APIGetProductDetail======",err);
+                    console.log("===error at APIGetProductDetail======", err);
 
                     fn(null);
                 });
@@ -99,14 +99,14 @@ module.exports = {
 
         });
     },
-     GetProductInfoByURL :function(urlApiProduct,currenturl, sessionId, ishaveProductEntity)  {
+    GetProductInfoByURL: function (urlApiProduct, currenturl, sessionId, ishaveProductEntity) {
         return new Promise((resolve, reject) => {
             if (currenturl && currenturl.length > 1) {
                 var args = {
                     url: currenturl
                 };
                 soap.createClient(urlApiProduct, function (err, client) {
-    
+
                     client.GetProductInfoByURL(args, function (err, result) {
                         if (err) reject(err);
                         var urlSearch = JSON.parse(JSON.stringify(result));
@@ -114,11 +114,11 @@ module.exports = {
                             var { PID } = urlSearch.GetProductInfoByURLResult;
                             console.log("===productIDFromURL====", PID);
                             if (PID && parseInt(PID) > 0) {
-    
+
                                 sessions[sessionId].productID_currentUrl = parseInt(PID);
                                 //get productname
                                 var argsProductDetail = { intProductID: parseInt(PID), intProvinceID: 3 };
-    
+
                                 module.exports.APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(productDetail) {
                                     if (productDetail && productDetail.GetProductResult) {
                                         var finalProductName = productDetail.GetProductResult.productNameField;
@@ -126,7 +126,7 @@ module.exports = {
                                             //nếu product đó BOT detect mà search không ra, hoặc ra nhiều Model (như iphone 6=> ra 32gb,64gb..) thì lấy sản phẩm từ URL
                                             var keyword = sessions[sessionId].product;
                                             var argsSearchProduct = "";
-    
+
                                             if (CommonHelper.isIncludeAccessoryKeyword(keyword))//search phụ kiện
                                             {
                                                 argsSearchProduct = {
@@ -135,19 +135,19 @@ module.exports = {
                                                 };
                                             }
                                             else {
-    
+
                                                 argsSearchProduct = {
                                                     q: keyword,
                                                     CateID: -4
                                                 };
                                             }
                                             module.exports.APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
-    
+
                                                 if (result.SearchProductPhiResult != null) {
-    
+
                                                     if (result.SearchProductPhiResult.string.length > 1) {//nhiều kết quả search
                                                         var productID = result.SearchProductPhiResult.string[0];
-    
+
                                                         var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
                                                         module.exports.APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
                                                             var productDetail = result.GetProductResult;
@@ -168,13 +168,13 @@ module.exports = {
                                                     resolve(finalProductName);
                                                 }
                                             });
-    
+
                                         }
                                         else {
                                             resolve(finalProductName);
                                         }
-    
-    
+
+
                                     }
                                     else {
                                         resolve(null);
@@ -195,6 +195,43 @@ module.exports = {
                 resolve(null);
             }
         });
-    
+
+    },
+    APICheckInStock: function (url, args, fn) {
+
+        soap.createClient(url, function (err, client) {
+
+            client.GetStoreInStock2016(args, function (err, result) {
+
+                var stores = JSON.parse(JSON.stringify(result));
+                fn(stores);
+
+
+            });
+
+        });
+    },
+
+    APIGetProductColor: function (url, args, fn) {
+        soap.createClient(url, function (err, client) {
+
+            client.GetProductColorByProductIDLang(args, function (err, result) {
+
+                var productColor = JSON.parse(JSON.stringify(result));
+
+                // console.log("=============================");
+                // console.log(productDetail);
+
+                //resultanswer=ChangeResultAnswer(productDetail);
+
+                fn(productColor);
+                // self.resultanswer+="Sản phẩm: "+productDetail.GetProductDetailBySiteIDResult.ProductName+"<br />"+
+                // "Giá: "+productDetail.GetProductDetailBySiteIDResult.ExpectedPrice;
+
+
+            });
+
+        });
     }
+
 }

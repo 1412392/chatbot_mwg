@@ -2,6 +2,12 @@ var lstAccessoryKeyword = [
     "ốp", "op lung", "bluetooth", "tai nghe", "tai phone", "pin", "sạc", "sac", "bàn phím", "ban phim", "loa", "thẻ nhớ", "the nho", "usb",
     "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
 ];
+var lstCommonProduct = [
+    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei", "note", "realme",
+    "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung", "sam sung", "dell", "asus", "macbook", "hp",
+    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi", "lenovo",
+    "may tinh bang", "tablet", "máy tính bảng", "miếng dán cường lực", "dán cường lực"
+];
 
 module.exports = {
     isIncludeAccessoryKeyword: function (keyword) {
@@ -26,5 +32,15 @@ module.exports = {
 
         return price.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
 
+    },
+    hasNumber: function (myString) {
+        return /\d/.test(myString);
+    },
+     isGeneralProduct :function (productname) {
+        for (var i = 0; i < lstCommonProduct.length; i++) {
+            if (productname.toLowerCase().trim() === lstCommonProduct[i].toLocaleLowerCase().trim())
+                return true;
+        }
+        return false;
     }
 }

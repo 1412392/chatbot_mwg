@@ -1,6 +1,4 @@
-﻿//import { read } from 'fs';
-
-var tracechat = require('../helpers/index');
+﻿var tracechat = require('../helpers/index');
 var logerror = require('../helpers/loghelper');
 var helpernumber = require('../helpers/helpernumber');
 var fetch = require('node-fetch');
@@ -13,46 +11,20 @@ const line = require('@line/bot-sdk');
 const https = require('https');
 var fetchTimeout = require('fetch-timeout');
 var helpersentence = require('../helpers/helpersentence');
+var CommonHelper = require('../helpers/commonhelper');
+
 var SendMessage = require('../services/SendMessage');
 var InstallmentModule = require('../modules/installment');
+var StockModule = require('../modules/stock');
+
 var ProductAPI = require('../services/ProductAPI');
+var ConstConfig = require('../const/config');
 
-const ERRORFILE_PATH = "/home/tgdd/error_logs_chatmodule/errorlogs.txt";
-
-const MODULE_CHATWITHBOT = "CHATWITHBOT";
-// var LineAPI =require('line-api');
-// const lineconfig = {
-//     channelAccessToken: "OF/JLbPlLNPPK1z65/CYKHYcmxICRDPRZ/5mv+uf5nc8svIORfM/9fT/zH/f4h00SA2XA5+xXKNPgxep0dQlP8VIF3K2iBOgWcunGCzcWvkLeZhESgk8V/FMtIQS0RKaWZ0RcsSpkrhH0JbV3catwAdB04t89/1O/w1cDnyilFU=",
-//     channelSecret: "6a24678d4466e1ed662397ed64b3926b"
-// };
-const lineClient = new line.Client({
-    channelAccessToken: 'OF/JLbPlLNPPK1z65/CYKHYcmxICRDPRZ/5mv+uf5nc8svIORfM/9fT/zH/f4h00SA2XA5+xXKNPgxep0dQlP8VIF3K2iBOgWcunGCzcWvkLeZhESgk8V/FMtIQS0RKaWZ0RcsSpkrhH0JbV3catwAdB04t89/1O/w1cDnyilFU='
-});
-
-
-var FB_PAGE_TOKEN = 'EAAdDXpuJZCS8BAHrQmdaKGOUC51GPjtXwZBXlX6ZCN4OuGNssuky7ffyNwciAmicecV7IfX0rOfsFNUwZCMnZATJxWpkK0aFmj2XUuhacR8XA1sWsFiGasBtBcAOgon0BQqeP8RDCm6VQR9V9Ygxow0EvBwbhrHjwViGHDQ77dIkfkY3XDhzv';
-
-var FB_APP_SECRET = '2ee14b4e3ccc367b37fce196af51ae09';
-var severRasaQuery = "http://localhost:5000/parse?q=";
-var serverChatwithBot = "http://172.16.3.123:3000/";
-
-var severResponse = "http://3e9daa83.ngrok.io/chatbot";
-
-
-// var severResponse = "http://rtm.thegioididong.com/chatbot";
-
-var urlApiProduct = "http://api.thegioididong.com/ProductSvc.svc?singleWsdl";
-var urlApiCategory = "http://api.thegioididong.com/CategorySvc.svc?singleWsdl";
-var urlwcfProduct = "http://webservice.thegioididong.com/ProductSvc.asmx?wsdl";
-var provinceDefault = 3;
-var pagesizedefault = 10;
-var pageIndexDefault = 0;
 
 var ASK_INSTALMENT_INFORMATION = "ask_instalment+information";
 var ASK_INSTALMENT_PACKAGE0D = "ask_instalment+package0d";
 
 var pathToExample = path.join(__dirname, '..', 'helpers', 'example');
-
 
 var greet = [];
 var offense = [];
@@ -62,33 +34,8 @@ var thankyou = [];
 var goodbye = [];
 var productnotfound = [];
 
-var listBriefID = [
-    "CMND + Hộ khẩu",//1
-    "CMND + Bằng lái xe HOẶC Hộ khẩu",//2
-    "",
-    "CMND + Hộ khẩu + Hóa đơn điện/nước/internet",//4
-    "",
-    "CMND + Bằng lái xe HOẶC Hộ khẩu + Hóa đơn điện/nước/internet",//6
-    "",
-    "CMND + Hộ khẩu + Hóa đơn điện/nước/internet + Chứng minh thu nhập"//8
-];
-var lstAccessoryKeyword = [
-    "ốp", "op lung", "bluetooth", "tai nghe", "tai phone", "pin", "sạc", "sac", "bàn phím", "ban phim", "loa", "thẻ nhớ", "the nho", "usb",
-    "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
-];
-var lstCommonProduct = [
-    "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei", "note", "realme",
-    "sạc", "ốp lưng", "pin", "oppo", "xiaomi", "mobiistar", "vivo", "samsung", "sam sung", "dell", "asus", "macbook", "hp",
-    "dán màn hình", "cáp sạc", "laptop msi", "ipad 2017", "msi", "lenovo",
-    "may tinh bang", "tablet", "máy tính bảng", "miếng dán cường lực", "dán cường lực"
-];
 
 var isGetExampleAnswer = false;
-
-var el = new elasticsearch.Client({
-    host: '192.168.2.54:9200',
-    log: 'trace'
-});
 
 function wait(ms) {
     var start = new Date().getTime();
@@ -97,33 +44,9 @@ function wait(ms) {
         end = new Date().getTime();
     }
 }
-
-function randomNumber(lengthNumber) {
-    return Math.floor((Math.random() * (lengthNumber - 1)) + 0);//random tu 0 den lengthnumber-1
-}
-const format_currency = (price) => {
-
-    return price.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-
-}
 const sessions = {};
 
-const isIncludeAccessoryKeyword = (keyword) => {
 
-    if (!keyword) return false;
-    for (var i = 0; i < lstAccessoryKeyword.length; i++) {
-        if (keyword.toLowerCase().includes(lstAccessoryKeyword[i]))
-            return true;
-    }
-    return false;
-};
-const isGeneralProduct = (productname) => {
-    for (var i = 0; i < lstCommonProduct.length; i++) {
-        if (productname.toLowerCase().trim() === lstCommonProduct[i].toLocaleLowerCase().trim())
-            return true;
-    }
-    return false;
-}
 const findOrCreateSession = (fbid) => {
     let sessionId;
     // Let's see if we already have a session for the user fbid
@@ -143,239 +66,6 @@ const findOrCreateSession = (fbid) => {
         };
     }
     return sessionId;
-};
-
-
-function SendToUserListColor(productID, productName, sender, siteid, replyobject, questionTitle, intent) {
-    if (productID) {
-        const sessionId = findOrCreateSession(sender);
-        var argsProductColor = { intProductID: parseInt(productID), LangID: "vi-VN" };
-        APIGetProductColor(urlwcfProduct, argsProductColor, function getResult(result) {
-
-
-            //console.log(result.GetDistricByProvinceResult.DistrictBO[0]);
-            var length = result.GetProductColorByProductIDLangResult.ProductColorBO.length;
-            //resultanswer = "Sảm phẩm " + productName + " hiện tại có các màu sau: <br />";
-            //if (length > 3) {
-            //    //nếu có nhiều hơn 3 màu, in danh sách màu
-            //    for (var i = 0; i < length; i++) {
-            //        var colorBo = result.GetProductColorByProductIDLangResult.ProductColorBO[i];
-            //        resultanswer += colorBo.colorname + " , ";
-
-            //    }
-
-            //}
-
-            //resultanswer += "<br />CHỌN MÀU SẮC "+sessions[sessionId].gender+"  QUAN TÂM CHO SẢN PHẨM ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
-
-            var type = "template";
-            questionTitle = "Danh sách màu sắc";
-
-            var jsoncolortemplate = {
-                username: sender,
-                siteid: siteid,
-                messagetype: "template",
-                replyobject: replyobject,
-                messagecontentobject: {
-                    elements: [
-                        {
-                            title: questionTitle,
-                            buttons: []
-                        }
-                    ]
-                }
-            };
-
-            for (var i = 0; i < length; i++) {
-                var colorBo = result.GetProductColorByProductIDLangResult.ProductColorBO[i];
-                //console.log(colorBo);                                                                           
-                jsoncolortemplate.messagecontentobject.elements[0].buttons.push({
-                    type: "postback",
-                    title: colorBo.ColorName,
-                    payload: colorBo.ProductCode
-                });
-            }
-
-
-            var bodyjson = JSON.stringify(jsoncolortemplate);
-
-            // console.log(bodyjson);
-            //xóa màu cũ đi
-            sessions[sessionId].color = null;
-            sessions[sessionId].colorname = null;
-
-            setTimeout(() => {
-                SentToClientButton(sender, bodyjson, intent, replyobject)
-                    .catch(console.error);
-            }, 1500);
-
-        });//end APIGetProductColor
-    }
-}
-
-function SendToUserListDistrict(productID, provinceID, sender, siteid, replyobject, questionTitle, intent) {
-
-
-
-    if (provinceID) {
-
-        var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-        APIGetDistrictByProvince(urlApiCategory, argsDistrictByProvince, function getResult(result) {
-            //console.log(result.GetDistricByProvinceResult.DistrictBO[0]);
-            var length = result.GetDistricByProvinceResult.DistrictBO.length;
-            var arrDistrictBO = result.GetDistricByProvinceResult.DistrictBO;
-            resultanswer = "";
-            //resultanswer += "<br />CHỌN QUẬN/HUYỆN CỦA "+sessions[sessionId].gender+"  ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
-
-            var type = "template";
-            questionTitle = "Danh sách quận/huyện";
-
-            var jsonmessageDistrict = {
-                username: sender,
-                siteid: siteid,
-                messagetype: "template",
-                replyobject: replyobject,
-                messagecontentobject: {
-                    elements: [
-                        {
-                            title: questionTitle,
-                            buttons: []
-                        }
-                    ]
-                }
-            };
-            arrDistrictBO.forEach(function (item, i) {
-                var total = 0;
-                var districbo = arrDistrictBO[i];
-                var argsProductStock = {
-                    productID: parseInt(productID), productCode: null, provinceID: parseInt(provinceID),
-                    districtID: parseInt(districbo.districtIDField), pageSize: 20, pageIndex: pageIndexDefault, total
-                };
-
-                APICheckInStock(urlApiCategory, argsProductStock, function (item) {
-                    console.log(item.GetStoreInStock2016Result);
-                    if (item.GetStoreInStock2016Result) {
-                        if (item.GetStoreInStock2016Result.StoreBO.length > 0)
-                            jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                                type: "postback",
-                                title: districbo.districtNameField,
-                                payload: districbo.districtIDField
-                            });
-                    }
-                });
-            });
-
-
-            setTimeout(() => {
-                //kiểm tra nếu không có quận huyện nào còn hàng thì send lại option
-                console.log(JSON.stringify(jsonmessageDistrict.messagecontentobject.elements[0].buttons));
-
-                if (jsonmessageDistrict.messagecontentobject.elements[0].buttons.length <= 0) {
-
-                    SentToClient(sender, "Không có quận/huyện nào còn hàng tại khu vực này. Vui lòng hỏi khu vực khác hoặc lựa chọn vấn đề khác", "", 0, "", replyobject, siteid)
-                        .catch(console.error);
-
-                    SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
-                        .catch(console.error);
-
-
-
-                    return;
-                }
-                else {
-
-
-                    // var bodystring = JSON.parse(jsonmessageDistrict);
-                    var bodyjson = JSON.stringify(jsonmessageDistrict);
-                    console.log(bodyjson);
-
-
-                    SentToClientButton(sender, bodyjson, intent, replyobject)
-                        .catch(console.error);
-                }
-
-            }, 2000);
-
-
-        });
-    }
-
-}
-
-const fbEvaluate = (id, replyobject, siteid) => {
-    return;
-    var messageID = Date.parse(new Date()) + Math.floor((Math.random() * 1000000) + 1);
-    var body = JSON.stringify({
-        username: id,
-        siteid: siteid,
-        messageID: messageID,
-        messagetype: "template",
-        replyobject: replyobject,
-        messagecontentobject: {
-            elements: [
-                {
-                    title: "Phiếu đánh giá dịch vụ",
-                    buttons: [
-                        {
-                            type: "postback",
-                            title: "Tốt",
-                            payload: "GOOD"
-                        }, {
-                            type: "postback",
-                            title: "Trung bình",
-                            payload: "NORMAL"
-                        },
-                        {
-                            type: "postback",
-                            title: "Tệ",
-                            payload: "BAD"
-                        }
-                    ]
-                }
-            ]
-
-        }
-    });
-
-    //===============trace log
-    var contentlogs = "<p>" + "Phiếu đánh giá dịch vụ" + "</p>";
-    contentlogs += "<button " + "type=button>" + "Tốt" + "</button>" + "<br />";
-    contentlogs += "<button " + "type=button>" + "Trung bình" + "</button>" + "<br />";
-    contentlogs += "<button " + "type=button>" + "Tệ" + "</button>" + "<br />";
-
-    tracechat.logChatHistory(id, contentlogs, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
-
-    fetch(serverChatwithBot, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: body,
-        json: true
-    })
-        .then((rsp) => {
-
-        });
-    //
-    fetch(severResponse, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: body,
-        json: true
-    })
-        .then(rsp => rsp.json())
-        .then(json => {
-            if (json.error && json.error.message) {
-                throw new Error(json.error.message);
-            }
-
-            return json;
-        });
-
-
-
 };
 
 const getButtonFinancialCompany = (productID, productName, sender, siteid, replyobject, questionTitle) => {
@@ -411,184 +101,6 @@ const getButtonFinancialCompany = (productID, productName, sender, siteid, reply
 
 }
 
-
-const getButtonInstalment = (sender, siteid, replyobject, questionTitle, productPrice, is0ptpercent) => {
-    var jsonmessageFiC =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Xem gói trả trước thường",
-                                payload: "11"
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
-
-    if (is0ptpercent) {
-        jsonmessageFiC.messagecontentobject.elements[0].buttons.push({
-            type: "postback",
-            title: "Xem trả góp 0% & 1% lãi suất (Không áp dụng giảm giá)",
-            payload: "INSTALMENT_0PTLS"
-        });
-    }
-    if (productPrice <= 25000000 && productPrice >= 2000000) {
-        jsonmessageFiC.messagecontentobject.elements[0].buttons.push({
-            type: "postback",
-            title: "Xem gói trả trước 0đ",
-            payload: "INSTALMENT_PACKAGE0D"
-        })
-    };
-
-    var bodyjson = JSON.stringify(jsonmessageFiC);
-    return bodyjson;
-
-}
-const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle, productPrice) => {
-    var jsonmessageAnother =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            // {
-                            //     type: "postback",
-                            //     title: "Chọn lại công ty tài chính",
-                            //     payload: 10
-                            // },
-                            {
-                                type: "postback",
-                                title: "Xem gói trả góp thường",
-                                payload: 11
-                            },
-                            // {
-                            //     type: "postback",
-                            //     title: "Xem tồn kho",
-                            //     payload: 2
-                            // },
-                            // {
-                            //     type: "postback",
-                            //     title: "Xem khuyễn mãi của sản phẩm",
-                            //     payload: 3
-                            // }
-
-                        ]
-                    }
-                ]
-            }
-        };
-    if (productPrice <= 25000000 && productPrice >= 2000000) {
-        jsonmessageAnother.messagecontentobject.elements[0].buttons.push({
-            type: "postback",
-            title: "Gói trả trước 0đ",
-            payload: "INSTALMENT_PACKAGE0D"
-        })
-    };
-
-    var bodyjson = JSON.stringify(jsonmessageAnother);
-    return bodyjson;
-}
-const AnotherOptionNormalInstalment = (sender, siteid, replyobject, questionTitle) => {
-    var jsonmessageAnother =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Chọn lại % trả trước",
-                                payload: 14
-                            },
-                            {
-                                type: "postback",
-                                title: "Chọn lại số tháng trả góp",
-                                payload: 15
-                            },
-                            {
-                                type: "postback",
-                                title: "Chọn lại công ty tài chính",
-                                payload: "NORMALINSTALMENT_COMPANY"
-                            }
-                            // {
-                            //     type: "postback",
-                            //     title: "Hỏi sản phẩm khác",
-                            //     payload: 1
-                            // },
-                            // {
-                            //     type: "postback",
-                            //     title: "Xem tồn kho",
-                            //     payload: 2
-                            // },
-                            // {
-                            //     type: "postback",
-                            //     title: "Xem khuyễn mãi của sản phẩm",
-                            //     payload: 3
-                            // }
-                            // {
-                            //     type: "postback",
-                            //     title: "Hỏi vấn đề khác",
-                            //     payload: 11
-                            // }
-
-                        ]
-                    }
-                ]
-            }
-        };
-
-    var bodyjson = JSON.stringify(jsonmessageAnother);
-    return bodyjson;
-}
-
-const AnotherOptionNormalInstalment0d = (sender, siteid, replyobject, questionTitle) => {
-    var jsonmessageAnother =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Chọn lại số tháng trả góp",
-                                payload: 15
-                            }
-
-                        ]
-                    }
-                ]
-            }
-        };
-
-    var bodyjson = JSON.stringify(jsonmessageAnother);
-    return bodyjson;
-}
-
 const getButtonYESNO = (productID, productName, sender, siteid, replyobject, questionTitle) => {
     var jsonmessageFiC =
         {
@@ -621,212 +133,6 @@ const getButtonYESNO = (productID, productName, sender, siteid, replyobject, que
     return bodyjson;
 
 }
-
-const getButtonMonthInstalment = (productID, productName, sender, siteid, replyobject, questionTitle, monthlist) => {
-    var jsonmessageFiC = {
-        username: sender,
-        siteid: siteid,
-        messagetype: "template",
-        replyobject: replyobject,
-        messagecontentobject: {
-            elements: [
-                {
-                    title: questionTitle,
-                    buttons: []
-                }
-            ]
-        }
-    };
-    // for (var i = 0; i < 3; i++) {
-    //     jsonmessageFiC.messagecontentobject.elements[0].buttons.push({
-    //         type: "postback",
-    //         title: monthlist[i] + " tháng",
-    //         payload: monthlist[i] + "|MONTH"
-    //     });
-    // }
-    monthlist = [6, 9, 12];
-
-    monthlist.forEach(element => {
-        jsonmessageFiC.messagecontentobject.elements[0].buttons.push({
-            type: "postback",
-            title: element + " tháng",
-            payload: element + "|MONTH"
-        });
-    });
-
-
-    var bodyjson = JSON.stringify(jsonmessageFiC);
-    return bodyjson;
-}
-
-function APIGetProductColor(url, args, fn) {
-    soap.createClient(url, function (err, client) {
-
-        client.GetProductColorByProductIDLang(args, function (err, result) {
-
-            var productColor = JSON.parse(JSON.stringify(result));
-
-            // console.log("=============================");
-            // console.log(productDetail);
-
-            //resultanswer=ChangeResultAnswer(productDetail);
-
-            fn(productColor);
-            // self.resultanswer+="Sản phẩm: "+productDetail.GetProductDetailBySiteIDResult.ProductName+"<br />"+
-            // "Giá: "+productDetail.GetProductDetailBySiteIDResult.ExpectedPrice;
-
-
-        });
-
-    });
-}
-
-function APIGetSeoURLProduct(url, args, fn) {
-    soap.createClient(url, function (err, client) {
-
-        client.getSeoURLProduct(args, function (err, result) {
-
-            var seourl = JSON.parse(JSON.stringify(result));
-
-            var final = "https://www.thegioididong.com" + seourl.getSeoURLProductResult;
-            fn(final);
-
-
-
-        });
-
-    });
-}
-
-
-const GetShockPriceByProductID = (productID) => {
-    var args = {
-        ProductID: productID
-    }
-    return new Promise((resolve, reject) => {
-        soap.createClient(urlApiProduct, function (err, client) {
-            client.GetShockPrice(args, function (err, result) {
-                if (err) reject(err);
-                // console.log("==========shock price========");
-                // console.log(result);
-
-                if (result && result.GetShockPriceResult) {
-                    if (Date.parse(result.GetShockPriceResult.showWebFromDateField) <= new Date().getTime() &&
-                        Date.parse(result.GetShockPriceResult.showWebToDateField) >= new Date().getTime()) {
-                        var priceDiscount = parseFloat(result.GetShockPriceResult.discountValueField);
-                        // console.log(priceDiscount);
-                        resolve(priceDiscount);
-                    }
-                    else {
-                        resolve(0);
-                    }
-
-                }
-                else {
-                    resolve(0);
-                }
-
-            });
-        });
-    })
-
-}
-
-function APIGetProductDetail(url, args, fn) {
-    soap.createClient(url, function (err, client) {
-
-        client.GetProduct(args, function (err, result) {
-
-            var productDetail = JSON.parse(JSON.stringify(result));
-
-            // console.log("=============================");
-            // console.log(productDetail);
-
-            //resultanswer=ChangeResultAnswer(productDetail);
-            //lay giá sốc
-            var shockPrice = GetShockPriceByProductID(args.intProductID).then((shockprice) => {
-                console.log("shockprice", shockprice);
-                if (productDetail) {
-                    productDetail.shockPriceByProductID = shockprice;
-                }
-
-                fn(productDetail);
-            }).catch(err => {
-                fn(null);
-            });
-
-
-            // self.resultanswer+="Sản phẩm: "+productDetail.GetProductDetailBySiteIDResult.ProductName+"<br />"+
-            // "Giá: "+productDetail.GetProductDetailBySiteIDResult.ExpectedPrice;
-
-
-        });
-
-    });
-}
-
-function APICheckInStock(url, args, fn) {
-    console.log(args);
-    soap.createClient(url, function (err, client) {
-
-        client.GetStoreInStock2016(args, function (err, result) {
-
-            var stores = JSON.parse(JSON.stringify(result));
-            fn(stores);
-
-
-        });
-
-    });
-}
-
-function APIGetDistrictByProvince(url, args, fn) {
-    soap.createClient(url, function (err, client) {
-
-        client.GetDistricByProvince(args, function (err, result) {
-
-            var lstDistric = JSON.parse(JSON.stringify(result));
-            fn(lstDistric);
-
-        });
-
-    });
-}
-
-
-function hasNumber(myString) {
-    return /\d/.test(myString);
-}
-
-async function getElasticSearch(client, index, type, keyword, callback) {
-
-    await client.search({
-        index: index,
-        type: type,
-        q: keyword
-    }, function (error, response) {
-        if (error) return callback(error, null); // returns the callback with the error that happened
-
-        return callback(null, response.hits.hits);
-    });  // returns the result of showdocs(response)
-
-}
-
-async function getElasticSearchDistrictAndProvince(client, index, type, keyword, provinveID, callback) {
-
-    await client.search({
-        index: index,
-        type: type,
-        q: keyword + " AND " + "provinceID:" + '"' + provinveID + '"'
-    }, function (error, response) {
-        if (error) return callback(error, null); // returns the callback with the error that happened
-
-        return callback(null, response.hits.hits);
-    });  // returns the result of showdocs(response)
-
-}
-
-
 
 const getExactlyUrl = (currenturl) => {
     if (currenturl) {
@@ -1054,7 +360,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                                     //bỏ đi
                                     sessions[sessionId].isLatestAskMonthInstalment = false;
-                                    SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
+                                    SendMessage.SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
                                         .catch(console.error);
 
                                     return;
@@ -1155,7 +461,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 else {
                     //chỉ resset lại color (vì color sẽ khác với sp khác)
-                    if (hasNumber(sessions[sessionId].color))//nó là productcode
+                    if (CommonHelper.hasNumber(sessions[sessionId].color))//nó là productcode
                     {
                         //console.log("==============MÃ MÀU PRODUCTCODE " + sessions[sessionId].color + " =================================");
                         sessions[sessionId].color = null;
@@ -1165,7 +471,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     // sessions[sessionId].district=null;
 
                     if (button_payload_state.toString().trim().length >= 2 &&
-                        button_payload_state.toString().length < 10 && hasNumber(button_payload_state))//là districtID
+                        button_payload_state.toString().length < 10 && CommonHelper.hasNumber(button_payload_state))//là districtID
                     {
                         if (parseInt(button_payload_state) >= 16) {
                             sessions[sessionId].district = button_payload_state;
@@ -1183,14 +489,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         questionTitle = "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm";
 
                         //console.log(sessions[sessionId].productID);
-                        SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
+                        SendMessage.SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
 
                         return;
                     }
                     else if (button_payload_state === 7)//gợi ý lại danh sách quận huyện (đã có product, province)
                     {
                         questionTitle = "Chọn quận/huyện nơi " + sessions[sessionId].gender + "  ở";
-                        SendToUserListDistrict(sessions[sessionId].productID, sessions[sessionId].provinveID, sender, siteid, replyobject, questionTitle, intent);
+                        SendMessage.SendToUserListDistrict(sessions[sessionId].productID, sessions[sessionId].provinveID, sender, siteid, replyobject, questionTitle, intent);
                         return;
                     }
                     else if (button_payload_state === 8 || button_payload_state === 9)//cong ty tai chinh
@@ -1200,7 +506,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
 
                     else if (button_payload_state === "NORMAL" || button_payload_state === "BAD" || button_payload_state === "GOOD") {
-                        SentToClient(sender, "Cảm ơn " + sessions[sessionId].gender + "  đã đánh giá. Rất vui được phục vụ " + sessions[sessionId].gender + " .", questionTitle, button_payload_state, "", replyobject, siteid)
+                        SendMessage.SentToClient(sender, "Cảm ơn " + sessions[sessionId].gender + "  đã đánh giá. Rất vui được phục vụ " + sessions[sessionId].gender + " .", questionTitle, button_payload_state, "", replyobject, siteid)
                             .catch(console.error);
                         return;
                     }
@@ -1210,9 +516,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
             else {
 
-                if (hasNumber(sessions[sessionId].color))//nó là productcode
+                if (CommonHelper.hasNumber(sessions[sessionId].color))//nó là productcode
                 {
-                    //console.log(hasNumber(sessions[sessionId].color));
+                    //console.log(CommonHelper.hasNumber(sessions[sessionId].color));
                     sessions[sessionId].color = null;
                 }
 
@@ -1228,8 +534,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             entities[i].value = entities[i].value.replace("cường lực", "màn hình").replace('_', ' ');
                         }
                         //phụ kiện 
-                        if (productIndex > 1 && (isIncludeAccessoryKeyword(sessions[sessionId].product)
-                            || isIncludeAccessoryKeyword(entities[i].value.toLowerCase().replace('_', ' ')))) {
+                        if (productIndex > 1 && (CommonHelper.isIncludeAccessoryKeyword(sessions[sessionId].product)
+                            || CommonHelper.isIncludeAccessoryKeyword(entities[i].value.toLowerCase().replace('_', ' ')))) {
                             sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');//gộp  sản phẩm lại
                         }
                         else {
@@ -1413,7 +719,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }
             //trường hợp sản phẩm chung chung thì xem như chưa xác định
-            if (sessions[sessionId].product && isGeneralProduct(sessions[sessionId].product)) {
+            if (sessions[sessionId].product && CommonHelper.isGeneralProduct(sessions[sessionId].product)) {
                 sessions[sessionId].product = null;
             }
 
@@ -1429,7 +735,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             console.log("========finalURL========", finalUrl);
 
             // currenturl = "dtdd/oppo-f7";
-            ProductAPI.GetProductInfoByURL(urlApiProduct, finalUrl, sessionId, ishaveProductEntity).then((value) => {
+            ProductAPI.GetProductInfoByURL(ConstConfig.URLAPI_PRODUCT, finalUrl, sessionId, ishaveProductEntity).then((value) => {
                 if (value) {//nếu có sản phẩm từ URL
                     sessions[sessionId].product = value.replace("+", " plus ");
 
@@ -1450,10 +756,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                     //câu chào HI
                     if (customer_question.trim().toLowerCase() === "hi") {
-                        var rn = randomNumber(greet.length);
+                        var rn = CommonHelper.randomNumber(greet.length);
                         resultanswer = greet[rn];
 
-                        SentToClient(sender, resultanswer, "Xin chào!", button_payload_state, "greet", replyobject, siteid)
+                        SendMessage.SentToClient(sender, resultanswer, "Xin chào!", button_payload_state, "greet", replyobject, siteid)
                             .catch(console.error);
                         return;
                     }
@@ -1492,692 +798,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             ishaveMoneyPrepaidInstalment, sessionId, sender, button_payload_state, replyobject, siteid, productnotfound);
                     }
                     else if (intent === "ask_stock") {
-
-
                         sessions[sessionId].isLatestAskNormalInstallment = false;
-                        return;//tạm thời không làm cái này
 
-
-                        if (intent === "ask_stock")
-                            sessions[sessionId].prev_intent = "ask_stock";
-                        if (intent === "ask_price")
-                            sessions[sessionId].prev_intent = "ask_price";
-                        if (intent === "ask_old_stock")
-                            sessions[sessionId].prev_intent = "ask_old_stock";
-
-
-                        questionTitle = "Thông tin sản phẩm!";
-                        //ten san pham, gia ca, dia chi, mau sac
-
-                        if (sessions[sessionId].product) {
-
-                            var productName = sessions[sessionId].product;
-                            console.log(productName);
-
-                            //nếu có tỉnh,tp => lấy tên tỉnh,tp
-                            var province;
-                            var district;
-                            var color;
-                            if (sessions[sessionId].province) {
-
-                                province = sessions[sessionId].province;
-
-                            }
-                            //nếu có quận.huyện =>lấy nó
-                            if (sessions[sessionId].district) {
-
-                                district = sessions[sessionId].district;
-
-                            }
-
-                            if (sessions[sessionId].color) {
-                                color = sessions[sessionId].color;
-
-                            }
-
-                            var keyword = productName;
-
-                            // var intRowCountRef=0;
-                            // var categoryLstRef=[];
-                            // var productTypeLstRef=[];
-                            // var categoryDefault=0;
-                            var argsSearchProduct = "";
-
-                            //console.log(keyword.toLowerCase());
-                            console.log(keyword);
-                            console.log(isIncludeAccessoryKeyword(keyword));
-
-                            if (isIncludeAccessoryKeyword(keyword))//search phụ kiện
-                            {
-                                argsSearchProduct = {
-                                    q: keyword,
-                                    CateID: -3
-                                };
-                            }
-                            else {
-
-                                argsSearchProduct = {
-                                    q: keyword,
-                                    CateID: -4
-                                };
-                            }
-
-                            if (intent === "ask_old_stock")//xử lý máy cũ
-                            {
-                                SentToClient(sender, "Chức năng tìm máy cũ đang được phát triển...Xin lỗi vì sự bất tiện này!", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                    .catch(console.error);
-
-                            }
-                            else {
-
-                                APIGetProductSearch(urlApiProduct, argsSearchProduct, function getResult(result) {
-
-                                    //console.log(result);
-                                    if (result.SearchProductPhiResult != null) {
-
-                                        //console.log("================KẾT QUẢ SEARCH===============");
-                                        //console.log(result.SearchProductPhiResult);
-
-                                        //console.log("============================================");
-
-                                        var productID = result.SearchProductPhiResult.string[0];
-                                        sessions[sessionId].productID = productID;
-
-                                        var argsProductDetail = { intProductID: parseInt(productID), intProvinceID: 3 };
-                                        var lstproduct = result;
-
-                                        APIGetProductDetail(urlApiProduct, argsProductDetail, function getResult(result) {
-
-
-                                            if (result && result.GetProductResult.productErpPriceBOField) {
-                                                //lấy link sp
-                                                var argsProductDetailGetSeoURL = {
-                                                    productCategoryLangBOField_uRLField: result.GetProductResult.productCategoryLangBOField.uRLField,
-                                                    productCategoryLangBOField_categoryNameField: result.GetProductResult.productCategoryLangBOField.categoryNameField,
-                                                    productCategoryBOField_uRLField: result.GetProductResult.productCategoryBOField.uRLField,
-                                                    productCategoryBOField_categoryNameField: result.GetProductResult.productCategoryBOField.categoryNameField,
-                                                    categoryNameField: result.GetProductResult.categoryNameField,
-                                                    productLanguageBOField_productNameField: result.GetProductResult.productLanguageBOField.productNameField,
-                                                    productLanguageBOField_uRLField: result.GetProductResult.productLanguageBOField.uRLField,
-                                                    productNameField: result.GetProductResult.productNameField,
-                                                    uRLField: result.GetProductResult.uRLField
-                                                };
-
-
-                                                // console.log(result);
-                                                resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
-                                                    + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
-                                                //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
-                                                resultanswer += "<br /><img width='120' height='120' src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
-                                                //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
-                                                // console.log(resultanswer);
-
-                                                APIGetSeoURLProduct(urlApiCategory, argsProductDetailGetSeoURL, function callback(seoURL) {
-
-                                                    resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
-
-                                                    if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
-                                                        (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
-                                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
-
-
-                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                            .catch(console.error);
-                                                    }
-                                                    else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
-
-
-                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                            .catch(console.error);
-                                                    }
-                                                    else {
-
-                                                        //nếu có tỉnh/tp mới, reset lại huyện
-
-                                                        if (province && !district) {//có province, không có district
-
-                                                            //lấy provinceID
-
-                                                            var index = "locationdata";
-                                                            var type = "province";
-                                                            getElasticSearch(el, index, type, province, function callbackEL(err, result) {
-                                                                if (err) return err;
-                                                                //console.log(result);
-                                                                if (result.length != 0) {//district được tìm thấy
-                                                                    var provinceID = result[0]._source.provinceID;
-                                                                    var provinceName = result[0]._source.provinceName;
-                                                                    sessions[sessionId].province = provinceName;
-                                                                    sessions[sessionId].provinveID = provinceID;
-
-                                                                    //console.log(provinceID);
-
-                                                                    //lấy danh sách siêu thị còn hàng
-                                                                    var total = 0;
-                                                                    var argsProductStock = "";
-                                                                    if (hasNumber(color)) {
-                                                                        argsProductStock = {
-                                                                            productID: parseInt(productID), productCode: color, provinceID: provinceID,
-                                                                            districtID: 0, pageSize: 30, pageIndex: pageIndexDefault, total
-                                                                        };
-                                                                    }
-                                                                    else {
-                                                                        argsProductStock = {
-                                                                            productID: parseInt(productID), productCode: null, provinceID: provinceID,
-                                                                            districtID: 0, pageSize: 30, pageIndex: pageIndexDefault, total
-                                                                        };
-                                                                    }
-
-                                                                    APICheckInStock(urlApiCategory, argsProductStock, function getResult(result) {
-                                                                        //console.log(argsProductStock);
-
-
-                                                                        // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                                        // console.log(total);
-                                                                        console.log(result);
-                                                                        if (result.total) {//có hàng
-                                                                            resultanswer = "";
-
-                                                                            var type = "template";
-
-                                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + provinceName;
-                                                                            var jsonmessageStore = {
-                                                                                username: sender,
-                                                                                siteid: siteid,
-                                                                                messagetype: "template",
-                                                                                replyobject: replyobject,
-                                                                                messagecontentobject: {
-                                                                                    elements: [
-                                                                                        {
-                                                                                            title: questionTitle,
-                                                                                            buttons: []
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            };
-                                                                            var length = result.GetStoreInStock2016Result.StoreBO.length;
-
-                                                                            // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
-                                                                            for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
-                                                                                var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                                                //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                                                //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
-
-                                                                                jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                                                    type: "web_url",
-                                                                                    title: (i + 1) + ". " + storeBO.webAddressField,
-                                                                                    url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                                                });
-                                                                            }
-
-                                                                            //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                            //    .catch(console.error);
-                                                                            // console.log(jsonmessageStore);
-
-                                                                            //  var bodystring = JSON.parse(jsonmessageStore);
-                                                                            var bodyjson = JSON.stringify(jsonmessageStore);
-
-
-                                                                            //console.log("===============BUTTON URL STORE===================");
-                                                                            //console.log(bodyjson);
-
-
-                                                                            SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                                                .catch(console.error);
-
-
-                                                                            //===========================================================================================
-
-
-                                                                            //lấy danh sách huyện của tỉnh đó
-
-                                                                            var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-
-                                                                            SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
-
-
-                                                                        }
-                                                                        else {//hết hàng
-                                                                            SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                                .catch(console.error);
-
-                                                                        }
-
-                                                                    });//end APIGetDistrictByProvince
-
-                                                                }
-                                                                else {
-
-                                                                    sessions[sessionId].province = null;
-                                                                    SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố " + sessions[sessionId].gender + "  đang ở. Vui lòng cung cấp tỉnh/Thành trước. (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                        .catch(console.error);
-
-                                                                }
-
-                                                            });//end elastic
-
-
-
-                                                        }
-                                                        else if (province && district) {
-
-                                                            //console.log(province+"-"+district);
-
-
-                                                            //lấy danh sách cửa hàng còn hàng ở tỉnh, huyện  đó không theo màu
-
-                                                            var index = "locationdata";
-                                                            var type = "district";
-                                                            if (!(sessions[sessionId].provinveID))//th này là do detect đc cả tỉnh lẫn huyện trong 1 câu (phức tạp)
-                                                            {
-                                                                sessions[sessionId].provinveID = 3;//cho tránh trường hợp lỗi query elastic (lấy mặc định là HCM)
-                                                            }
-                                                            //tìm huyện theo tỉnh trước
-                                                            getElasticSearchDistrictAndProvince(el, index, type, district, sessions[sessionId].provinveID, function callbackEL(err, result) {
-                                                                if (err) return err;
-                                                                if (result.length != 0) {
-                                                                    if (result.length == 1)//đã xác định đúng chính xác huyện và tỉnh đó
-                                                                    {
-                                                                        var provinceID = result[0]._source.provinceID;
-                                                                        var districtID = result[0]._source.districtID;
-                                                                        var districtName = result[0]._source.districtName;
-                                                                        var provinceName = province;
-
-                                                                        //console.log(provinceID);
-
-                                                                        //lấy danh sách siêu thị còn hàng
-                                                                        var total = 0;
-                                                                        var argsProductStock = "";
-                                                                        if (hasNumber(color)) {
-                                                                            argsProductStock = {
-                                                                                productID: parseInt(productID), productCode: color, provinceID: parseInt(provinceID),
-                                                                                districtID: parseInt(districtID), pageSize: 20, pageIndex: pageIndexDefault, total
-                                                                            };
-                                                                        }
-                                                                        else {
-                                                                            argsProductStock = {
-                                                                                productID: parseInt(productID), productCode: null, provinceID: parseInt(provinceID),
-                                                                                districtID: parseInt(districtID), pageSize: 20, pageIndex: pageIndexDefault, total
-                                                                            };
-                                                                        }
-                                                                        APICheckInStock(urlApiCategory, argsProductStock, function getResult(result) {
-                                                                            //console.log(argsProductStock);
-                                                                            //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
-
-                                                                            // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                                            console.log(result);
-                                                                            if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
-
-                                                                                // console.log(total);
-                                                                                resultanswer = "";
-
-                                                                                if (color && hasNumber(color)) {
-                                                                                    //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
-                                                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
-                                                                                }
-                                                                                else {
-                                                                                    //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
-                                                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName + "," + provinceName;
-                                                                                }
-
-                                                                                var type = "template";
-
-
-                                                                                var jsonmessageStore = {
-                                                                                    username: sender,
-                                                                                    siteid: siteid,
-                                                                                    messagetype: "template",
-                                                                                    replyobject: replyobject,
-                                                                                    messagecontentobject: {
-                                                                                        elements: [
-                                                                                            {
-                                                                                                title: questionTitle,
-                                                                                                buttons: []
-                                                                                            }
-                                                                                        ]
-                                                                                    }
-                                                                                };
-
-                                                                                var length = result.GetStoreInStock2016Result.StoreBO.length;
-
-                                                                                for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
-                                                                                    var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                                                    if (storeBO.webAddressField && storeBO.webAddressField != "undefined") {
-                                                                                        // resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                                                        // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
-
-
-                                                                                        jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                                                            type: "web_url",
-                                                                                            title: (i + 1) + ". " + storeBO.webAddressField,
-                                                                                            url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                                                        });
-
-                                                                                    }
-
-                                                                                }
-                                                                                //  var bodystring = JSON.parse(jsonmessageStore);
-                                                                                var bodyjson = JSON.stringify(jsonmessageStore);
-
-
-                                                                                //console.log("===============BUTTON URL STORE===================");
-                                                                                //console.log(bodyjson);
-
-
-
-                                                                                SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                                                    .catch(console.error);
-
-                                                                                //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                                //    .catch(console.error);
-                                                                                // resultanswer = "";
-                                                                                //nếu có hỏi màu, gợi ý thêm danh sách màu
-                                                                                //không hỏi thì kệ nó :v
-                                                                                //if (color) {
-
-
-
-                                                                                if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
-                                                                                    resultanswer = "";
-                                                                                    setTimeout(() => {
-                                                                                        SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                                            .catch(console.error);
-                                                                                    }, 1500);
-
-                                                                                }
-                                                                                else {
-                                                                                    resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
-                                                                                    SendToUserListColor(sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
-                                                                                    return;
-                                                                                }
-
-
-
-                                                                                //}//end if color
-                                                                                //else {
-                                                                                //resultanswer = "Vui lòng chọn màu sắc "+sessions[sessionId].gender+"  quan tâm để xem danh sách cửa hàng còn hàng!"
-                                                                                //}
-
-                                                                            }//end if(result)
-                                                                            else {
-                                                                                //sessions[sessionId].province = null;
-                                                                                //sessions[sessionId].district = null;
-
-                                                                                if (color && hasNumber(color)) {
-
-
-                                                                                    resultanswer = "Rất tiếc. Sản phẩm có màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " ! Vui lòng chọn lại."
-
-                                                                                    //đưa ra ôption
-
-                                                                                    SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                                        .catch(console.error);
-
-                                                                                    resultanswer = "";
-                                                                                    //suggest khu vực
-
-
-                                                                                    //===================================================================
-
-
-
-                                                                                    //reset color
-                                                                                    //sessions[sessionId].color = null;
-                                                                                    //sessions[sessionId].colorname = null;
-
-
-                                                                                }
-                                                                                else {
-                                                                                    resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
-
-                                                                                    //suggest khu vực
-                                                                                    var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-                                                                                    //=======================================================================
-
-                                                                                    SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
-
-                                                                                    //=======================================================================
-
-
-                                                                                }
-
-                                                                            }
-
-                                                                            SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                                .catch(console.error);
-
-                                                                        });//end APICheckInStock
-                                                                    }
-                                                                    else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (3 kết quả tối đa)
-
-                                                                        resultanswer = "";
-                                                                        resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
-
-
-                                                                        var type = "template";
-                                                                        questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
-                                                                        var jsonmessageDistrict = {
-                                                                            username: sender,
-                                                                            siteid: siteid,
-                                                                            messagetype: "template",
-                                                                            replyobject: replyobject,
-                                                                            messagecontentobject: {
-                                                                                elements: [
-                                                                                    {
-                                                                                        title: questionTitle,
-                                                                                        buttons: []
-                                                                                    }
-                                                                                ]
-                                                                            }
-                                                                        };
-
-                                                                        for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                                                            if (i > 5) break;
-                                                                            var resultEach = result[i]._source;
-                                                                            jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                                                                                type: "postback",
-                                                                                title: resultEach.districtName,
-                                                                                payload: resultEach.districtID
-                                                                            });
-
-                                                                        }
-
-                                                                        var bodyjson = JSON.stringify(jsonmessageDistrict);
-
-                                                                        //console.log(bodyjson);
-                                                                        SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                                            .catch(console.error);
-                                                                    }
-
-                                                                }
-                                                                else {//trường hợp này có thể là tỉnh/thành phố một đằng (ID) mà huyện/quận lại một nẻo
-
-                                                                    //Dùng elastic, search theo đơn vị nhỏ nhất là quận/huyện (không theo province ID), Suggest ra tầm 3 kết quả 
-
-                                                                    var index1 = "locationdata";
-                                                                    var type1 = "district";
-                                                                    getElasticSearch(el, index1, type1, province, function callbackEL(err, result) {
-                                                                        if (err) return err;
-                                                                        //console.log(result);
-                                                                        if (result.length != 0) {//address được tìm thấy
-                                                                            var provinceID = result[0]._source.provinceID;
-                                                                            var districtName = result[0]._source.districtName;
-                                                                            sessions[sessionId].province = districtName.split(",");
-                                                                            sessions[sessionId].provinveID = provinceID;
-
-
-                                                                            resultanswer = "";
-                                                                            resultanswer += "CÓ PHẢI Ý " + sessions[sessionId].gender + "  LÀ CÁC ĐỊA CHỈ DƯỚI ĐÂY KHÔNG ?<br /> ";
-
-
-                                                                            var type = "template";
-                                                                            questionTitle = "Ý " + sessions[sessionId].gender + "  là ?";
-                                                                            var jsonmessageDistrict = {
-                                                                                username: sender,
-                                                                                siteid: siteid,
-                                                                                messagetype: "template",
-                                                                                replyobject: replyobject,
-                                                                                messagecontentobject: {
-                                                                                    elements: [
-                                                                                        {
-                                                                                            title: questionTitle,
-                                                                                            buttons: []
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            };
-
-                                                                            for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                                                                if (i > 5) break;
-                                                                                var resultEach = result[i]._source;
-                                                                                jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                                                                                    type: "postback",
-                                                                                    title: resultEach.districtName,
-                                                                                    payload: resultEach.districtID
-                                                                                });
-
-                                                                            }
-                                                                            var bodyjson = JSON.stringify(jsonmessageDistrict);
-
-                                                                            //console.log(bodyjson);
-                                                                            SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                                                .catch(console.error);
-                                                                        }
-
-                                                                        else {
-
-                                                                            SentToClient(sender, "" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                                .catch(console.error);
-                                                                        }
-
-
-
-                                                                    });//end getElasticSearch
-
-
-                                                                    sessions[sessionId].district = null;
-                                                                    //sessions[sessionId].province = null;
-
-
-                                                                    //fbMessage(sender, "Không nhận diện được địa chỉ. Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...", questionTitle, button_payload_state, intent)
-                                                                    //    .catch(console.error);
-
-                                                                }
-
-                                                            });//end getElasticSearchDistrictAndProvince
-
-                                                            //suggest thêm màu để chọn                                        
-
-                                                        }//end if(product && province)
-                                                        else if (!province && district)//khong có tỉnh, chỉ có huyện/quận
-                                                        {
-                                                            resultanswer = "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...";
-                                                        }
-                                                        else {//chỉ có product
-
-                                                            resultanswer += "<br />Vui lòng cung cấp tên tỉnh/thành phố để xem siêu thị có hàng (VIẾT HOA CHỮ ĐẦU) Ví dụ: Hồ Chí Minh, Phú Yên, Cần Thơ...";
-
-                                                        }
-
-                                                        // console.log("Sản phẩm hỏi: " + productName);
-                                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                            .catch(console.error);
-                                                    }
-
-                                                });
-                                            }
-
-                                            else {
-                                                resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
-                                                SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                    .catch(console.error);
-                                            }
-
-
-
-                                        });
-
-
-                                        ////============================================================================================
-                                        ////gợi ý thêm 3 sản phẩm liên quan
-
-                                        //questionTitle = "Danh sách sản phẩm liên quan !";
-
-                                        //var type = "template";
-
-                                        //var jsonmessageDistrict = '{' +
-                                        //    '"recipient":' + '{' + '"id":' +
-                                        //    '"' + sender + '"' +
-                                        //    '},' +
-                                        //    '"message":' + '{' +
-                                        //    '"attachment":' + '{' +
-                                        //    '"type":' + '"' + type + '"' + ',' +
-                                        //    '"payload":' + '{' +
-                                        //    '"template_type":"generic"' + ',' +
-                                        //    '"elements":' + '[' +
-                                        //    '{' +
-                                        //    '"title":' + '"' + questionTitle + '"' + ',' +
-                                        //    '"buttons":' + '[';
-
-                                        //for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                        //    if (i > 2) break;
-                                        //    var resultEach = result[i]._source;
-                                        //    if (i == 2 || i == result.length - 1) {
-
-                                        //        jsonmessageDistrict += '{' +
-                                        //            '"type":"postback"' + ',' +
-                                        //            '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                        //            '"payload":' + '"' + resultEach.districtID + '"' + '}';
-
-                                        //    }
-                                        //    else {
-                                        //        jsonmessageDistrict += '{' +
-                                        //            '"type":"postback"' + ',' +
-                                        //            '"title":' + '"' + resultEach.districtName + '"' + ',' +
-                                        //            '"payload":' + '"' + resultEach.districtID + '"' + '}' + ',';
-
-
-
-                                        //    }
-
-                                        //}
-                                        //jsonmessageDistrict +=
-                                        //    ']' +
-                                        //    '}' +
-                                        //    ']' +
-                                        //    '}' +
-                                        //    '}' +
-                                        //    '}' +
-                                        //    '}';
-
-                                        //var bodystring = JSON.parse(jsonmessageDistrict);
-
-                                        //var bodyjson = JSON.stringify(bodystring);
-
-                                        ////console.log(bodyjson);
-                                        //fbMessagebutton(sender, bodyjson)
-                                        //    .catch(console.error);
-                                        ////============================================================================================
-                                    }
-
-                                    else {
-                                        var rn = randomNumber(productnotfound.length);
-                                        resultanswer = productnotfound[rn];
-
-                                        SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                            .catch(console.error);
-
-                                    }
-
-                                });
-                            }
-
-                        }//end if (sessions[sessionId].product)
-
-                        else {
-                            var rn = randomNumber(unknowproduct.length);
-                            resultanswer = unknowproduct[rn];
-                        }
+                        StockModule.StockModule(sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state);
 
                     }
 
@@ -2196,11 +819,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             }).catch((error) => {
                 console.log("======error when GetProductInfoByURL=======ENDED", error);
-                logerror.WriteLogToFile(ERRORFILE_PATH, "error when GetProductInfoByURL at 4883: " + error);
+                logerror.WriteLogToFile(ConstConfig.ERRORFILE_PATH, "error when GetProductInfoByURL at 4883: " + error);
             });
         }
         catch (err) {
-            logerror.WriteLogToFile(ERRORFILE_PATH, "Error at 4887: " + err);
+            logerror.WriteLogToFile(ConstConfig.ERRORFILE_PATH, "Error at 4887: " + err);
 
         }
     });
@@ -2214,7 +837,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
     if (button_payload_state === "1") {
         questionTitle = "Hỏi thông tin sản phẩm"
         if (sessions[sessionId].product && sessions[sessionId].prev_intent != "ask_instalment") {
-            var sever = severRasaQuery;
+            var sever = ConstConfig.SERVER_RASAQUERY;
             var url = encodeURI(sever);
             sessions[sessionId].prev_intent = "ask_stock";
             getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
@@ -2226,7 +849,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
     else if (button_payload_state === "2") {
         questionTitle = "Hỏi giá sản phẩm"
         if (sessions[sessionId].product) {
-            var sever = severRasaQuery;
+            var sever = ConstConfig.SERVER_RASAQUERY;
             var url = encodeURI(sever);
             sessions[sessionId].prev_intent = "ask_price";
             getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
@@ -2238,7 +861,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
     else if (button_payload_state === "3") {
         questionTitle = "Hỏi khuyến mãi sản phẩm"
         if (sessions[sessionId].product) {
-            var sever = severRasaQuery;
+            var sever = ConstConfig.SERVER_RASAQUERY;
             var url = encodeURI(sever);
             sessions[sessionId].prev_intent = "ask_promotion";
             getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
@@ -2251,16 +874,14 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
     else if (button_payload_state === "4") {
 
         sessions[sessionId].prev_intent = "ask_instalment";
-        var sever = severRasaQuery;
+        var sever = ConstConfig.SERVER_RASAQUERY;
         var url = encodeURI(sever);
 
         getJsonAndAnalyze(url, sender, sessionId, parseInt(button_payload_state), replyobject, siteid);
         return;
 
     }
-
-
-    SentToClient(sender, resultanswer, questionTitle, parseInt(button_payload_state), "", replyobject, siteid)
+    SendMessage.SentToClient(sender, resultanswer, questionTitle, parseInt(button_payload_state), "", replyobject, siteid)
         .catch(console.error);
 
 
@@ -2269,7 +890,7 @@ const responsepostbackgreet = (sender, sessionId, button_payload_state, replyobj
 
 const responsepostbackothers = (sender, sessionId, othersID, replyobject, siteid) => {
 
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
 
     var button_payload_state = othersID;
@@ -2282,7 +903,7 @@ const responsepostbackothers = (sender, sessionId, othersID, replyobject, siteid
 
 const responsepostbackcolor = (sender, sessionId, productCode, colorname, replyobject, siteid) => {
 
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
 
     var button_payload_state = productCode;
@@ -2291,7 +912,7 @@ const responsepostbackcolor = (sender, sessionId, productCode, colorname, replyo
     getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
 };
 const responsepostbackFeedback = (sender, sessionId, feedback, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
 
     var button_payload_state = feedback;
@@ -2301,7 +922,7 @@ const responsepostbackFeedback = (sender, sessionId, feedback, replyobject, site
 
 };
 const responsepostbackfinancialcompany = (sender, sessionId, company, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
 
     var button_payload_state = company;
@@ -2317,22 +938,20 @@ const responseRepeatChooseFinancialCompany = (sender, sessionId, button_payload_
         //console.log(jsonbuttonFinancialCompany);
         sessions[sessionId].isLatestAskCompanyForNormalInstalment = false;
 
-        SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment", replyobject)
+        SendMessage.SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment", replyobject)
             .catch(console.error);
     }
     else {
-        var rn = randomNumber(unknowproduct.length);
+        var rn = CommonHelper.randomNumber(unknowproduct.length);
         var resultanswer = unknowproduct[rn];
         if (!resultanswer) {//trường hợp chưa load xong file từ data
             resultanswer = "Không hiểu sản phẩm " + sessions[sessionId].gender + "  đang muốn hỏi là gì?";
         }
 
-        SentToClient(sender, resultanswer, "", button_payload_state, "ask_instalment", replyobject, siteid)
+        SendMessage.SentToClient(sender, resultanswer, "", button_payload_state, "ask_instalment", replyobject, siteid)
             .catch(console.error);
 
     }
-
-
 
 }
 const responseRepeatChooseFinancialCompany_NormalInstalment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
@@ -2345,30 +964,30 @@ const responseRepeatChooseFinancialCompany_NormalInstalment = (sender, sessionId
         //session phân biệt đang chọn company cho gói trả góp thường
         sessions[sessionId].isLatestAskCompanyForNormalInstalment = true;
 
-        SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment", replyobject)
+        SendMessage.SentToClientButton(sender, jsonbuttonFinancialCompany, "ask_instalment", replyobject)
             .catch(console.error);
     }
     else {
-        var rn = randomNumber(unknowproduct.length);
+        var rn = CommonHelper.randomNumber(unknowproduct.length);
         var resultanswer = unknowproduct[rn];
         if (!resultanswer) {//trường hợp chưa load xong file từ data
             resultanswer = "Không hiểu sản phẩm " + sessions[sessionId].gender + "  đang muốn hỏi là gì?";
         }
 
-        SentToClient(sender, resultanswer, "", button_payload_state, "ask_instalment", replyobject, siteid)
+        SendMessage.SentToClient(sender, resultanswer, "", button_payload_state, "ask_instalment", replyobject, siteid)
             .catch(console.error);
 
     }
 }
 const responsePackage0d = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
 
     var button_payload_state = button_payload_state;
     getJsonAndAnalyze(url, sender, sessionId, button_payload_state, replyobject, siteid);
 }
 const responsePackage0PTLS = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
 
     var button_payload_state = button_payload_state;
@@ -2378,7 +997,7 @@ const responsePackage0PTLS = (sender, sessionId, button_payload_state, replyobje
 
 
 const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     try {
@@ -2401,7 +1020,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
             }
             else {
                 request({
-                    url: encodeURI(severRasaQuery + messagecontent),
+                    url: encodeURI(ConstConfig.SERVER_RASAQUERY + messagecontent),
                     headers: { 'Content-Type': 'application/json; charset=utf-8' },
                     json: true
                 }, function (error, response, body) {
@@ -2430,7 +1049,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
                                     if (moneyPrepaid < 400000) {
                                         //không hợp lệ số tiền trả trước                           
                                         resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng chỉ nhập số TRÒN CHỤC và nằm trong khoảng từ 0% đến 80%."
-                                        SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
+                                        SendMessage.SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
                                             .catch(console.error);
                                         sessions[sessionId].isLatestAskPercentInstalment = false;
 
@@ -2453,7 +1072,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
                     }
                     else {
                         resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng chỉ nhập số TRÒN CHỤC và nằm trong khoảng từ 0% đến 80%."
-                        SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
+                        SendMessage.SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
                             .catch(console.error);
                         sessions[sessionId].isLatestAskPercentInstalment = false;
 
@@ -2473,7 +1092,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
         console.log(err);
         //bị lỗi khi nhập
         resultanswer = "Phần trăm trả trước không hợp lệ. Vui lòng nhập lại và chỉ nhập số TRÒN CHỤC."
-        SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
+        SendMessage.SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
             .catch(console.error);
 
         return;
@@ -2481,7 +1100,7 @@ const getPercentInstalment = (sender, sessionId, messagecontent, replyobject, si
     }
 }
 const getMonthInstalmentByInputDirect = (sender, sessionId, messagecontent, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     try {
@@ -2496,7 +1115,7 @@ const getMonthInstalmentByInputDirect = (sender, sessionId, messagecontent, repl
         console.log("ERROR month getMonthInstalmentByInputDirect", err);
         //bị lỗi khi nhập
         resultanswer = "ERROR month getMonthInstalmentByInputDirect."
-        SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
+        SendMessage.SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
             .catch(console.error);
 
         return;
@@ -2505,7 +1124,7 @@ const getMonthInstalmentByInputDirect = (sender, sessionId, messagecontent, repl
 }
 
 const getMonthInstalment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     try {
@@ -2518,7 +1137,7 @@ const getMonthInstalment = (sender, sessionId, button_payload_state, replyobject
         console.log(err);
         //bị lỗi khi nhập
         resultanswer = "Số tháng không hợp lệ. Có lỗi xảy ra."
-        SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
+        SendMessage.SentToClient(sender, resultanswer, "", -1, "", replyobject, siteid)
             .catch(console.error);
 
         return;
@@ -2535,13 +1154,13 @@ const sendBriefSupport = (sender, sessionId, button_payload_state, replyobject, 
                     5. Hóa đơn điện(cáp/nước/internet- không bắt buộc) có địa chỉ trùng với địa chỉ trên CMND để được hưởng lãi suất tốt nhất "+ sessions[sessionId].gender + " nhé</br>\
                     <span style='color:red;font-style:italic'>LƯU Ý: THỜI GIAN DUYỆT HỒ SƠ TỪ 4-14 TIẾNG Ạ.</span></p>";
 
-    SentToClient(sender, resultanswer, "", button_payload_state, "ask_instalment+briefsupport", replyobject, siteid)
+    SendMessage.SentToClient(sender, resultanswer, "", button_payload_state, "ask_instalment+briefsupport", replyobject, siteid)
         .catch(console.error);
     return;
 }
 
 const getGIDInstalment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     var option = parseInt(button_payload_state);
@@ -2549,7 +1168,7 @@ const getGIDInstalment = (sender, sessionId, button_payload_state, replyobject, 
     getJsonAndAnalyze(url, sender, sessionId, option, replyobject, siteid);
 }
 const getBLXInstalment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     var option = parseInt(button_payload_state);
@@ -2557,7 +1176,7 @@ const getBLXInstalment = (sender, sessionId, button_payload_state, replyobject, 
     getJsonAndAnalyze(url, sender, sessionId, option, replyobject, siteid);
 }
 const getSHKInstalment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     var option = parseInt(button_payload_state);
@@ -2565,7 +1184,7 @@ const getSHKInstalment = (sender, sessionId, button_payload_state, replyobject, 
     getJsonAndAnalyze(url, sender, sessionId, option, replyobject, siteid);
 }
 const getHDDNInstalment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     var option = parseInt(button_payload_state);
@@ -2574,7 +1193,7 @@ const getHDDNInstalment = (sender, sessionId, button_payload_state, replyobject,
 }
 
 const getBriefIDInstalment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
 
@@ -2582,7 +1201,7 @@ const getBriefIDInstalment = (sender, sessionId, button_payload_state, replyobje
 }
 
 const askPercentMonthAgain = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     var option = parseInt(button_payload_state);
@@ -2590,7 +1209,7 @@ const askPercentMonthAgain = (sender, sessionId, button_payload_state, replyobje
     getJsonAndAnalyze(url, sender, sessionId, option, replyobject, siteid);
 }
 const processNormalInstallment = (sender, sessionId, button_payload_state, replyobject, siteid) => {
-    var sever = severRasaQuery;
+    var sever = ConstConfig.SERVER_RASAQUERY;
     var url = encodeURI(sever);
     var resultanswer = "";
     var option = parseInt(button_payload_state);
@@ -2734,7 +1353,7 @@ var webhookController = {
             if (messagetype == 2) {
                 // We received an attachment
                 // Let's reply with an automatic message
-                SentToClient(sender, '"+sessions[sessionId].gender+"  đáng yêu quá trời. ', "", "", "", replyobject, siteid)
+                SendMessage.SentToClient(sender, '"+sessions[sessionId].gender+"  đáng yêu quá trời. ', "", "", "", replyobject, siteid)
                     .catch(console.error);
             } else {
 
@@ -2747,7 +1366,7 @@ var webhookController = {
 
 
 
-                var sever = severRasaQuery + messagecontent;
+                var sever = ConstConfig.SERVER_RASAQUERY + messagecontent;
                 var url = encodeURI(sever);
                 console.log("====url==========", url);
 
