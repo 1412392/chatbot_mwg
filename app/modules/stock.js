@@ -14,7 +14,7 @@ const ERRORFILE_PATH = "/home/tgdd/error_logs_chatmodule/errorlogs.txt";
 module.exports = {
     StockModule: function (sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state) {
         try {
-
+            return;
             sessions[sessionId].prev_intent = "ask_stock";
 
             questionTitle = "Thông tin sản phẩm!";

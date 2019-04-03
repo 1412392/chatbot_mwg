@@ -309,7 +309,7 @@ module.exports = {
                     var districbo = arrDistrictBO[i];
                     var argsProductStock = {
                         productID: parseInt(productID), productCode: null, provinceID: parseInt(provinceID),
-                        districtID: parseInt(districbo.districtIDField), pageSize: 20, pageIndex: pageIndexDefault, total
+                        districtID: parseInt(districbo.districtIDField), pageSize: 20, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
                     };
 
                     ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function (item) {
