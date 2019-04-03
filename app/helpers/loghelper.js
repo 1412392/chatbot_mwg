@@ -1,3 +1,5 @@
+var fs = require('file-system');
+
 module.exports = {
 
     WriteLogToFile: function (path, content) {

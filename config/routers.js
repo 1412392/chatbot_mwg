@@ -18,9 +18,9 @@ module.exports = function (app) {
 	var webhookRouter = Router()
 		.get('/', controllers.webhook.index)
 		.post('/', controllers.webhook.postmessage)
-		.post('/processsubmit', controllers.webhook.processsubmit)
-		.post('/notifyline',  controllers.webhook.notifyline)
-		.post('/notifyline_error',controllers.webhook.notifyline_error);
+		.post('/processsubmit', controllers.webhook.processsubmit);
+		//.post('/notifyline',  controllers.webhook.notifyline)
+		//.post('/notifyline_error',controllers.webhook.notifyline_error);
 
 
 	app.use('/webhook', webhookRouter);
