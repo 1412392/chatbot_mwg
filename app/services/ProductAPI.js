@@ -99,7 +99,7 @@ module.exports = {
 
         });
     },
-    GetProductInfoByURL: function (urlApiProduct, currenturl, sessionId, ishaveProductEntity) {
+    GetProductInfoByURL: function (sessions,urlApiProduct, currenturl, sessionId, ishaveProductEntity) {
         return new Promise((resolve, reject) => {
             if (currenturl && currenturl.length > 1) {
                 var args = {

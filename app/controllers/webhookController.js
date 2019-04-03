@@ -735,7 +735,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             console.log("========finalURL========", finalUrl);
 
             // currenturl = "dtdd/oppo-f7";
-            ProductAPI.GetProductInfoByURL(ConstConfig.URLAPI_PRODUCT, finalUrl, sessionId, ishaveProductEntity).then((value) => {
+            ProductAPI.GetProductInfoByURL(sessions,ConstConfig.URLAPI_PRODUCT, finalUrl, sessionId, ishaveProductEntity).then((value) => {
                 if (value) {//nếu có sản phẩm từ URL
                     sessions[sessionId].product = value.replace("+", " plus ");
 
