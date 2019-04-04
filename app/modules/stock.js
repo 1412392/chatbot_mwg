@@ -10,6 +10,9 @@ var Elastic = require('../services/Elastic');
 var ConstConfig = require('../const/config');
 
 const ERRORFILE_PATH = "/home/tgdd/error_logs_chatmodule/errorlogs.txt";
+var locationindex = "locationdata";
+var provincetype = "province";
+var districttype = "district";
 
 module.exports = {
     StockModule: function (sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state) {
@@ -106,28 +109,39 @@ module.exports = {
                                 };
 
 
-                                // console.log(result);
+                                //console.log(result.GetProductResult);
                                 resultanswer = "Sản phẩm: " + "<span style='font-weight:bold'>" + result.GetProductResult.productNameField + "</span>" + "<br />"
                                     + (result.GetProductResult.productErpPriceBOField.priceField == "0" ? ("") : ("Giá: " + "<span style='font-weight:bold'>" + parseFloat(result.GetProductResult.productErpPriceBOField.priceField).toLocaleString() + " đ" + "</span>"));
                                 //  console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                 resultanswer += "<br /><img width='120' height='120' src='" + result.GetProductResult.mimageUrlField + "'" + "/>";
                                 //console.log("Giá: " + result.GetProductResult.productErpPriceBOField.priceField.toString());
                                 // console.log(resultanswer);
+                                var isPreorder = CommonHelper.IsPreoder(result.GetProductResult);
 
                                 ProductAPI.APIGetSeoURLProduct(ConstConfig.URLAPI_CATEGORY, argsProductDetailGetSeoURL, function callback(seoURL) {
 
                                     resultanswer += "<br />Thông tin chi tiết sản phẩm: " + "<a href='" + seoURL + "' target='_blank'>" + seoURL + "</a>" + "<br />";
+                                    if (isPreorder) {
+                                        resultanswer += "<p style='color:#bc9816;font-style:italic'>Sản phẩm hiện tại đang trong quá trình đặt trước và trải nghiệm tại siêu thị.</p>";
+                                    }
 
-                                    if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 1) || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
+                                    if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0") ||
                                         (result.GetProductResult.productErpPriceBOField.priceField.toString() === "-1")) {
-                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
 
                                         SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                             .catch(console.error);
                                     }
-                                    else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField == 2) || ((result.GetProductResult.productErpPriceBOField.priceField).toString() === "0")) {
-                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại đang tạm hết hàng. Vui lòng chọn sản phẩm khác ạ!";
+                                    else if ((parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || (result.GetProductResult.productErpPriceBOField.priceField).toString() === "0") && !isPreorder) {
+                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại chưa có hàng tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+
+
+                                        SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                            .catch(console.error);
+                                    }
+                                    else if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) === 3 && !isPreorder) {
+                                        resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm đang trong quá trình nhập hàng về. " + sessions[sessionId].gender + " vui lòng đăng ký nhận thông tin theo link sản phẩm ở trên ạ. ";
 
 
                                         SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
@@ -136,17 +150,13 @@ module.exports = {
                                     else {
 
                                         //nếu có tỉnh/tp mới, reset lại huyện
-
                                         if (province && !district) {//có province, không có district
 
-                                            //lấy provinceID
-
-                                            var index = "locationdata";
-                                            var type = "province";
-                                            Elastic.getElasticSearch(index, type, province, function callbackEL(err, result) {
+                                            //lấy provinceID                             
+                                            Elastic.getElasticSearch(locationindex, provincetype, province, function callbackEL(err, result) {
                                                 if (err) return err;
                                                 //console.log(result);
-                                                if (result.length != 0) {//district được tìm thấy
+                                                if (result.length != 0) {//province được tìm thấy
                                                     var provinceID = result[0]._source.provinceID;
                                                     var provinceName = result[0]._source.provinceName;
                                                     sessions[sessionId].province = provinceName;
@@ -160,29 +170,27 @@ module.exports = {
                                                     if (CommonHelper.hasNumber(color)) {
                                                         argsProductStock = {
                                                             productID: parseInt(productID), productCode: color, provinceID: provinceID,
-                                                            districtID: 0, pageSize: 30, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                                            districtID: 0, pageSize: 300, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
                                                         };
                                                     }
                                                     else {
                                                         argsProductStock = {
                                                             productID: parseInt(productID), productCode: null, provinceID: provinceID,
-                                                            districtID: 0, pageSize: 30, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                                            districtID: 0, pageSize: 300, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
                                                         };
                                                     }
 
                                                     ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
                                                         //console.log(argsProductStock);
-
-
                                                         // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
                                                         // console.log(total);
-                                                        console.log(result);
+                                                        //console.log(result);
                                                         if (result.total) {//có hàng
                                                             resultanswer = "";
 
                                                             var type = "template";
 
-                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + provinceName;
+                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + "<span style='color:red'>" + provinceName + "</span>";
                                                             var jsonmessageStore = {
                                                                 username: sender,
                                                                 siteid: siteid,
@@ -240,7 +248,7 @@ module.exports = {
 
                                                         }
                                                         else {//hết hàng
-                                                            SendMessage.SentToClient(sender, "Rất tiếc. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG HOẶC ĐANG NHẬP VỀ</span> tại khu vực " + provinceName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                            SendMessage.SentToClient(sender, "Dạ xin lỗi. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + provinceName + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                 .catch(console.error);
 
                                                         }
@@ -251,7 +259,7 @@ module.exports = {
                                                 else {
 
                                                     sessions[sessionId].province = null;
-                                                    SendMessage.SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố " + sessions[sessionId].gender + "  đang ở. Vui lòng cung cấp tỉnh/Thành trước. (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                    SendMessage.SentToClient(sender, "Không nhận diện được Tỉnh/Thành Phố " + sessions[sessionId].gender + "  đang ở. Vui lòng cung cấp tỉnh/Thành trước. Ví dụ: Hồ Chí Minh, Phú Yên...", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                         .catch(console.error);
 
                                                 }
@@ -263,21 +271,35 @@ module.exports = {
                                         }
                                         else if (province && district) {
 
-                                            //console.log(province+"-"+district);
-
-
+                                            console.log('+++' + province + "-" + district);
                                             //lấy danh sách cửa hàng còn hàng ở tỉnh, huyện  đó không theo màu
 
-                                            var index = "locationdata";
-                                            var type = "district";
-                                            if (!(sessions[sessionId].provinveID))//th này là do detect đc cả tỉnh lẫn huyện trong 1 câu (phức tạp)
-                                            {
-                                                sessions[sessionId].provinveID = 3;//cho tránh trường hợp lỗi query elastic (lấy mặc định là HCM)
-                                            }
+                                            //xác định provinceID
+                                            //lấy provinceID                             
+                                            Elastic.getElasticSearch(locationindex, provincetype, province, function callbackEL(err, result) {
+                                                if (err) return err;
+                                                //console.log(result);
+                                                if (result.length != 0) {//province được tìm thấy
+                                                    var provinceID = result[0]._source.provinceID;
+                                                    var provinceName = result[0]._source.provinceName;
+                                                    sessions[sessionId].province = provinceName;
+                                                    sessions[sessionId].provinveID = provinceID;
+
+                                                }
+                                                else {//khong tim thấy province
+
+                                                    sessions[sessionId].province = null;
+                                                    SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh thành đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                        .catch(console.error);
+                                                }
+                                            });
+
+
                                             //tìm huyện theo tỉnh trước
                                             Elastic.getElasticSearchDistrictAndProvince(index, type, district, sessions[sessionId].provinveID, function callbackEL(err, result) {
                                                 if (err) return err;
                                                 if (result.length != 0) {
+                                                    console.log(result);
                                                     if (result.length == 1)//đã xác định đúng chính xác huyện và tỉnh đó
                                                     {
                                                         var provinceID = result[0]._source.provinceID;
@@ -548,7 +570,7 @@ module.exports = {
 
                                                         else {
 
-                                                            SendMessage.SentToClient(sender, "" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? (VIẾT HOA CHỮ ĐẦU). Ví dụ: Phú Yên, Hồ Chí Minh, Hà Nội...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                            SendMessage.SentToClient(sender, "" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ?. Ví dụ: Phú Yên, Hồ Chí Minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                 .catch(console.error);
                                                         }
 
@@ -573,11 +595,18 @@ module.exports = {
                                         }//end if(product && province)
                                         else if (!province && district)//khong có tỉnh, chỉ có huyện/quận
                                         {
-                                            resultanswer = "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Vui lòng cung cấp tỉnh/thành phố trước (VIẾT HOA CHỮ ĐẦU), ví dụ: Hồ Chí Minh, Hà Nội, Phú Yên...";
+
+
                                         }
                                         else {//chỉ có product
 
-                                            resultanswer += "<br />Vui lòng cung cấp tên tỉnh/thành phố để xem siêu thị có hàng (VIẾT HOA CHỮ ĐẦU) Ví dụ: Hồ Chí Minh, Phú Yên, Cần Thơ...";
+                                            if (isPreorder) {
+                                                resultanswer += "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Cho em biết tỉnh/thành phố để xem hàng trải nghiệm, ví dụ: Hồ Chí Minh, Phú Yên...";
+
+                                            } else {
+                                                resultanswer += "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Cho em biết tỉnh/thành phố để xem siêu thị còn hàng, ví dụ: Hồ Chí Minh, Phú Yên...";
+                                            }
+                                            sessions[sessionId].IsLatestRequireLocation_Province = true;
 
                                         }
 
@@ -590,7 +619,7 @@ module.exports = {
                             }
 
                             else {
-                                resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG KINH DOANH</span> tại Thế giới di động. Vui lòng hỏi sản phẩm khác.";
+                                resultanswer = "Sản phẩm " + result.GetProductResult.productNameField + " hiện tại <span style='color:red'>KHÔNG CÒN KINH DOANH</span> tại Thế giới di động. Rất xin lỗi vì sự bất tiện này ạ.";
                                 SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                     .catch(console.error);
                             }

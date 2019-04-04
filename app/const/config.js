@@ -1,5 +1,6 @@
 module.exports = Object.freeze({
     SERVER_RESPONSE: "http://rtm.thegioididong.com/chatbot",
+    //SERVER_RESPONSE: "http://ac799455.ngrok.io/chatbot",
     URLAPI_CATEGORY: "http://api.thegioididong.com/CategorySvc.svc?singleWsdl",
     URLAPI_PRODUCT: "http://api.thegioididong.com/ProductSvc.svc?singleWsdl",
     ERRORFILE_PATH: "/home/tgdd/error_logs_chatmodule/errorlogs.txt",

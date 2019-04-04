@@ -265,6 +265,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                                     intent = ASK_INSTALMENT_PACKAGE0D;
                                     sessions[sessionId].prev_intent = intent;
 
+                                    //th đang hỏi percent gói thường thì nhảy vào gói 0đ
+                                    sessions[sessionId].isLatestAskPercentInstalment = false;
+
                                 }
                                 catch (errr) {
                                     console.log("err when parse Month_instalment => isLatestAskMonth0dInstalment", err);
@@ -279,9 +282,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             try {
                                 sessions[sessionId].month_instalment = parseInt(customer_question);
                                 //ishaveMonthInstalment = true;
-                                intent = ASK_INSTALMENT_INFORMATION;
+                                intent = ASK_INSTALMENT_PACKAGE0D;
                                 sessions[sessionId].prev_intent = intent;
-
+                                //th đang hỏi percent gói thường thì nhảy vào gói 0đ
+                                sessions[sessionId].isLatestAskPercentInstalment = false;
                             }
                             catch (errr) {
                                 console.log("err when parse Month_instalment => isLatestAskMonth0dInstalment", err);
@@ -291,6 +295,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     }
                 }
                 else {
+                    // console.log("++++++++++++DCM DA VAO DAY+++++++++");
                     intent = ASK_INSTALMENT_PACKAGE0D;
                     // intent = sessions[sessionId].prev_intent;
                     sessions[sessionId].prev_intent = intent;
@@ -300,6 +305,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         console.log("=====isLatestAskMonthInstalment====", month);
                         console.log("=====intent====", intent);
                         console.log("=====prev_intent====", sessions[sessionId].prev_intent);
+
+                        //th đang hỏi percent gói thường thì nhảy vào gói 0đ
+                        sessions[sessionId].isLatestAskPercentInstalment = false;
                     }
                     catch (err) {
                         try {
@@ -446,11 +454,18 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
 
                     sessions[sessionId].month_instalment = null;
-                    sessions[sessionId].isLatestAskMonthInstalment = true;
+                    if (intent === ASK_INSTALMENT_PACKAGE0D) {
+                        sessions[sessionId].isLatestAskMonth0dInstalment = true;
+                    }
+                    else {
+                        sessions[sessionId].isLatestAskMonthInstalment = true;
+                    }
+
                 }
 
                 else if (button_payload_state === "INSTALMENT_PACKAGE0D") {
                     intent = ASK_INSTALMENT_PACKAGE0D;
+                    sessions[sessionId].isLatestAskPercentInstalment = false;
 
                 }
                 else if (button_payload_state === "INSTALMENT_0PTLS") {
@@ -624,6 +639,12 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
             }
 
+            //xu ly askstock_tinh thanh
+            if (sessions[sessionId].IsLatestRequireLocation_Province) {
+                intent = sessions[sessionId].prev_intent;
+                
+            }
+
             //th sản phẩm bị sai tên
 
             if (sessions[sessionId].product) {
@@ -735,13 +756,15 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             console.log("========finalURL========", finalUrl);
 
             // currenturl = "dtdd/oppo-f7";
-            ProductAPI.GetProductInfoByURL(sessions,ConstConfig.URLAPI_PRODUCT, finalUrl, sessionId, ishaveProductEntity).then((value) => {
+            ProductAPI.GetProductInfoByURL(sessions, ConstConfig.URLAPI_PRODUCT, finalUrl, sessionId, ishaveProductEntity).then((value) => {
                 if (value) {//nếu có sản phẩm từ URL
                     sessions[sessionId].product = value.replace("+", " plus ");
 
                 }
 
                 console.log("===productNameAfter==", sessions[sessionId].product);
+                console.log("=======intent=====", intent);
+                console.log("=======pre intent=====", sessions[sessionId].prev_intent);
 
                 if (!intent && ((!sessions[sessionId].product) && (!sessions[sessionId].province) && (!sessions[sessionId].district))) {
                     //nếu đã có trong session
@@ -755,14 +778,14 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 else {
 
                     //câu chào HI
-                    if (customer_question.trim().toLowerCase() === "hi") {
-                        var rn = CommonHelper.randomNumber(greet.length);
-                        resultanswer = greet[rn];
+                    // if (customer_question.trim().toLowerCase() === "hi") {
+                    //     var rn = CommonHelper.randomNumber(greet.length);
+                    //     resultanswer = greet[rn];
 
-                        SendMessage.SentToClient(sender, resultanswer, "Xin chào!", button_payload_state, "greet", replyobject, siteid)
-                            .catch(console.error);
-                        return;
-                    }
+                    //     SendMessage.SentToClient(sender, resultanswer, "Xin chào!", button_payload_state, "greet", replyobject, siteid)
+                    //         .catch(console.error);
+                    //     return;
+                    // }
 
                     ///
 

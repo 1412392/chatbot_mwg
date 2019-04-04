@@ -654,13 +654,13 @@ module.exports = {
                                         }
                                         //console.log(result.GetProductResult.productErpPriceBOField.webStatusIdField);
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else if ((parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || (result.GetProductResult.productErpPriceBOField.priceField).toString() === "0") && !CommonHelper.IsPreoder(result.GetProductResult)) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>không có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại  <span style='color:red'>không có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);
@@ -1696,14 +1696,14 @@ module.exports = {
                                             resultanswer += "<p style='color:#bc9816;font-style:italic'>Sản phẩm hiện tại đang trong quá trình đặt trước và chưa có sẵn hàng</p>";
                                         }
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else if ((parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2
                                             || (result.GetProductResult.productErpPriceBOField.priceField).toString() === "0") && !CommonHelper.IsPreoder(result.GetProductResult)) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại  <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);
@@ -1849,13 +1849,13 @@ module.exports = {
                                             resultanswer += "<p style='color:#bc9816;font-style:italic'>Sản phẩm hiện tại đang trong quá trình đặt trước và chưa có sẵn hàng</p>";
                                         }
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else if ((parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || (result.GetProductResult.productErpPriceBOField.priceField).toString() === "0") && !CommonHelper.IsPreoder(result.GetProductResult)) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment+package0d", replyobject, siteid)
                                                 .catch(console.error);
@@ -1887,7 +1887,7 @@ module.exports = {
 
                                                 resultanswer += "<br /><span style='font-style:italic;'>" + sessions[sessionId].gender + " muốn trả góp trong vòng mấy tháng ạ?</span></br>";
                                                 sessions[sessionId].isLatestAskMonth0dInstalment = true;
-
+                                                
                                                 var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, resultanswer, sessions[sessionId].InstalmentMonth);
 
                                                 // SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
@@ -2071,8 +2071,7 @@ module.exports = {
                             });
                         }
                         else {
-                            var rn = CommonHelper.randomNumber(productnotfound.length);
-                            resultanswer = productnotfound[rn];
+                            resultanswer = "Dạ không tìm thấy sản phẩm <span style='color:red'>" + productName + "</span>. " + sessions[sessionId].gender + " có thể nõi rõ và đúng tên sản phẩm để phục vụ tốt hơn ạ. Em cảm ơn " + sessions[sessionId].gender + "</br>";
 
                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                 .catch(console.error);
@@ -2287,13 +2286,13 @@ module.exports = {
                                             resultanswer += "<p style='color:#bc9816;font-style:italic'>Sản phẩm hiện tại đang trong quá trình đặt trước và chưa có sẵn hàng</p>";
                                         }
                                         if (parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 1 || (result.GetProductResult.productErpPriceBOField.priceField.toString() === "0")) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại <span style='color:red'>ngừng kinh doanh</span>. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);
                                         }
                                         else if ((parseInt(result.GetProductResult.productErpPriceBOField.webStatusIdField) == 2 || (result.GetProductResult.productErpPriceBOField.priceField).toString() === "0") && !CommonHelper.IsPreoder(result.GetProductResult)) {
-                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  hỏi hiện tại  <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
+                                            resultanswer += "<br />" + "Sản phẩm " + sessions[sessionId].gender + "  quan tâm hiện tại  <span style='color:red'>chưa có hàng</span> tại TGDD. Vui lòng chọn sản phẩm khác ạ!";
 
                                             SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
                                                 .catch(console.error);

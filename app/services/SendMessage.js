@@ -11,11 +11,11 @@ var ConstConfig = require('../const/config');
 module.exports = {
     SentToClientButton: function (id, text, intent, replyobject) {
         //console.log("============SentToClientButton===============");
-        if (!intent.includes("ask_instalment")) {
-            return new Promise((resolve, reject) => {
-                return reject('SKIP')
-            })
-        }
+        // if (!intent.includes("ask_instalment")) {
+        //     return new Promise((resolve, reject) => {
+        //         return reject('SKIP')
+        //     })
+        // }
 
         var jsonparse = JSON.parse(text);
         var btnlist = jsonparse.messagecontentobject.elements[0].buttons;
@@ -88,11 +88,11 @@ module.exports = {
 
         //============27/8/2018=====> bỏ nhưng câu hỏi ngoài: instalment,greet,goodbye,thankyou
 
-        if (!intent.includes("ask_instalment")) {
-            return new Promise((resolve, reject) => {
-                return reject('SKIP')
-            })
-        }
+        // if (!intent.includes("ask_instalment")) {
+        //     return new Promise((resolve, reject) => {
+        //         return reject('SKIP')
+        //     })
+        // }
         var body = "";
 
         if (state === 0)//câu hỏi do user send, không phải từ postback
@@ -288,7 +288,7 @@ module.exports = {
                 //resultanswer += "<br />CHỌN QUẬN/HUYỆN CỦA "+sessions[sessionId].gender+"  ĐỂ KIỂM TRA CHÍNH XÁC HƠN? ";
 
                 var type = "template";
-                questionTitle = "Danh sách quận/huyện";
+                questionTitle = "Chọn quận/huyện gần bạn để xem siêu thị còn hàng";
 
                 var jsonmessageDistrict = {
                     username: sender,
@@ -309,11 +309,11 @@ module.exports = {
                     var districbo = arrDistrictBO[i];
                     var argsProductStock = {
                         productID: parseInt(productID), productCode: null, provinceID: parseInt(provinceID),
-                        districtID: parseInt(districbo.districtIDField), pageSize: 20, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                        districtID: parseInt(districbo.districtIDField), pageSize: 100, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
                     };
 
                     ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function (item) {
-                        console.log(item.GetStoreInStock2016Result);
+                        //console.log(item.GetStoreInStock2016Result);
                         if (item.GetStoreInStock2016Result) {
                             if (item.GetStoreInStock2016Result.StoreBO.length > 0)
                                 jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
