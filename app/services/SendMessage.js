@@ -173,21 +173,21 @@ module.exports = {
                             {
                                 title: questionTitle + text,
                                 buttons: [
-                                    {
-                                        type: "postback",
-                                        title: "Hỏi sản phẩm khác",
-                                        payload: "1"
-                                    },
+                                    // {
+                                    //     type: "postback",
+                                    //     title: "Hỏi sản phẩm khác",
+                                    //     payload: "1"
+                                    // },
                                     {
                                         type: "postback",
                                         title: "Chọn lại màu",
                                         payload: "6"
                                     },
-                                    {
-                                        type: "postback",
-                                        title: "Chọn lại quận/huyện",
-                                        payload: "7"
-                                    }
+                                    // {
+                                    //     type: "postback",
+                                    //     title: "Chọn lại quận/huyện",
+                                    //     payload: "7"
+                                    // }
                                 ]
                             }
                         ]
@@ -195,9 +195,9 @@ module.exports = {
                     }
                 });
                 var contentlogs = "<p>" + text + "</p>";
-                contentlogs += "<button " + "type=button>" + "Hỏi sản phẩm khác" + "</button>" + "<br />";
+               // contentlogs += "<button " + "type=button>" + "Hỏi sản phẩm khác" + "</button>" + "<br />";
                 contentlogs += "<button " + "type=button>" + "Chọn lại màu" + "</button>" + "<br />";
-                contentlogs += "<button " + "type=button>" + "Chọn lại quận/huyện" + "</button>" + "<br />";
+                //contentlogs += "<button " + "type=button>" + "Chọn lại quận/huyện" + "</button>" + "<br />";
 
                 tracechat.logChatHistory(id, contentlogs, 2, false, messageID);//1 là câu hỏi, 2 là câu trả lời
 
@@ -364,8 +364,8 @@ module.exports = {
     SendToUserListColor: function (sessions, sessionId, productID, productName, sender, siteid, replyobject, questionTitle, intent) {
         if (productID) {
 
-            var argsProductColor = { intProductID: parseInt(productID), LangID: "vi-VN" };
-            APIGetProductColor(ConstConfig.URLWCF_PRODUCT, argsProductColor, function getResult(result) {
+            var argsProductColor = { intProductID: parseInt(productID) };
+           ProductAPI.APIGetProductColor(ConstConfig.URLAPI_PRODUCT, argsProductColor, function getResult(result) {
 
 
                 //console.log(result.GetDistricByProvinceResult.DistrictBO[0]);

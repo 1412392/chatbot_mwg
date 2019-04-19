@@ -11,11 +11,13 @@ module.exports = {
     getElasticSearch: async function (index, type, keyword, callback) {
 
         //bo dau keyword neu co
-        keyword = CommonHelper.xoa_dau(keyword);
+        keyword = CommonHelper.xoa_dau(keyword).replace(".", " ");
+        var keywordforsearch = 'seKeyword:"*' + keyword + '*"';
+        console.log("++++++++++keywordforsearch+++++", keywordforsearch);
         await el.search({
             index: index,
             type: type,
-            q: "seKeyword:" + '"' + keyword + '"'
+            q: keywordforsearch
         }, function (error, response) {
             if (error) return callback(error, null); // returns the callback with the error that happened
 
@@ -24,12 +26,14 @@ module.exports = {
 
     },
     getElasticSearchDistrictAndProvince: async function (index, type, keyword, provinveID, callback) {
-        keyword = CommonHelper.xoa_dau(keyword);
-        console.log("seKeyword:" + '"' + keyword + '"' + " AND " + "provinceID:" + '"' + provinveID + '"')
+        keyword = CommonHelper.xoa_dau(keyword).replace(".", " ");;
+        var keywordforsearch = 'seKeyword:"*' + keyword + '*"' + ' AND ' + 'provinceID:"' + provinveID + '"';
+        console.log("++++++++++keywordforsearch+++++", keywordforsearch);
+
         await el.search({
             index: index,
             type: type,
-            q: "seKeyword:" + '"' + keyword + '"' + " AND " + "provinceID:" + '"' + provinveID + '"'
+            q: keywordforsearch
         }, function (error, response) {
             if (error) return callback(error, null); // returns the callback with the error that happened
 

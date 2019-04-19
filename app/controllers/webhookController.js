@@ -186,7 +186,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             var ishaveProductEntity = false, ishaveMonthInstalment = false,
                 ishavePercentInstalment = false, ishaveProduct = false,
-                ishaveMoneyPrepaidInstalment = false, isAsk0PTInstalment = false;
+                ishaveMoneyPrepaidInstalment = false, isAsk0PTInstalment = false, isHaveDistrict = false, isHaveProvince = false;
 
 
             //==========================================================
@@ -475,11 +475,12 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                 }
 
                 else {
+
                     //chỉ resset lại color (vì color sẽ khác với sp khác)
-                    if (CommonHelper.hasNumber(sessions[sessionId].color))//nó là productcode
+                    if (CommonHelper.hasNumber(sessions[sessionId].colorProductCode))//nó là productcode
                     {
                         //console.log("==============MÃ MÀU PRODUCTCODE " + sessions[sessionId].color + " =================================");
-                        sessions[sessionId].color = null;
+                        sessions[sessionId].colorProductCode = null;
                     }
                     // sessions[sessionId].price=null;
                     // sessions[sessionId].province=null;
@@ -488,15 +489,17 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     if (button_payload_state.toString().trim().length >= 2 &&
                         button_payload_state.toString().length < 10 && CommonHelper.hasNumber(button_payload_state))//là districtID
                     {
+
                         if (parseInt(button_payload_state) >= 16) {
-                            sessions[sessionId].district = button_payload_state;
+                            sessions[sessionId].districtID = button_payload_state;
+                            sessions[sessionId].IsLatestRequireChooseDistrict = true;
                         }
 
                     }
                     else if (button_payload_state.length >= 10)//la productCode color
                     {
                         sessions[sessionId].isPreAskColor = true;
-                        sessions[sessionId].color = button_payload_state;
+                        sessions[sessionId].colorProductCode = button_payload_state;
                     }
 
                     else if (button_payload_state === 6)//gợi ý lại danh sách màu (trường hợp này đã có product)
@@ -531,11 +534,11 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
             else {
 
-                if (CommonHelper.hasNumber(sessions[sessionId].color))//nó là productcode
-                {
-                    //console.log(CommonHelper.hasNumber(sessions[sessionId].color));
-                    sessions[sessionId].color = null;
-                }
+                // if (CommonHelper.hasNumber(sessions[sessionId].colorProductCode))//nó là productcode
+                // {
+                //     //console.log(CommonHelper.hasNumber(sessions[sessionId].color));
+                //     sessions[sessionId].colorProductCode = null;
+                // }
 
 
                 var productIndex = 0;
@@ -569,7 +572,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         }
                     }
                     if (entities[i].entity === "color") {
-                        sessions[sessionId].color = entities[i].value.replace('_', ' ');
+                        sessions[sessionId].colorProductCode=null;
+                        sessions[sessionId].colorname = entities[i].value.replace('_', ' ');
                     }
                     if (entities[i].entity === "price") {
                         sessions[sessionId].price = entities[i].value.replace('_', ' ');
@@ -577,16 +581,18 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     if (entities[i].entity === "province") {
 
                         //nếu có tỉnh mới, reset lại huyện
-
-                        if (sessions[sessionId].province)
+                        isHaveProvince = true;
+                        if (sessions[sessionId].province && !isHaveDistrict) {
                             sessions[sessionId].district = null;
-
+                            sessions[sessionId].districtID = null;
+                        }
                         sessions[sessionId].province = entities[i].value.replace('_', ' ');
 
                     }
                     if (entities[i].entity === "district") {
                         sessions[sessionId].district = entities[i].value.replace('_', ' ');
-
+                        sessions[sessionId].districtID = null;
+                        isHaveDistrict = true;
                     }
 
                     //tra gop
@@ -640,10 +646,13 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             }
 
             //xu ly askstock_tinh thanh
-            if (sessions[sessionId].IsLatestRequireLocation_Province) {
+            if (sessions[sessionId].IsLatestRequireLocation_Province ||
+                sessions[sessionId].IsLatestRequireChooseDistrict || sessions[sessionId].isLatestUnknowProduct_AskStock) {
                 intent = sessions[sessionId].prev_intent;
-                
+
             }
+
+
 
             //th sản phẩm bị sai tên
 
@@ -823,7 +832,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     else if (intent === "ask_stock") {
                         sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                        StockModule.StockModule(sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state);
+                        StockModule.StockModule(sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state,productnotfound);
 
                     }
 

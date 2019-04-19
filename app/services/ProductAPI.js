@@ -99,7 +99,7 @@ module.exports = {
 
         });
     },
-    GetProductInfoByURL: function (sessions,urlApiProduct, currenturl, sessionId, ishaveProductEntity) {
+    GetProductInfoByURL: function (sessions, urlApiProduct, currenturl, sessionId, ishaveProductEntity) {
         return new Promise((resolve, reject) => {
             if (currenturl && currenturl.length > 1) {
                 var args = {
@@ -198,7 +198,7 @@ module.exports = {
 
     },
     APICheckInStock: function (url, args, fn) {
-
+        console.log("++++++++", args);
         soap.createClient(url, function (err, client) {
 
             client.GetStoreInStock2016(args, function (err, result) {
@@ -212,26 +212,111 @@ module.exports = {
         });
     },
 
-    APIGetProductColor: function (url, args, fn) {
+    APIGetPriceListByProduct: function (url, productID, fn) {
+
         soap.createClient(url, function (err, client) {
 
-            client.GetProductColorByProductIDLang(args, function (err, result) {
+            var args = {
+                intProductID: productID,
+                intProvinceID: 3
+            };
+            client.GetPriceListByProduct(args, function (err, result) {
 
-                var productColor = JSON.parse(JSON.stringify(result));
+                var lstPrice = JSON.parse(JSON.stringify(result));
 
                 // console.log("=============================");
-                // console.log(productDetail);
+                // lstPrice.GetPriceListByProductResult.ProductErpPriceBO.forEach(item=>{
+                //     console.log(item);
+                // })
 
-                //resultanswer=ChangeResultAnswer(productDetail);
-
-                fn(productColor);
-                // self.resultanswer+="Sản phẩm: "+productDetail.GetProductDetailBySiteIDResult.ProductName+"<br />"+
-                // "Giá: "+productDetail.GetProductDetailBySiteIDResult.ExpectedPrice;
+                fn(lstPrice);
 
 
             });
 
         });
-    }
 
+    },
+    APIGetProductColor: function (url, args, fn) {
+        soap.createClient(url, function (err, client) {
+
+            client.GetProductColorByProductID(args, function (err, result) {
+
+                var productColor = JSON.parse(JSON.stringify(result));
+                var finalListProductColor = [];
+
+                module.exports.APIGetPriceListByProduct(url, args.intProductID, function callback(ListPriceResult) {
+
+                    //loc lai mau co the ban
+                    if (productColor.GetProductColorByProductIDResult &&
+                        productColor.GetProductColorByProductIDResult.ProductColorBO && productColor.GetProductColorByProductIDResult.ProductColorBO.length > 0) {
+
+                        productColor.GetProductColorByProductIDResult.ProductColorBO.forEach(colorBO => {
+                            ListPriceResult.GetPriceListByProductResult.ProductErpPriceBO.forEach(priceBO => {
+                                if (priceBO != null && priceBO.productCodeField == colorBO.productCodeField &&
+                                    priceBO.webStatusIdField != 1 &&
+                                    priceBO.webStatusIdField != 2 && // Hang sap ve
+                                    priceBO.webStatusIdField != 5 &&
+                                    //price.webStatusIdField != 7 && // Xem giá tại siêu thị
+                                    priceBO.webStatusIdField != 9 &&
+                                    priceBO.webStatusIdField != 0 &&
+                                    priceBO.priceField > 0) {
+                                    finalListProductColor.push({
+                                        ProductCode: colorBO.productCodeField,
+                                        ColorName: colorBO.colorNameField
+                                    })
+                                }
+
+                            });
+                        })
+                        console.log("=====finalListProductColor=====", finalListProductColor)
+                        fn(finalListProductColor);
+                    }
+                    else {
+                        fn(null);
+                    }
+
+                });
+
+            });
+
+        });
+    },
+    GetProductCodeColorByColorName: function (url, productID, color, fn) {
+
+        if (!color) {
+            fn({ ProductCode: null, ColorName: null });
+        }
+        else {
+            soap.createClient(url, function (err, client) {
+                var args = {
+                    intProductID: productID
+                }
+                module.exports.APIGetProductColor(url, args, function callback(APIGetProductColorresult) {
+
+                    var ProductCode = "", ColorName = "";
+                    if (APIGetProductColorresult && APIGetProductColorresult.length > 0) {
+                        APIGetProductColorresult.forEach(element => {
+                            // console.log(element.ColorName);
+                            var colorname = "mau " + CommonHelper.xoa_dau(element.ColorName.toLowerCase());
+                            if (CommonHelper.xoa_dau(color.toLowerCase()).includes(colorname)
+                                || colorname.includes(CommonHelper.xoa_dau(color.toLowerCase()))) {
+                                ProductCode = element.ProductCode;
+                                ColorName = element.ColorName;
+                                return;
+
+                            }
+
+                        });
+                        fn({ ProductCode: ProductCode.trim(), ColorName });
+
+                    }
+                    else {
+                        fn({ ProductCode: null, ColorName: null });
+                    }
+
+                });
+            });
+        }
+    }
 }
