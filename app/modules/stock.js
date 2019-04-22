@@ -979,6 +979,7 @@ module.exports = {
                 SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                     .catch(console.error);
             }
+           
         }
         catch (err) {
             logerror.WriteLogToFile(ConstConfig.ERRORFILE_PATH, "Error at stockmodule : " + err);

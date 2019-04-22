@@ -70,31 +70,31 @@ const findOrCreateSession = (fbid) => {
 
 const getButtonFinancialCompany = (productID, productName, sender, siteid, replyobject, questionTitle) => {
     var jsonmessageFiC =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "HomeCredit",
-                                payload: 8
-                            },
-                            {
-                                type: "postback",
-                                title: "FeCredit",
-                                payload: 9
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
+    {
+        username: sender,
+        siteid: siteid,
+        messagetype: "template",
+        replyobject: replyobject,
+        messagecontentobject: {
+            elements: [
+                {
+                    title: questionTitle,
+                    buttons: [
+                        {
+                            type: "postback",
+                            title: "HomeCredit",
+                            payload: 8
+                        },
+                        {
+                            type: "postback",
+                            title: "FeCredit",
+                            payload: 9
+                        }
+                    ]
+                }
+            ]
+        }
+    };
 
     var bodyjson = JSON.stringify(jsonmessageFiC);
     return bodyjson;
@@ -103,31 +103,31 @@ const getButtonFinancialCompany = (productID, productName, sender, siteid, reply
 
 const getButtonYESNO = (productID, productName, sender, siteid, replyobject, questionTitle) => {
     var jsonmessageFiC =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Có",
-                                payload: 12
-                            },
-                            {
-                                type: "postback",
-                                title: "Không",
-                                payload: 13
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
+    {
+        username: sender,
+        siteid: siteid,
+        messagetype: "template",
+        replyobject: replyobject,
+        messagecontentobject: {
+            elements: [
+                {
+                    title: questionTitle,
+                    buttons: [
+                        {
+                            type: "postback",
+                            title: "Có",
+                            payload: 12
+                        },
+                        {
+                            type: "postback",
+                            title: "Không",
+                            payload: 13
+                        }
+                    ]
+                }
+            ]
+        }
+    };
 
     var bodyjson = JSON.stringify(jsonmessageFiC);
     return bodyjson;
@@ -572,7 +572,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         }
                     }
                     if (entities[i].entity === "color") {
-                        sessions[sessionId].colorProductCode=null;
+                        sessions[sessionId].colorProductCode = null;
                         sessions[sessionId].colorname = entities[i].value.replace('_', ' ');
                     }
                     if (entities[i].entity === "price") {
@@ -644,12 +644,18 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
                 }
             }
+            console.log("=======sessions[sessionId].isLatestUnknowProduct_AskStock=====", sessions[sessionId].isLatestUnknowProduct_AskStock);
+            console.log("=======sessions[sessionId].IsLatestRequireChooseDistrict=====", sessions[sessionId].IsLatestRequireChooseDistrict);
 
             //xu ly askstock_tinh thanh
-            if (sessions[sessionId].IsLatestRequireLocation_Province ||
+            if ((sessions[sessionId].IsLatestRequireLocation_Province && (isHaveProvince || isHaveDistrict)) ||
                 sessions[sessionId].IsLatestRequireChooseDistrict || sessions[sessionId].isLatestUnknowProduct_AskStock) {
                 intent = sessions[sessionId].prev_intent;
 
+            }
+
+            if (sessions[sessionId].product && sessions[sessionId].prev_intent === "ask_stock") {
+                sessions[sessionId].isLatestUnknowProduct_AskStock = false;
             }
 
 
@@ -819,6 +825,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         }
                     }
 
+
                     //=============
                     if (!sessions[sessionId].prev_intent) {
                         sessions[sessionId].prev_intent = "";
@@ -832,7 +839,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     else if (intent === "ask_stock") {
                         sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                        StockModule.StockModule(sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state,productnotfound);
+                        StockModule.StockModule(sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state, productnotfound);
 
                     }
 
@@ -841,6 +848,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         sessions[sessionId].isLatestAskNormalInstallment = false;
                         resultanswer = "Em chưa rõ câu hỏi của " + sessions[sessionId].gender + "  lắm. " + sessions[sessionId].gender + "  vui lòng cung cấp rõ thông tin cần hỏi như: tên sản phẩm, giá cả, địa chỉ...Cảm ơn " + sessions[sessionId].gender + " ";
                     }
+
+                    //luon set pre_intent
+                    sessions[sessionId].prev_intent = intent;
 
 
                 }
