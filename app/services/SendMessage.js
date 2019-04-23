@@ -332,11 +332,11 @@ module.exports = {
 
                     if (jsonmessageDistrict.messagecontentobject.elements[0].buttons.length <= 0) {
 
-                        module.exports.SentToClient(sender, "Không có quận/huyện nào còn hàng tại khu vực này. Vui lòng hỏi khu vực khác hoặc lựa chọn vấn đề khác", "", 0, "", replyobject, siteid)
-                            .catch(console.error);
+                        // module.exports.SentToClient(sender, "Không có quận/huyện nào còn hàng tại khu vực này. Vui lòng hỏi khu vực khác hoặc lựa chọn vấn đề khác", "", 0, "", replyobject, siteid)
+                        //     .catch(console.error);
 
-                        module.exports.SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
-                            .catch(console.error);
+                        // module.exports.SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
+                        //     .catch(console.error);
 
 
 
