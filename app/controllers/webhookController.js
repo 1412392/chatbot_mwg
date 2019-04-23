@@ -186,7 +186,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             var ishaveProductEntity = false, ishaveMonthInstalment = false,
                 ishavePercentInstalment = false, ishaveProduct = false,
-                ishaveMoneyPrepaidInstalment = false, isAsk0PTInstalment = false, isHaveDistrict = false, isHaveProvince = false;
+                ishaveMoneyPrepaidInstalment = false, isAsk0PTInstalment = false,
+                isHaveDistrict = false, isHaveProvince = false, isHaveAccessories = false;
 
 
             //==========================================================
@@ -552,8 +553,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             entities[i].value = entities[i].value.replace("cường lực", "màn hình").replace('_', ' ');
                         }
                         //phụ kiện 
-                        if (productIndex > 1 && (CommonHelper.isIncludeAccessoryKeyword(sessions[sessionId].product)
-                            || CommonHelper.isIncludeAccessoryKeyword(entities[i].value.toLowerCase().replace('_', ' ')))) {
+                        if ((productIndex > 1 && (CommonHelper.isIncludeAccessoryKeyword(sessions[sessionId].product)
+                            || CommonHelper.isIncludeAccessoryKeyword(entities[i].value.toLowerCase().replace('_', ' ')))) || isHaveAccessories) {
                             sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');//gộp  sản phẩm lại
                         }
                         else {
@@ -562,6 +563,22 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         ishaveProductEntity = true;
 
 
+                    }
+                    if (entities[i].entity === "accessories") {
+                        isHaveAccessories = true;
+                        sessions[sessionId].accessories = entities[i].value.replace('_', ' ');
+                        if (ishaveProductEntity) {
+                            sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');
+                        }
+                        else {
+                            if (sessions[sessionId].product) {//nếu trươc đó đã có sp (trong câu luôn hoặc câu trước)
+                                sessions[sessionId].product += " " + entities[i].value.replace('_', ' ');
+                            }
+                            else {
+                                sessions[sessionId].product = entities[i].value.replace('_', ' ');
+                            }
+
+                        }
                     }
                     if (entities[i].entity === "storage")//bộ nhớ lưu trữ
                     {
@@ -773,9 +790,15 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             // currenturl = "dtdd/oppo-f7";
             ProductAPI.GetProductInfoByURL(sessions, ConstConfig.URLAPI_PRODUCT, finalUrl, sessionId, ishaveProductEntity).then((value) => {
                 if (value) {//nếu có sản phẩm từ URL
-                    sessions[sessionId].product = value.replace("+", " plus ");
 
+                    if (isHaveAccessories) {
+                        sessions[sessionId].product = sessions[sessionId].accessories + " " + value.replace("+", " plus ");
+                    }
+                    else {
+                        sessions[sessionId].product = value.replace("+", " plus ");
+                    }
                 }
+
 
                 console.log("===productNameAfter==", sessions[sessionId].product);
                 console.log("=======intent=====", intent);

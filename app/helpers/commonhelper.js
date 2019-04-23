@@ -1,6 +1,6 @@
 var lstAccessoryKeyword = [
     "ốp", "op lung", "bluetooth", "tai nghe", "tai phone", "pin", "sạc", "sac", "bàn phím", "ban phim", "loa", "thẻ nhớ", "the nho", "usb",
-    "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap"
+    "gậy", "giá đỡ", "gay tu suong", "dán màn hình", "dây cáp", "ong kinh", "kính", "túi", "day cap", "cáp"
 ];
 var lstCommonProduct = [
     "laptop", "iphone", "điện thoại iphone", "iphone đó", "nokia", "huawei", "note", "realme",
