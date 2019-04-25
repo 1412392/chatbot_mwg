@@ -666,7 +666,8 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
 
             //xu ly askstock_tinh thanh
             if ((sessions[sessionId].IsLatestRequireLocation_Province && (isHaveProvince || isHaveDistrict)) ||
-                sessions[sessionId].IsLatestRequireChooseDistrict || sessions[sessionId].isLatestUnknowProduct_AskStock) {
+                sessions[sessionId].IsLatestRequireChooseDistrict
+                || (sessions[sessionId].isLatestUnknowProduct_AskStock && sessions[sessionId].countIsLatestUnknowProduct_AskStock < 2)) {
                 intent = sessions[sessionId].prev_intent;
 
             }

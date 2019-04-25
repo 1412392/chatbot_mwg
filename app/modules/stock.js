@@ -976,10 +976,19 @@ module.exports = {
                 var rn = CommonHelper.randomNumber(unknowproduct.length);
                 resultanswer = unknowproduct[rn];
                 sessions[sessionId].isLatestUnknowProduct_AskStock = true;
-                SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                    .catch(console.error);
+                if (!sessions[sessionId].countIsLatestUnknowProduct_AskStock) {
+                    sessions[sessionId].countIsLatestUnknowProduct_AskStock = 1;
+                }
+                else {
+                    sessions[sessionId].countIsLatestUnknowProduct_AskStock++;
+                }
+                if (sessions[sessionId].countIsLatestUnknowProduct_AskStock === 1) {
+                    SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                        .catch(console.error);
+                }
+
             }
-           
+
         }
         catch (err) {
             logerror.WriteLogToFile(ConstConfig.ERRORFILE_PATH, "Error at stockmodule : " + err);
