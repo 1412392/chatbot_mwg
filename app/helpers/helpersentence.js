@@ -154,7 +154,7 @@ module.exports = {
         if (!messagecontent.includes("nokia") && !messagecontent.includes("inch") &&
             !messagecontent.includes("tr") || messagecontent.includes("a6"))//ví dụ 3.5tr 
         {
-            messagecontent = messagecontent.replace(".", " ");
+            messagecontent = messagecontent.replace(/\./g, " ");//replace dấu .
             messagecontent = messagecontent.replace(",", " ");
         }
 
