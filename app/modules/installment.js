@@ -623,7 +623,7 @@ module.exports = {
                                     };
 
                                     var productCapacity = "";
-                                    if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                    if (productDetail.capacityField && productDetail.capacityField.toLowerCase().includes("gb")) {
                                         productCapacity = productDetail.capacityField;
                                     }
                                     //console.log(result);
@@ -1657,7 +1657,7 @@ module.exports = {
                                 var productDetail = result.GetProductResult;
                                 console.log("============capacityField==================", productDetail.capacityField);
                                 var productCapacity = "";
-                                if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                if (productDetail.capacityField && productDetail.capacityField.toLowerCase().includes("gb")) {
                                     productCapacity = productDetail.capacityField;
                                 }
                                 if (result && result.GetProductResult.productErpPriceBOField) {
@@ -1819,7 +1819,7 @@ module.exports = {
                                     };
 
                                     var productCapacity = "";
-                                    if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                    if (productDetail.capacityField&& productDetail.capacityField.toLowerCase().includes("gb")) {
                                         productCapacity = productDetail.capacityField;
                                     }
                                     //console.log(result);
@@ -2247,7 +2247,7 @@ module.exports = {
                                 var productDetail = result.GetProductResult;
                                 console.log("============capacityField==================", productDetail.capacityField);
                                 var productCapacity = "";
-                                if (productDetail.capacityField.toLowerCase().includes("gb")) {
+                                if (productDetail.capacityField && productDetail.capacityField.toLowerCase().includes("gb")) {
                                     productCapacity = productDetail.capacityField;
                                 }
                                 if (result && result.GetProductResult.productErpPriceBOField) {
