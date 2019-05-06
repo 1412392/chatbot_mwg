@@ -232,6 +232,7 @@ module.exports = {
                                     //==== START find productcode color
                                     ProductAPI.GetProductCodeColorByColorName(ConstConfig.URLAPI_PRODUCT, productID, colorname, function callbackGetProductCodeColorByColorName(result) {
                                         productCode = result.ProductCode;
+                                        console.log("=====productCode====",productCode);
                                         colorname = result.ColorName;
                                         sessions[sessionId].colorProductCode = productCode;
                                         sessions[sessionId].colorname = result.ColorName;

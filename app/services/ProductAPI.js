@@ -285,7 +285,22 @@ module.exports = {
     GetProductCodeColorByColorName: function (url, productID, color, fn) {
 
         if (!color) {
-            fn({ ProductCode: null, ColorName: null });
+            //check nếu sản phẩm chỉ có 1 code bán thì lấy code đó làm default luôn
+            let args = {
+                intProductID: productID
+            };
+            module.exports.APIGetProductColor(url, args, function callback(APIGetProductColorresult) {
+                if (APIGetProductColorresult && APIGetProductColorresult.length === 1) {
+                    fn({
+                        ProductCode: APIGetProductColorresult[0].ProductCode,
+                        ColorName: APIGetProductColorresult[0].ColorName
+                    });
+                }
+                else {
+                    fn({ ProductCode: null, ColorName: null });
+                }
+            });
+
         }
         else {
             soap.createClient(url, function (err, client) {
