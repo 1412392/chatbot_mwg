@@ -419,7 +419,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             //==========================
 
             //xác định entities
-            if (entities == null || entities.length == 0) {
+            if ((entities == null || entities.length == 0) && intent == null) {
                 // sessions[sessionId].product=null;
 
                 if (button_payload_state === 4)//hỏi trả góp ngay lúc đầu
@@ -492,6 +492,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     {
 
                         if (parseInt(button_payload_state) >= 16) {
+                            console.log("===========DCMbutton_payload_state==============", button_payload_state);
                             sessions[sessionId].districtID = button_payload_state;
                             sessions[sessionId].IsLatestRequireChooseDistrict = true;
                         }

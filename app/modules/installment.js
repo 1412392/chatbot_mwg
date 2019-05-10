@@ -21,41 +21,41 @@ var listBriefID = [
 ];
 const getButtonListBrief = (productID, productName, sender, siteid, replyobject, questionTitle) => {
     var jsonmessageFiC =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "CMND + Hộ khẩu",
-                                payload: "BID_1"
-                            },
-                            {
-                                type: "postback",
-                                title: "CMND + Bằng Lái Xe hoặc Hộ khẩu",
-                                payload: "BID_2"
-                            },
-                            {
-                                type: "postback",
-                                title: "CMND + Hộ khẩu + Hóa đơn điện",
-                                payload: "BID_4"
-                            },
-                            {
-                                type: "postback",
-                                title: "CMND + Bằng Lái Xe hoặc Hộ khẩu + Hóa đơn điện",
-                                payload: "BID_6"
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
+    {
+        username: sender,
+        siteid: siteid,
+        messagetype: "template",
+        replyobject: replyobject,
+        messagecontentobject: {
+            elements: [
+                {
+                    title: questionTitle,
+                    buttons: [
+                        {
+                            type: "postback",
+                            title: "CMND + Hộ khẩu",
+                            payload: "BID_1"
+                        },
+                        {
+                            type: "postback",
+                            title: "CMND + Bằng Lái Xe hoặc Hộ khẩu",
+                            payload: "BID_2"
+                        },
+                        {
+                            type: "postback",
+                            title: "CMND + Hộ khẩu + Hóa đơn điện",
+                            payload: "BID_4"
+                        },
+                        {
+                            type: "postback",
+                            title: "CMND + Bằng Lái Xe hoặc Hộ khẩu + Hóa đơn điện",
+                            payload: "BID_6"
+                        }
+                    ]
+                }
+            ]
+        }
+    };
 
     var bodyjson = JSON.stringify(jsonmessageFiC);
     return bodyjson;
@@ -63,26 +63,26 @@ const getButtonListBrief = (productID, productName, sender, siteid, replyobject,
 }
 const getButtonBriefSupport = (sender, siteid, replyobject, questionTitle) => {
     var jsonmessageFiC =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Xem chi tiết hồ sơ yêu cầu",
-                                payload: "BRIEFSUPPORT"
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
+    {
+        username: sender,
+        siteid: siteid,
+        messagetype: "template",
+        replyobject: replyobject,
+        messagecontentobject: {
+            elements: [
+                {
+                    title: questionTitle,
+                    buttons: [
+                        {
+                            type: "postback",
+                            title: "Xem chi tiết hồ sơ yêu cầu",
+                            payload: "BRIEFSUPPORT"
+                        }
+                    ]
+                }
+            ]
+        }
+    };
 
     var bodyjson = JSON.stringify(jsonmessageFiC);
     return bodyjson;
@@ -343,42 +343,42 @@ function IsSystemPromoNotApplyForCompany(productBO, ErpInstallProgramId) {
 
 const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle, productPrice) => {
     var jsonmessageAnother =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            // {
-                            //     type: "postback",
-                            //     title: "Chọn lại công ty tài chính",
-                            //     payload: 10
-                            // },
-                            {
-                                type: "postback",
-                                title: "Xem gói trả góp thường",
-                                payload: 11
-                            },
-                            // {
-                            //     type: "postback",
-                            //     title: "Xem tồn kho",
-                            //     payload: 2
-                            // },
-                            // {
-                            //     type: "postback",
-                            //     title: "Xem khuyễn mãi của sản phẩm",
-                            //     payload: 3
-                            // }
+    {
+        username: sender,
+        siteid: siteid,
+        messagetype: "template",
+        replyobject: replyobject,
+        messagecontentobject: {
+            elements: [
+                {
+                    title: questionTitle,
+                    buttons: [
+                        // {
+                        //     type: "postback",
+                        //     title: "Chọn lại công ty tài chính",
+                        //     payload: 10
+                        // },
+                        {
+                            type: "postback",
+                            title: "Xem gói trả góp thường",
+                            payload: 11
+                        },
+                        // {
+                        //     type: "postback",
+                        //     title: "Xem tồn kho",
+                        //     payload: 2
+                        // },
+                        // {
+                        //     type: "postback",
+                        //     title: "Xem khuyễn mãi của sản phẩm",
+                        //     payload: 3
+                        // }
 
-                        ]
-                    }
-                ]
-            }
-        };
+                    ]
+                }
+            ]
+        }
+    };
     if (productPrice <= 25000000 && productPrice >= 2000000) {
         jsonmessageAnother.messagecontentobject.elements[0].buttons.push({
             type: "postback",
@@ -393,53 +393,53 @@ const AnotherOptionInstalment = (sender, siteid, replyobject, questionTitle, pro
 
 const AnotherOptionNormalInstalment0d = (sender, siteid, replyobject, questionTitle) => {
     var jsonmessageAnother =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Chọn lại số tháng trả góp",
-                                payload: 15
-                            }
+    {
+        username: sender,
+        siteid: siteid,
+        messagetype: "template",
+        replyobject: replyobject,
+        messagecontentobject: {
+            elements: [
+                {
+                    title: questionTitle,
+                    buttons: [
+                        {
+                            type: "postback",
+                            title: "Chọn lại số tháng trả góp",
+                            payload: 15
+                        }
 
-                        ]
-                    }
-                ]
-            }
-        };
+                    ]
+                }
+            ]
+        }
+    };
 
     var bodyjson = JSON.stringify(jsonmessageAnother);
     return bodyjson;
 }
 const getButtonInstalment = (sender, siteid, replyobject, questionTitle, productPrice, is0ptpercent) => {
     var jsonmessageFiC =
-        {
-            username: sender,
-            siteid: siteid,
-            messagetype: "template",
-            replyobject: replyobject,
-            messagecontentobject: {
-                elements: [
-                    {
-                        title: questionTitle,
-                        buttons: [
-                            {
-                                type: "postback",
-                                title: "Xem gói trả trước thường",
-                                payload: "11"
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
+    {
+        username: sender,
+        siteid: siteid,
+        messagetype: "template",
+        replyobject: replyobject,
+        messagecontentobject: {
+            elements: [
+                {
+                    title: questionTitle,
+                    buttons: [
+                        {
+                            type: "postback",
+                            title: "Xem gói trả trước thường",
+                            payload: "11"
+                        }
+                    ]
+                }
+            ]
+        }
+    };
 
     if (is0ptpercent) {
         jsonmessageFiC.messagecontentobject.elements[0].buttons.push({
@@ -521,8 +521,15 @@ module.exports = {
                         sessions[sessionId].prev_intent = intent;
                         return;
                     }
-                    intent = sessions[sessionId].prev_intent ? sessions[sessionId].prev_intent : intent;
-                    console.log("đổi intent", intent);
+                    if (sessions[sessionId].product) {//nếu đã có product trước rồi ,
+                        //=> không đổi intent
+                    }
+                    else {
+                        intent = sessions[sessionId].prev_intent ? sessions[sessionId].prev_intent : intent;
+                        console.log("đổi intent", intent);
+                    }
+
+
                 }
             }
             sessions[sessionId].prev_intent = originIntent;
@@ -1527,32 +1534,32 @@ module.exports = {
                                                                                         "<span style='color:green'>% trả trước là " + sessions[sessionId].percent_instalment + "%</span></br>";
                                                                                     if (parseInt(sessions[sessionId].percent_instalment) === 0) {
                                                                                         var jsonmessageAnother =
-                                                                                            {
-                                                                                                username: sender,
-                                                                                                siteid: siteid,
-                                                                                                messagetype: "template",
-                                                                                                replyobject: replyobject,
-                                                                                                messagecontentobject: {
-                                                                                                    elements: [
-                                                                                                        {
-                                                                                                            title: resultanswer,
-                                                                                                            buttons: [
-                                                                                                                {
-                                                                                                                    type: "postback",
-                                                                                                                    title: "Xem gói trả trước 0đ",
-                                                                                                                    payload: "INSTALMENT_PACKAGE0D"
-                                                                                                                },
-                                                                                                                {
-                                                                                                                    type: "postback",
-                                                                                                                    title: "Xem gói 0% lãi suất",
-                                                                                                                    payload: "INSTALMENT_0PTLS"
-                                                                                                                }
+                                                                                        {
+                                                                                            username: sender,
+                                                                                            siteid: siteid,
+                                                                                            messagetype: "template",
+                                                                                            replyobject: replyobject,
+                                                                                            messagecontentobject: {
+                                                                                                elements: [
+                                                                                                    {
+                                                                                                        title: resultanswer,
+                                                                                                        buttons: [
+                                                                                                            {
+                                                                                                                type: "postback",
+                                                                                                                title: "Xem gói trả trước 0đ",
+                                                                                                                payload: "INSTALMENT_PACKAGE0D"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                type: "postback",
+                                                                                                                title: "Xem gói 0% lãi suất",
+                                                                                                                payload: "INSTALMENT_0PTLS"
+                                                                                                            }
 
-                                                                                                            ]
-                                                                                                        }
-                                                                                                    ]
-                                                                                                }
-                                                                                            };
+                                                                                                        ]
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        };
 
                                                                                         var anotheroptionbutton = JSON.stringify(jsonmessageAnother);
 
@@ -1819,7 +1826,7 @@ module.exports = {
                                     };
 
                                     var productCapacity = "";
-                                    if (productDetail.capacityField&& productDetail.capacityField.toLowerCase().includes("gb")) {
+                                    if (productDetail.capacityField && productDetail.capacityField.toLowerCase().includes("gb")) {
                                         productCapacity = productDetail.capacityField;
                                     }
                                     //console.log(result);
@@ -1887,7 +1894,7 @@ module.exports = {
 
                                                 resultanswer += "<br /><span style='font-style:italic;'>" + sessions[sessionId].gender + " muốn trả góp trong vòng mấy tháng ạ?</span></br>";
                                                 sessions[sessionId].isLatestAskMonth0dInstalment = true;
-                                                
+
                                                 var jsonbuttonMI = getButtonMonthInstalment(productID, productName, sender, siteid, replyobject, resultanswer, sessions[sessionId].InstalmentMonth);
 
                                                 // SentToClient(sender, resultanswer, questionTitle, button_payload_state, "ask_instalment", replyobject, siteid)
