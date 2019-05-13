@@ -187,7 +187,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
             var ishaveProductEntity = false, ishaveMonthInstalment = false,
                 ishavePercentInstalment = false, ishaveProduct = false,
                 ishaveMoneyPrepaidInstalment = false, isAsk0PTInstalment = false,
-                isHaveDistrict = false, isHaveProvince = false, isHaveAccessories = false;
+                isHaveDistrict = false, isHaveProvince = false, isHaveAccessories = false,isHaveColor=false;;
 
 
             //==========================================================
@@ -563,6 +563,9 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                         }
                         ishaveProductEntity = true;
 
+                        //xóa màu cũ đi
+                        sessions[sessionId].colorProductCode = null;
+                        sessions[sessionId].colorname = null;
 
                     }
                     if (entities[i].entity === "accessories") {
@@ -580,6 +583,10 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                             }
 
                         }
+
+                         //xóa màu cũ đi
+                         sessions[sessionId].colorProductCode = null;
+                         sessions[sessionId].colorname = null;
                     }
                     if (entities[i].entity === "storage")//bộ nhớ lưu trữ
                     {
@@ -592,6 +599,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     if (entities[i].entity === "color") {
                         sessions[sessionId].colorProductCode = null;
                         sessions[sessionId].colorname = entities[i].value.replace('_', ' ');
+                        isHaveColor=true;
                     }
                     if (entities[i].entity === "price") {
                         sessions[sessionId].price = entities[i].value.replace('_', ' ');
@@ -864,7 +872,7 @@ const getJsonAndAnalyze = (url, sender, sessionId, button_payload_state, replyob
                     else if (intent === "ask_stock") {
                         sessions[sessionId].isLatestAskNormalInstallment = false;
 
-                        StockModule.StockModule(sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state, productnotfound);
+                        StockModule.StockModule(sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state, productnotfound,isHaveColor);
 
                     }
 

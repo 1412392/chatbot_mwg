@@ -16,7 +16,7 @@ var provincetype = "province";
 var districttype = "district";
 
 module.exports = {
-    StockModule: function (sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state, productnotfound) {
+    StockModule: function (sessions, sessionId, sender, siteid, replyobject, intent, unknowproduct, button_payload_state, productnotfound, isHaveColor) {
         try {
 
             sessions[sessionId].prev_intent = "ask_stock";
@@ -232,503 +232,170 @@ module.exports = {
                                     //==== START find productcode color
                                     ProductAPI.GetProductCodeColorByColorName(ConstConfig.URLAPI_PRODUCT, productID, colorname, function callbackGetProductCodeColorByColorName(result) {
                                         productCode = result.ProductCode;
-                                        console.log("=====productCode====",productCode);
+                                        console.log("=====productCode====", productCode);
+                                        console.log("======result.ColorName=========", result.ColorName);
+
+
                                         colorname = result.ColorName;
                                         sessions[sessionId].colorProductCode = productCode;
                                         sessions[sessionId].colorname = result.ColorName;
 
-                                        if (sessions[sessionId].IsLatestRequireChooseDistrict) {
-
-                                            sessions[sessionId].IsLatestRequireChooseDistrict = false;
-                                            //có provinceID và districtID
-                                            var argsProductStock = "";
-                                            var total = 0;
-
-                                            argsProductStock = {
-                                                productID: parseInt(productID), productCode: productCode, provinceID: provinceID,
-                                                districtID: districtID, pageSize: 300, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                        //nếu có hỏi màu nhưng ko có kết quả thì sản phẩm không có màu này
+                                        if (isHaveColor && !result.ColorName) {
+                                            let args = {
+                                                intProductID: productID
                                             };
-
-                                            ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
-                                                //console.log(argsProductStock);
-                                                // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                // console.log(total);
-                                                //console.log(result);
-                                                if (result.total) {//có hàng
-                                                    resultanswer = "";
-
-                                                    var type = "template";
-
-                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + "<span style='color:red'>" + province + "</span>";
-                                                    var jsonmessageStore = {
-                                                        username: sender,
-                                                        siteid: siteid,
-                                                        messagetype: "template",
-                                                        replyobject: replyobject,
-                                                        messagecontentobject: {
-                                                            elements: [
-                                                                {
-                                                                    title: questionTitle,
-                                                                    buttons: []
-                                                                }
-                                                            ]
-                                                        }
-                                                    };
-                                                    var length = result.GetStoreInStock2016Result.StoreBO.length;
-
-                                                    // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
-                                                    for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
-                                                        var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                        //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                        //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
-
-                                                        jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                            type: "web_url",
-                                                            title: (i + 1) + ". " + storeBO.webAddressField,
-                                                            url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                        });
-                                                    }
-
-                                                    //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                    //    .catch(console.error);
-                                                    // console.log(jsonmessageStore);
-
-                                                    //  var bodystring = JSON.parse(jsonmessageStore);
-                                                    var bodyjson = JSON.stringify(jsonmessageStore);
+                                            ProductAPI.APIGetProductColor(ConstConfig.URLAPI_PRODUCT, args, function callback(APIGetProductColorresult) {
+                                                if (APIGetProductColorresult && APIGetProductColorresult.length > 0) {
+                                                    let listColor = [];
+                                                    APIGetProductColorresult.forEach(element => {
+                                                        listColor.push(element.ColorName);
+                                                    });
+                                                    let stringlistColor = listColor.join(",");
+                                                    resultanswer += "Dạ, sản phẩm này hiện tại chỉ có <span style='color:red'>" + APIGetProductColorresult.length + "</span> màu , là màu " + stringlistColor + " thôi ạ!";
 
 
-                                                    //console.log("===============BUTTON URL STORE===================");
-                                                    //console.log(bodyjson);
-
-
-                                                    SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                        .catch(console.error);
-                                                }
-                                                else {//hết hàng
-                                                    if (colorname) {
-                                                        resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + ", bản màu <span style='font-style:italic'>" + colorname + "</span> đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
-                                                    }
-                                                    else {
-                                                        resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
-                                                    }
                                                     SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                         .catch(console.error);
 
                                                 }
-
-
-                                            });//end APIGetDistrictByProvince
-                                            return;
-                                        }
-
-                                        if (!province && !district) {
-                                            resultanswer += "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Cho em biết tỉnh/thành phố để xem siêu thị còn hàng, ví dụ: Hồ Chí Minh, Phú Yên...";
-
-                                            sessions[sessionId].IsLatestRequireLocation_Province = true;
-                                            SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                .catch(console.error);
-                                            return;
+                                                return;
+                                            });
                                         }
                                         else {
 
-                                            SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                .catch(console.error);
 
-                                            if (province && !district) {//có province, không có district
+                                            if (sessions[sessionId].IsLatestRequireChooseDistrict) {
 
-                                                //lấy provinceID                             
-                                                Elastic.getElasticSearch(locationindex, provincetype, province, function callbackEL(err, result) {
-                                                    if (err) return err;
+                                                sessions[sessionId].IsLatestRequireChooseDistrict = false;
+                                                //có provinceID và districtID
+                                                var argsProductStock = "";
+                                                var total = 0;
+
+                                                argsProductStock = {
+                                                    productID: parseInt(productID), productCode: productCode, provinceID: provinceID,
+                                                    districtID: districtID, pageSize: 300, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                                };
+
+                                                ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
+                                                    //console.log(argsProductStock);
+                                                    // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
+                                                    // console.log(total);
                                                     //console.log(result);
-                                                    if (result.length > 0) {//province được tìm thấy
-                                                        var provinceID = result[0]._source.provinceID;
-                                                        var provinceName = result[0]._source.provinceName;
-                                                        sessions[sessionId].province = provinceName;
-                                                        sessions[sessionId].provinveID = provinceID;
+                                                    if (result.total) {//có hàng
+                                                        resultanswer = "";
 
-                                                        //console.log(provinceID);
+                                                        var type = "template";
 
-                                                        //lấy danh sách siêu thị còn hàng
-                                                        var total = 0;
-                                                        var argsProductStock = "";
-                                                        argsProductStock = {
-                                                            productID: parseInt(productID), productCode: productCode, provinceID: provinceID,
-                                                            districtID: 0, pageSize: 300, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                                        questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + "<span style='color:red'>" + province + "</span>";
+                                                        var jsonmessageStore = {
+                                                            username: sender,
+                                                            siteid: siteid,
+                                                            messagetype: "template",
+                                                            replyobject: replyobject,
+                                                            messagecontentobject: {
+                                                                elements: [
+                                                                    {
+                                                                        title: questionTitle,
+                                                                        buttons: []
+                                                                    }
+                                                                ]
+                                                            }
                                                         };
+                                                        var length = result.GetStoreInStock2016Result.StoreBO.length;
+
+                                                        // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
+                                                        for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
+                                                            var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
+                                                            //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
+                                                            //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
+
+                                                            jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+                                                                type: "web_url",
+                                                                title: (i + 1) + ". " + storeBO.webAddressField,
+                                                                url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+                                                            });
+                                                        }
+
+                                                        //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                        //    .catch(console.error);
+                                                        // console.log(jsonmessageStore);
+
+                                                        //  var bodystring = JSON.parse(jsonmessageStore);
+                                                        var bodyjson = JSON.stringify(jsonmessageStore);
 
 
-                                                        ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
-                                                            //console.log(argsProductStock);
-                                                            // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                            // console.log(total);
-                                                            //console.log(result);
-                                                            if (result.total) {//có hàng
-                                                                resultanswer = "";
-
-                                                                var type = "template";
-
-                                                                questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + "<span style='color:red'>" + provinceName + "</span>";
-                                                                var jsonmessageStore = {
-                                                                    username: sender,
-                                                                    siteid: siteid,
-                                                                    messagetype: "template",
-                                                                    replyobject: replyobject,
-                                                                    messagecontentobject: {
-                                                                        elements: [
-                                                                            {
-                                                                                title: questionTitle,
-                                                                                buttons: []
-                                                                            }
-                                                                        ]
-                                                                    }
-                                                                };
-                                                                var length = result.GetStoreInStock2016Result.StoreBO.length;
-
-                                                                // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
-                                                                for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
-                                                                    var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                                    //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                                    //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
-
-                                                                    jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                                        type: "web_url",
-                                                                        title: (i + 1) + ". " + storeBO.webAddressField,
-                                                                        url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                                    });
-                                                                }
-
-                                                                //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                //    .catch(console.error);
-                                                                // console.log(jsonmessageStore);
-
-                                                                //  var bodystring = JSON.parse(jsonmessageStore);
-                                                                var bodyjson = JSON.stringify(jsonmessageStore);
+                                                        //console.log("===============BUTTON URL STORE===================");
+                                                        //console.log(bodyjson);
 
 
-                                                                //console.log("===============BUTTON URL STORE===================");
-                                                                //console.log(bodyjson);
-
-
-                                                                SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                                    .catch(console.error);
-
-
-                                                                //===========================================================================================
-
-
-                                                                //lấy danh sách huyện của tỉnh đó (còn hang)
-
-                                                                var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-
-                                                                SendMessage.SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
-
-
-                                                            }
-                                                            else {//hết hàng
-
-                                                                if (colorname) {
-                                                                    resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + ", bản màu <span style='font-style:italic'>" + colorname + "</span> đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
-                                                                }
-                                                                else {
-                                                                    resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
-                                                                }
-                                                                SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                    .catch(console.error);
-
-                                                            }
-
-                                                        });//end APIGetDistrictByProvince
-
+                                                        SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
+                                                            .catch(console.error);
                                                     }
-                                                    else {
-
-                                                        sessions[sessionId].province = null;
-                                                        sessions[sessionId].IsLatestRequireLocation_Province = true;
-
-                                                        SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                    else {//hết hàng
+                                                        if (colorname) {
+                                                            resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + ", bản màu <span style='font-style:italic'>" + colorname + "</span> đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
+                                                        }
+                                                        else {
+                                                            resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
+                                                        }
+                                                        SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
                                                             .catch(console.error);
 
                                                     }
 
-                                                });//end elastic
 
-
-
+                                                });//end APIGetDistrictByProvince
+                                                return;
                                             }
-                                            else if (province && district) {
 
-                                                console.log('+++' + province + "-" + district);
-                                                //lấy danh sách cửa hàng còn hàng ở tỉnh, huyện  đó không theo màu
+                                            if (!province && !district) {
+                                                resultanswer += "<br />" + sessions[sessionId].gender + "  đang ở Tỉnh/Thành phố nào ạ? Cho em biết tỉnh/thành phố để xem siêu thị còn hàng, ví dụ: Hồ Chí Minh, Phú Yên...";
 
-                                                //xác định provinceID
-                                                //lấy provinceID                             
-                                                Elastic.getElasticSearch(locationindex, provincetype, province, function callbackEL(err, result) {
-                                                    if (err) return err;
-                                                    //console.log(result);
-                                                    if (result.length != 0) {//province được tìm thấy
-                                                        var provinceID = result[0]._source.provinceID;
-                                                        var provinceName = result[0]._source.provinceName;
-                                                        sessions[sessionId].province = provinceName;
-                                                        sessions[sessionId].provinveID = provinceID;
-                                                        //tìm huyện theo tỉnh trước
-                                                        Elastic.getElasticSearchDistrictAndProvince(locationindex, districttype, district, sessions[sessionId].provinveID, function callbackEL(err, result) {
-                                                            if (err) return err;
-                                                            if (result.length > 0) {
-                                                                console.log(result);
-                                                                if (result.length == 1)//đã xác định đúng chính xác huyện và tỉnh đó
-                                                                {
-                                                                    var provinceID = result[0]._source.provinceID;
-                                                                    var districtID = result[0]._source.districtID;
+                                                sessions[sessionId].IsLatestRequireLocation_Province = true;
+                                                SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                    .catch(console.error);
+                                                return;
+                                            }
+                                            else {
 
-                                                                    var districtName = result[0]._source.districtName;
-                                                                    var provinceName = sessions[sessionId].province;
+                                                SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                    .catch(console.error);
 
-                                                                    sessions[sessionId].districtID = districtID;
+                                                if (province && !district) {//có province, không có district
 
-                                                                    //console.log(provinceID);
-
-                                                                    //lấy danh sách siêu thị còn hàng
-                                                                    var total = 0;
-                                                                    var argsProductStock = "";
-
-                                                                    argsProductStock = {
-                                                                        productID: parseInt(productID), productCode: productCode, provinceID: parseInt(provinceID),
-                                                                        districtID: parseInt(districtID), pageSize: 20, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
-                                                                    };
-
-                                                                    ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
-                                                                        //console.log(argsProductStock);
-                                                                        //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
-
-                                                                        // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                                        console.log(result);
-                                                                        if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
-
-                                                                            // console.log(total);
-                                                                            resultanswer = "";
-
-                                                                            if (colorname) {
-                                                                                //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
-                                                                                questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
-                                                                            }
-                                                                            else {
-                                                                                //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
-                                                                                questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName + "," + provinceName;
-                                                                            }
-
-                                                                            var type = "template";
-
-
-                                                                            var jsonmessageStore = {
-                                                                                username: sender,
-                                                                                siteid: siteid,
-                                                                                messagetype: "template",
-                                                                                replyobject: replyobject,
-                                                                                messagecontentobject: {
-                                                                                    elements: [
-                                                                                        {
-                                                                                            title: questionTitle,
-                                                                                            buttons: []
-                                                                                        }
-                                                                                    ]
-                                                                                }
-                                                                            };
-
-                                                                            var length = result.GetStoreInStock2016Result.StoreBO.length;
-
-                                                                            for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
-                                                                                var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                                                if (storeBO.webAddressField && storeBO.webAddressField != "undefined") {
-                                                                                    // resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                                                    // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
-
-
-                                                                                    jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                                                        type: "web_url",
-                                                                                        title: (i + 1) + ". " + storeBO.webAddressField,
-                                                                                        url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                                                    });
-
-                                                                                }
-
-                                                                            }
-                                                                            //  var bodystring = JSON.parse(jsonmessageStore);
-                                                                            var bodyjson = JSON.stringify(jsonmessageStore);
-
-
-                                                                            //console.log("===============BUTTON URL STORE===================");
-                                                                            //console.log(bodyjson);
-
-
-
-                                                                            SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                                                .catch(console.error);
-
-                                                                            // if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
-                                                                            //     resultanswer = "";
-                                                                            //     setTimeout(() => {
-                                                                            //         SendMessage.SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                            //             .catch(console.error);
-                                                                            //     }, 1500);
-
-                                                                            // }
-                                                                            // else {
-                                                                            //     resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
-                                                                            //     SendMessage.SendToUserListColor(sessions, sessionId, sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
-                                                                            //     return;
-                                                                            // }
-
-                                                                        }//end if(result)
-                                                                        else {
-                                                                            //sessions[sessionId].province = null;
-                                                                            //sessions[sessionId].district = null;
-
-                                                                            // if (colorname) {
-                                                                            //     resultanswer = "Rất tiếc. Sản phẩm này, bản màu " + color.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " !"
-                                                                            //     //đưa ra ôption
-                                                                            //     SendMessage.SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                            //         .catch(console.error);
-
-                                                                            //     resultanswer = "";
-                                                                            // }
-                                                                            // else {
-                                                                            resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
-
-                                                                            //suggest khu vực
-                                                                            var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-                                                                            //=======================================================================
-                                                                            SendMessage.SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
-                                                                            //=======================================================================
-                                                                            // }
-
-                                                                        }
-
-                                                                        SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                            .catch(console.error);
-
-                                                                    });//end APICheckInStock
-                                                                }
-                                                                else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (6 kết quả tối đa)
-
-                                                                    resultanswer = "";
-                                                                    resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
-
-
-                                                                    var type = "template";
-                                                                    questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
-                                                                    var jsonmessageDistrict = {
-                                                                        username: sender,
-                                                                        siteid: siteid,
-                                                                        messagetype: "template",
-                                                                        replyobject: replyobject,
-                                                                        messagecontentobject: {
-                                                                            elements: [
-                                                                                {
-                                                                                    title: questionTitle,
-                                                                                    buttons: []
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                    };
-
-                                                                    for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                                                        if (i > 5) break;
-                                                                        var resultEach = result[i]._source;
-                                                                        jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                                                                            type: "postback",
-                                                                            title: resultEach.districtName,
-                                                                            payload: resultEach.districtID
-                                                                        });
-
-                                                                    }
-
-                                                                    var bodyjson = JSON.stringify(jsonmessageDistrict);
-
-                                                                    //console.log(bodyjson);
-                                                                    SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
-                                                                        .catch(console.error);
-                                                                }
-
-                                                            }
-                                                            else {
-                                                                sessions[sessionId].province = null;
-                                                                sessions[sessionId].district = null;
-
-                                                                sessions[sessionId].IsLatestRequireLocation_Province = true;
-
-                                                                SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                    .catch(console.error);
-                                                            }
-
-                                                        });//end getElasticSearchDistrictAndProvince
-
-                                                    }
-                                                    else {//khong tim thấy province
-
-                                                        sessions[sessionId].province = null;
-                                                        sessions[sessionId].district = null;
-
-
-                                                        sessions[sessionId].IsLatestRequireLocation_Province = true;
-
-                                                        SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                            .catch(console.error);
-                                                    }
-                                                });
-
-                                            }//end if(product && province)
-                                            else if (!province && district)//khong có tỉnh, chỉ có huyện/quận
-                                            {
-
-                                                //search theo district
-                                                Elastic.getElasticSearch(locationindex, districttype, district, function callbackEL(err, result) {
-                                                    if (err) return err;
-                                                    if (result.length > 0) {
-                                                        if (result.length == 1)//đã xác định đúng chính xác huyện đó
-                                                        {
+                                                    //lấy provinceID                             
+                                                    Elastic.getElasticSearch(locationindex, provincetype, province, function callbackEL(err, result) {
+                                                        if (err) return err;
+                                                        //console.log(result);
+                                                        if (result.length > 0) {//province được tìm thấy
                                                             var provinceID = result[0]._source.provinceID;
-                                                            var districtID = result[0]._source.districtID;
-
-                                                            var districtName = result[0]._source.districtName;
-                                                            var provinceName = sessions[sessionId].province;
-
-                                                            sessions[sessionId].districtID = districtID;
+                                                            var provinceName = result[0]._source.provinceName;
+                                                            sessions[sessionId].province = provinceName;
+                                                            sessions[sessionId].provinveID = provinceID;
 
                                                             //console.log(provinceID);
 
                                                             //lấy danh sách siêu thị còn hàng
                                                             var total = 0;
                                                             var argsProductStock = "";
-
                                                             argsProductStock = {
-                                                                productID: parseInt(productID), productCode: productCode, provinceID: parseInt(provinceID),
-                                                                districtID: parseInt(districtID), pageSize: 20, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                                                productID: parseInt(productID), productCode: productCode, provinceID: provinceID,
+                                                                districtID: 0, pageSize: 300, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
                                                             };
 
 
                                                             ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
                                                                 //console.log(argsProductStock);
-                                                                //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
-
                                                                 // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
-                                                                console.log(result);
-                                                                if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
-
-                                                                    // console.log(total);
+                                                                // console.log(total);
+                                                                //console.log(result);
+                                                                if (result.total) {//có hàng
                                                                     resultanswer = "";
-
-                                                                    if (colorname) {
-                                                                        //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
-                                                                        questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
-                                                                    }
-                                                                    else {
-                                                                        //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
-                                                                        questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName;
-                                                                    }
 
                                                                     var type = "template";
 
-
+                                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + "<span style='color:red'>" + provinceName + "</span>";
                                                                     var jsonmessageStore = {
                                                                         username: sender,
                                                                         siteid: siteid,
@@ -743,25 +410,25 @@ module.exports = {
                                                                             ]
                                                                         }
                                                                     };
-
                                                                     var length = result.GetStoreInStock2016Result.StoreBO.length;
 
+                                                                    // resultanswer += "<br />Danh sách siêu thị có hàng tại " + provinceName + "<br />";
                                                                     for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
                                                                         var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
-                                                                        if (storeBO.webAddressField && storeBO.webAddressField.toLowerCase() != "undefined") {
-                                                                            // resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
-                                                                            // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
+                                                                        //resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
+                                                                        //resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
 
-
-                                                                            jsonmessageStore.messagecontentobject.elements[0].buttons.push({
-                                                                                type: "web_url",
-                                                                                title: (i + 1) + ". " + storeBO.webAddressField,
-                                                                                url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
-                                                                            });
-
-                                                                        }
-
+                                                                        jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+                                                                            type: "web_url",
+                                                                            title: (i + 1) + ". " + storeBO.webAddressField,
+                                                                            url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+                                                                        });
                                                                     }
+
+                                                                    //SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                    //    .catch(console.error);
+                                                                    // console.log(jsonmessageStore);
+
                                                                     //  var bodystring = JSON.parse(jsonmessageStore);
                                                                     var bodyjson = JSON.stringify(jsonmessageStore);
 
@@ -770,114 +437,476 @@ module.exports = {
                                                                     //console.log(bodyjson);
 
 
-
                                                                     SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
                                                                         .catch(console.error);
 
-                                                                    // if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
-                                                                    //     resultanswer = "";
-                                                                    //     setTimeout(() => {
-                                                                    //         SendMessage.SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                    //             .catch(console.error);
-                                                                    //     }, 1500);
 
-                                                                    // }
-                                                                    // else {
-                                                                    //     resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
-                                                                    //     SendMessage.SendToUserListColor(sessions, sessionId, sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
-                                                                    //     return;
-                                                                    // }
+                                                                    //===========================================================================================
 
-                                                                }//end if(result)
-                                                                else {
-                                                                    //sessions[sessionId].province = null;
-                                                                    //sessions[sessionId].district = null;
 
-                                                                    // if (colorname) {
-                                                                    //     resultanswer = "Rất tiếc. Sản phẩm này, bản màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " ! Vui lòng chọn màu khác ạ."
+                                                                    //lấy danh sách huyện của tỉnh đó (còn hang)
 
-                                                                    //     //đưa ra ôption
-
-                                                                    //     SendMessage.SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
-                                                                    //         .catch(console.error);
-
-                                                                    //     resultanswer = "";
-
-                                                                    // }
-                                                                    //else {
-                                                                    resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
-
-                                                                    //suggest khu vực
                                                                     var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
-                                                                    //=======================================================================
+
                                                                     SendMessage.SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
-                                                                    //=======================================================================
-                                                                    //}
+
+
+                                                                }
+                                                                else {//hết hàng
+
+                                                                    if (colorname) {
+                                                                        resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + ", bản màu <span style='font-style:italic'>" + colorname + "</span> đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
+                                                                    }
+                                                                    else {
+                                                                        resultanswer = "Dạ xin lỗi. Sản phẩm " + productName + " đã <span style='color:red'>HẾT HÀNG </span> tại khu vực " + province + " của " + sessions[sessionId].gender + ". " + sessions[sessionId].gender + " vui lòng chọn lại khu vực lân cận ạ";
+                                                                    }
+                                                                    SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                        .catch(console.error);
 
                                                                 }
 
-                                                                SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                                    .catch(console.error);
+                                                            });//end APIGetDistrictByProvince
 
-                                                            });//end APICheckInStock
                                                         }
-                                                        else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (6 kết quả tối đa)
+                                                        else {
 
-                                                            resultanswer = "";
-                                                            resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
+                                                            sessions[sessionId].province = null;
+                                                            sessions[sessionId].IsLatestRequireLocation_Province = true;
+
+                                                            SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                .catch(console.error);
+
+                                                        }
+
+                                                    });//end elastic
 
 
-                                                            var type = "template";
-                                                            questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
-                                                            var jsonmessageDistrict = {
-                                                                username: sender,
-                                                                siteid: siteid,
-                                                                messagetype: "template",
-                                                                replyobject: replyobject,
-                                                                messagecontentobject: {
-                                                                    elements: [
-                                                                        {
-                                                                            title: questionTitle,
-                                                                            buttons: []
+
+                                                }
+                                                else if (province && district) {
+
+                                                    console.log('+++' + province + "-" + district);
+                                                    //lấy danh sách cửa hàng còn hàng ở tỉnh, huyện  đó không theo màu
+
+                                                    //xác định provinceID
+                                                    //lấy provinceID                             
+                                                    Elastic.getElasticSearch(locationindex, provincetype, province, function callbackEL(err, result) {
+                                                        if (err) return err;
+                                                        //console.log(result);
+                                                        if (result.length != 0) {//province được tìm thấy
+                                                            var provinceID = result[0]._source.provinceID;
+                                                            var provinceName = result[0]._source.provinceName;
+                                                            sessions[sessionId].province = provinceName;
+                                                            sessions[sessionId].provinveID = provinceID;
+                                                            //tìm huyện theo tỉnh trước
+                                                            Elastic.getElasticSearchDistrictAndProvince(locationindex, districttype, district, sessions[sessionId].provinveID, function callbackEL(err, result) {
+                                                                if (err) return err;
+                                                                if (result.length > 0) {
+                                                                    console.log(result);
+                                                                    if (result.length == 1)//đã xác định đúng chính xác huyện và tỉnh đó
+                                                                    {
+                                                                        var provinceID = result[0]._source.provinceID;
+                                                                        var districtID = result[0]._source.districtID;
+
+                                                                        var districtName = result[0]._source.districtName;
+                                                                        var provinceName = sessions[sessionId].province;
+
+                                                                        sessions[sessionId].districtID = districtID;
+
+                                                                        //console.log(provinceID);
+
+                                                                        //lấy danh sách siêu thị còn hàng
+                                                                        var total = 0;
+                                                                        var argsProductStock = "";
+
+                                                                        argsProductStock = {
+                                                                            productID: parseInt(productID), productCode: productCode, provinceID: parseInt(provinceID),
+                                                                            districtID: parseInt(districtID), pageSize: 20, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                                                        };
+
+                                                                        ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
+                                                                            //console.log(argsProductStock);
+                                                                            //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
+
+                                                                            // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
+                                                                            console.log(result);
+                                                                            if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
+
+                                                                                // console.log(total);
+                                                                                resultanswer = "";
+
+                                                                                if (colorname) {
+                                                                                    //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
+                                                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
+                                                                                }
+                                                                                else {
+                                                                                    //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
+                                                                                    questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName + "," + provinceName;
+                                                                                }
+
+                                                                                var type = "template";
+
+
+                                                                                var jsonmessageStore = {
+                                                                                    username: sender,
+                                                                                    siteid: siteid,
+                                                                                    messagetype: "template",
+                                                                                    replyobject: replyobject,
+                                                                                    messagecontentobject: {
+                                                                                        elements: [
+                                                                                            {
+                                                                                                title: questionTitle,
+                                                                                                buttons: []
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                };
+
+                                                                                var length = result.GetStoreInStock2016Result.StoreBO.length;
+
+                                                                                for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
+                                                                                    var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
+                                                                                    if (storeBO.webAddressField && storeBO.webAddressField != "undefined") {
+                                                                                        // resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
+                                                                                        // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
+
+
+                                                                                        jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+                                                                                            type: "web_url",
+                                                                                            title: (i + 1) + ". " + storeBO.webAddressField,
+                                                                                            url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+                                                                                        });
+
+                                                                                    }
+
+                                                                                }
+                                                                                //  var bodystring = JSON.parse(jsonmessageStore);
+                                                                                var bodyjson = JSON.stringify(jsonmessageStore);
+
+
+                                                                                //console.log("===============BUTTON URL STORE===================");
+                                                                                //console.log(bodyjson);
+
+
+
+                                                                                SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
+                                                                                    .catch(console.error);
+
+                                                                                // if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
+                                                                                //     resultanswer = "";
+                                                                                //     setTimeout(() => {
+                                                                                //         SendMessage.SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
+                                                                                //             .catch(console.error);
+                                                                                //     }, 1500);
+
+                                                                                // }
+                                                                                // else {
+                                                                                //     resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
+                                                                                //     SendMessage.SendToUserListColor(sessions, sessionId, sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
+                                                                                //     return;
+                                                                                // }
+
+                                                                            }//end if(result)
+                                                                            else {
+                                                                                //sessions[sessionId].province = null;
+                                                                                //sessions[sessionId].district = null;
+
+                                                                                // if (colorname) {
+                                                                                //     resultanswer = "Rất tiếc. Sản phẩm này, bản màu " + color.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " !"
+                                                                                //     //đưa ra ôption
+                                                                                //     SendMessage.SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
+                                                                                //         .catch(console.error);
+
+                                                                                //     resultanswer = "";
+                                                                                // }
+                                                                                // else {
+                                                                                resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
+
+                                                                                //suggest khu vực
+                                                                                var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
+                                                                                //=======================================================================
+                                                                                SendMessage.SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
+                                                                                //=======================================================================
+                                                                                // }
+
+                                                                            }
+
+                                                                            SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                                .catch(console.error);
+
+                                                                        });//end APICheckInStock
+                                                                    }
+                                                                    else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (6 kết quả tối đa)
+
+                                                                        resultanswer = "";
+                                                                        resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
+
+
+                                                                        var type = "template";
+                                                                        questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
+                                                                        var jsonmessageDistrict = {
+                                                                            username: sender,
+                                                                            siteid: siteid,
+                                                                            messagetype: "template",
+                                                                            replyobject: replyobject,
+                                                                            messagecontentobject: {
+                                                                                elements: [
+                                                                                    {
+                                                                                        title: questionTitle,
+                                                                                        buttons: []
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        };
+
+                                                                        for (var i = 0; i < result.length; i++) {//lấy tối đa 6
+                                                                            if (i > 5) break;
+                                                                            var resultEach = result[i]._source;
+                                                                            jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+                                                                                type: "postback",
+                                                                                title: resultEach.districtName,
+                                                                                payload: resultEach.districtID
+                                                                            });
+
                                                                         }
-                                                                    ]
+
+                                                                        var bodyjson = JSON.stringify(jsonmessageDistrict);
+
+                                                                        //console.log(bodyjson);
+                                                                        SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
+                                                                            .catch(console.error);
+                                                                    }
+
                                                                 }
-                                                            };
+                                                                else {
+                                                                    sessions[sessionId].province = null;
+                                                                    sessions[sessionId].district = null;
 
-                                                            for (var i = 0; i < result.length; i++) {//lấy tối đa 6
-                                                                if (i > 5) break;
-                                                                var resultEach = result[i]._source;
-                                                                jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
-                                                                    type: "postback",
-                                                                    title: resultEach.districtName,
-                                                                    payload: resultEach.districtID
-                                                                });
+                                                                    sessions[sessionId].IsLatestRequireLocation_Province = true;
 
+                                                                    SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                        .catch(console.error);
+                                                                }
+
+                                                            });//end getElasticSearchDistrictAndProvince
+
+                                                        }
+                                                        else {//khong tim thấy province
+
+                                                            sessions[sessionId].province = null;
+                                                            sessions[sessionId].district = null;
+
+
+                                                            sessions[sessionId].IsLatestRequireLocation_Province = true;
+
+                                                            SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                .catch(console.error);
+                                                        }
+                                                    });
+
+                                                }//end if(product && province)
+                                                else if (!province && district)//khong có tỉnh, chỉ có huyện/quận
+                                                {
+
+                                                    //search theo district
+                                                    Elastic.getElasticSearch(locationindex, districttype, district, function callbackEL(err, result) {
+                                                        if (err) return err;
+                                                        if (result.length > 0) {
+                                                            if (result.length == 1)//đã xác định đúng chính xác huyện đó
+                                                            {
+                                                                var provinceID = result[0]._source.provinceID;
+                                                                var districtID = result[0]._source.districtID;
+
+                                                                var districtName = result[0]._source.districtName;
+                                                                var provinceName = sessions[sessionId].province;
+
+                                                                sessions[sessionId].districtID = districtID;
+
+                                                                //console.log(provinceID);
+
+                                                                //lấy danh sách siêu thị còn hàng
+                                                                var total = 0;
+                                                                var argsProductStock = "";
+
+                                                                argsProductStock = {
+                                                                    productID: parseInt(productID), productCode: productCode, provinceID: parseInt(provinceID),
+                                                                    districtID: parseInt(districtID), pageSize: 20, pageIndex: ConstConfig.DEFAULT_PAGEINDEX, total
+                                                                };
+
+
+                                                                ProductAPI.APICheckInStock(ConstConfig.URLAPI_CATEGORY, argsProductStock, function getResult(result) {
+                                                                    //console.log(argsProductStock);
+                                                                    //console.log("Tham số truyền vào Check Stock:<br />" + JSON.parse(argsProductStock));
+
+                                                                    // console.log(result.GetStoreInStock2016Result.StoreBO[1]);
+                                                                    console.log(result);
+                                                                    if (result.total > 0 && result.GetStoreInStock2016Result.StoreBO.length > 0 && result.GetStoreInStock2016Result.StoreBO[0].webAddressField != "undefined") {//có hàng
+
+                                                                        // console.log(total);
+                                                                        resultanswer = "";
+
+                                                                        if (colorname) {
+                                                                            //resultanswer += "<br />Danh sách siêu thị có sản phẩm màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName + "<br />";
+                                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> màu " + sessions[sessionId].colorname.toUpperCase() + " tại " + districtName + "," + provinceName;
+                                                                        }
+                                                                        else {
+                                                                            //resultanswer += "<br />Danh sách siêu thị có sản phẩm có hàng tại " + districtName + "," + provinceName + "<br />";
+                                                                            questionTitle = "Danh sách siêu thị <span style='color:green'>CÒN HÀNG</span> tại " + districtName;
+                                                                        }
+
+                                                                        var type = "template";
+
+
+                                                                        var jsonmessageStore = {
+                                                                            username: sender,
+                                                                            siteid: siteid,
+                                                                            messagetype: "template",
+                                                                            replyobject: replyobject,
+                                                                            messagecontentobject: {
+                                                                                elements: [
+                                                                                    {
+                                                                                        title: questionTitle,
+                                                                                        buttons: []
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        };
+
+                                                                        var length = result.GetStoreInStock2016Result.StoreBO.length;
+
+                                                                        for (var i = 0; i < result.GetStoreInStock2016Result.StoreBO.length; i++) {
+                                                                            var storeBO = result.GetStoreInStock2016Result.StoreBO[i];
+                                                                            if (storeBO.webAddressField && storeBO.webAddressField.toLowerCase() != "undefined") {
+                                                                                // resultanswer += (i + 1) + ". " + storeBO.webAddressField + "<br />";
+                                                                                // resultanswer += " https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField + "<br />";
+
+
+                                                                                jsonmessageStore.messagecontentobject.elements[0].buttons.push({
+                                                                                    type: "web_url",
+                                                                                    title: (i + 1) + ". " + storeBO.webAddressField,
+                                                                                    url: "https://www.thegioididong.com/sieu-thi-so-" + storeBO.storeIDField
+                                                                                });
+
+                                                                            }
+
+                                                                        }
+                                                                        //  var bodystring = JSON.parse(jsonmessageStore);
+                                                                        var bodyjson = JSON.stringify(jsonmessageStore);
+
+
+                                                                        //console.log("===============BUTTON URL STORE===================");
+                                                                        //console.log(bodyjson);
+
+
+
+                                                                        SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
+                                                                            .catch(console.error);
+
+                                                                        // if (sessions[sessionId].isPreAskColor) {//nếu câu trước đã answer color rồi thì không đưa lại ds color nữa
+                                                                        //     resultanswer = "";
+                                                                        //     setTimeout(() => {
+                                                                        //         SendMessage.SentToClient(sender, resultanswer, "Lựa chọn", 0, "option_whenoutcolorstock", replyobject, siteid)
+                                                                        //             .catch(console.error);
+                                                                        //     }, 1500);
+
+                                                                        // }
+                                                                        // else {
+                                                                        //     resultanswer += "Vui lòng chọn màu sắc " + sessions[sessionId].gender + "  quan tâm để xem danh sách cửa hàng còn hàng!";
+                                                                        //     SendMessage.SendToUserListColor(sessions, sessionId, sessions[sessionId].productID, sessions[sessionId].product, sender, siteid, replyobject, questionTitle, intent);
+                                                                        //     return;
+                                                                        // }
+
+                                                                    }//end if(result)
+                                                                    else {
+                                                                        //sessions[sessionId].province = null;
+                                                                        //sessions[sessionId].district = null;
+
+                                                                        // if (colorname) {
+                                                                        //     resultanswer = "Rất tiếc. Sản phẩm này, bản màu " + sessions[sessionId].colorname.toUpperCase() + " đã <span style='color:red'>HẾT HÀNG</span> tại khu vực của " + sessions[sessionId].gender + " ! Vui lòng chọn màu khác ạ."
+
+                                                                        //     //đưa ra ôption
+
+                                                                        //     SendMessage.SentToClient(sender, resultanswer, questionTitle, 0, "option_whenoutcolorstock", replyobject, siteid)
+                                                                        //         .catch(console.error);
+
+                                                                        //     resultanswer = "";
+
+                                                                        // }
+                                                                        //else {
+                                                                        resultanswer = "Rất tiếc. Sản phẩm đã <span style='color:red;font-weight:bold'>HẾT HÀNG</span> tại khu vực " + districtName + " của " + sessions[sessionId].gender + " ! Vui lòng chọn lại khu vực lân cận.";
+
+                                                                        //suggest khu vực
+                                                                        var argsDistrictByProvince = { intProvinceID: parseInt(provinceID) };
+                                                                        //=======================================================================
+                                                                        SendMessage.SendToUserListDistrict(sessions[sessionId].productID, provinceID, sender, siteid, replyobject, questionTitle, intent);
+                                                                        //=======================================================================
+                                                                        //}
+
+                                                                    }
+
+                                                                    SendMessage.SentToClient(sender, resultanswer, questionTitle, button_payload_state, intent, replyobject, siteid)
+                                                                        .catch(console.error);
+
+                                                                });//end APICheckInStock
+                                                            }
+                                                            else {//nếu ra quá nhiều thì suggest ra quận huyện nào thành phố đó (6 kết quả tối đa)
+
+                                                                resultanswer = "";
+                                                                resultanswer += "Ý " + sessions[sessionId].gender + "  LÀ GÌ ?<br /> ";
+
+
+                                                                var type = "template";
+                                                                questionTitle = "Ý " + sessions[sessionId].gender + "  có phải là ?";
+                                                                var jsonmessageDistrict = {
+                                                                    username: sender,
+                                                                    siteid: siteid,
+                                                                    messagetype: "template",
+                                                                    replyobject: replyobject,
+                                                                    messagecontentobject: {
+                                                                        elements: [
+                                                                            {
+                                                                                title: questionTitle,
+                                                                                buttons: []
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                };
+
+                                                                for (var i = 0; i < result.length; i++) {//lấy tối đa 6
+                                                                    if (i > 5) break;
+                                                                    var resultEach = result[i]._source;
+                                                                    jsonmessageDistrict.messagecontentobject.elements[0].buttons.push({
+                                                                        type: "postback",
+                                                                        title: resultEach.districtName,
+                                                                        payload: resultEach.districtID
+                                                                    });
+
+                                                                }
+
+                                                                var bodyjson = JSON.stringify(jsonmessageDistrict);
+
+                                                                //console.log(bodyjson);
+                                                                SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
+                                                                    .catch(console.error);
                                                             }
 
-                                                            var bodyjson = JSON.stringify(jsonmessageDistrict);
+                                                        }
+                                                        else {
+                                                            sessions[sessionId].province = null;
+                                                            sessions[sessionId].district = null;
 
-                                                            //console.log(bodyjson);
-                                                            SendMessage.SentToClientButton(sender, bodyjson, intent, replyobject)
+                                                            sessions[sessionId].IsLatestRequireLocation_Province = true;
+
+                                                            SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
                                                                 .catch(console.error);
                                                         }
 
-                                                    }
-                                                    else {
-                                                        sessions[sessionId].province = null;
-                                                        sessions[sessionId].district = null;
-
-                                                        sessions[sessionId].IsLatestRequireLocation_Province = true;
-
-                                                        SendMessage.SentToClient(sender, "Dạ " + sessions[sessionId].gender + " có thể cung cấp rõ hơn tỉnh/thành, quận/huyện đang ở không ạ?  Ví dụ: hồ chí minh, quận 10 hồ chí minh...", questionTitle, button_payload_state, intent, replyobject, siteid)
-                                                            .catch(console.error);
-                                                    }
 
 
 
+                                                    });
 
-                                                });
-
+                                                }
                                             }
                                         }
 
